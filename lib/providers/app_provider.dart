@@ -1,0 +1,210 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
+
+import 'package:passtateless/scripts/file_manager.dart' as file_manager;
+import 'package:passtateless/scripts/uni_password_generator.dart';
+
+class AppProvider extends ChangeNotifier {
+  // ————UI相关状态————
+  // 页面索引
+  int _currentIndex = 0;
+  int get currentIndex => _currentIndex;
+  set currentIndex(int index) {
+    _currentIndex = index;
+    notifyListeners();
+  }
+
+  // 页面标题
+  final List<String> pageTitles = ['生成密码', 'V2生成器', '矫正规则', '帮助'];
+  String get currentTitle => pageTitles[_currentIndex];
+  // 自定义规则
+  Map<String, dynamic> _customRuleMap = {};
+  Map<String, dynamic> get customRuleMap => _customRuleMap;
+  void setCustomRules(Map<String, dynamic> map) {
+    _customRuleMap = map;
+  }
+
+  // 帮助内容
+  String _helpContent = '正在加载帮助';
+  String get helpContent => _helpContent;
+
+  // ————控制器————
+  final TextEditingController _inputTextController = TextEditingController();
+  TextEditingController get inputTextController => _inputTextController;
+
+  final TextEditingController _correctionInputController =
+      TextEditingController();
+  TextEditingController get correctionInputController =>
+      _correctionInputController;
+
+  AppProvider() {
+    _loadHelp();
+  }
+
+  // ————密码相关状态————
+  // 使用矫正
+  bool _useCorrection = true;
+  bool get useCorrection => _useCorrection;
+  set useCorrection(bool value) {
+    _useCorrection = value;
+    notifyListeners();
+  }
+
+  // 移除特殊字符
+  bool _removeSpChar = false;
+  bool get removeSpChar => _removeSpChar;
+  set removeSpChar(bool value) {
+    _removeSpChar = value;
+    notifyListeners();
+  }
+
+  // 移除字母
+  bool _removeAlpha = false;
+  bool get removeAlpha => _removeAlpha;
+  set removeAlpha(bool value) {
+    _removeAlpha = value;
+    notifyListeners();
+  }
+
+  // 移除数字
+  bool _removeDigits = false;
+  bool get removeDigits => _removeDigits;
+  set removeDigits(bool value) {
+    _removeDigits = value;
+    notifyListeners();
+  }
+
+  // 密码生成状态
+  (int stat, String res) _generateRes = (-1, "暂未生成");
+  (int stat, String res) get generateRes => _generateRes;
+  // v2算法警告
+  String _v2Warnings = "";
+  String get v2Warnings => _v2Warnings;
+  void refreshWarnings() {
+    _v2Warnings = getParserWarnings();
+    notifyListeners();
+  }
+
+  /// 生成密码
+  ///
+  /// [v2Config] 可选参数，用于传递 V2 的 JSON 配置
+  /// [master] 用于V2算法的主密码
+  void genPassword({String? v2Config, String? master}) {
+    final rawInput = _inputTextController.text;
+
+    String effectiveV2Config = "";
+    String effectiveV2Master = "";
+
+    if (rawInput.isEmpty) {
+      _generateRes = (1, "输入为空");
+    } else {
+      effectiveV2Config = v2Config ?? "";
+      effectiveV2Master = master ?? "";
+      if (effectiveV2Config.isEmpty) {
+        _generateRes = (1, "未提供 V2 配置");
+        notifyListeners();
+        return;
+      }
+
+      _generateRes = uniPasswordGen(
+        input: rawInput,
+        customRules: _customRuleMap,
+        useCorrection: _useCorrection,
+        removeSpChar: _removeSpChar,
+        removeAlpha: _removeAlpha,
+        removeDigits: _removeDigits,
+        v2ConfigJson: effectiveV2Config,
+        v2Master: effectiveV2Master
+      );
+    }
+
+    notifyListeners();
+  }
+
+  /// 解析 JSON 规则
+  (int stat, String errors) parseJSON(String jsonString) {
+    try {
+      final parsed = json.decode(jsonString) as Map<String, dynamic>;
+      final allValuesAreString = parsed.values.every((v) => v is String);
+
+      if (!allValuesAreString) {
+        return (1, "所有值必须为字符串");
+      }
+
+      _customRuleMap = parsed;
+      notifyListeners();
+      return (0, "解析成功");
+    } catch (e) {
+      return (1, e.toString());
+    }
+  }
+
+  /// 从缓存加载规则
+  Future<(int stat, String errors)> loadFromCache() async {
+    final loadRes = await file_manager.loadCorrections();
+    if (loadRes.$1 == 0) {
+      _customRuleMap = loadRes.$2;
+      _correctionInputController.text = json.encode(loadRes.$2);
+      notifyListeners();
+      return (0, loadRes.$3);
+    } else {
+      return (1, loadRes.$3);
+    }
+  }
+
+  /// 覆盖缓存规则
+  Future<(int stat, String errors)> saveToCache() async {
+    final correctionsInput = _correctionInputController.text;
+
+    try {
+      // 验证JSON格式
+      final tempMap = json.decode(correctionsInput) as Map<String, dynamic>;
+      final allValuesAreString = tempMap.values.every((v) => v is String);
+      if (!allValuesAreString) {
+        return (1, "所有值必须为字符串");
+      }
+      // 保存
+      final saveRes = await file_manager.saveCorrections(correctionsInput);
+      return saveRes;
+    } catch (e) {
+      return (1, e.toString());
+    }
+  }
+
+  /// 删除缓存
+  Future<(int stat, String errors)> deleteCache() async {
+    try {
+      final delRes = await file_manager.deleteCorrections();
+      if (delRes.$1 == 0) {
+        _customRuleMap = {};
+        _correctionInputController.clear();
+        notifyListeners();
+        return delRes;
+      } else {
+        return delRes;
+      }
+    } catch (e) {
+      return (1, e.toString());
+    }
+  }
+
+  // 加载帮助内容
+  Future<void> _loadHelp() async {
+    try {
+      final String content = await rootBundle.loadString('assets/help.md');
+      _helpContent = content;
+      notifyListeners();
+    } catch (e) {
+      _helpContent = "加载失败: $e";
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _inputTextController.dispose();
+    _correctionInputController.dispose();
+    super.dispose();
+  }
+}
