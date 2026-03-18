@@ -1,4 +1,4 @@
-import 'generator_v2.dart' as generator;
+import 'core_generator.dart' as generator;
 import 'dart:convert' as convert;
 
 String warnings = "使用此算法生成一次密码以生成警告";

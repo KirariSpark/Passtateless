@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 
 import 'package:passtateless/scripts/file_manager.dart' as file_manager;
-import 'package:passtateless/scripts/uni_password_generator.dart';
+import 'package:passtateless/scripts/main_generator.dart';
 
 class AppProvider extends ChangeNotifier {
   // ————UI相关状态————
@@ -114,8 +114,8 @@ class AppProvider extends ChangeNotifier {
         removeSpChar: _removeSpChar,
         removeAlpha: _removeAlpha,
         removeDigits: _removeDigits,
-        v2ConfigJson: effectiveV2Config,
-        v2Master: effectiveV2Master
+        configJson: effectiveV2Config,
+        master: effectiveV2Master
       );
     }
 

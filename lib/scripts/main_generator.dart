@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:passtateless/scripts/v2_parser.dart' as parser;
+import 'package:passtateless/scripts/parser.dart' as parser;
 import 'package:passtateless/scripts/utils.dart' as utils;
 
 /// 统一密码生成器函数
@@ -12,9 +12,8 @@ import 'package:passtateless/scripts/utils.dart' as utils;
 /// [removeSpChar] 是否移除特殊字符
 /// [removeAlpha] 是否移除字母
 /// [removeDigits] 是否移除数字
-/// [useV2] 是否使用 V2 算法
-/// [v2ConfigJson] V2 算法的 JSON 配置字符串
-/// [v2Master] V2 算法的主密码
+/// [configJson] 生成算法的 JSON 配置字符串
+/// [master] 主密码
 (int status, String result) uniPasswordGen({
   required String input,
   required Map<String, dynamic> customRules,
@@ -22,8 +21,8 @@ import 'package:passtateless/scripts/utils.dart' as utils;
   required bool removeSpChar,
   required bool removeAlpha,
   required bool removeDigits,
-  required String v2ConfigJson,
-  required String v2Master
+  required String configJson,
+  required String master
 }) {
   // 输入预处理和矫正
   String processedInput = input;
@@ -56,7 +55,7 @@ import 'package:passtateless/scripts/utils.dart' as utils;
 
   // 生成
   // V2
-  final (status, v2Result) = parser.parse(v2ConfigJson, processedInput + v2Master);
+  final (status, v2Result) = parser.parse(configJson, processedInput + master);
   if (status != 0) {
     result = v2Result;
     genStatus = 1;
