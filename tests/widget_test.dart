@@ -1,13 +1,18 @@
-import 'package:passtateless/widgets/quick_options.dart';
+import 'package:passtateless/widgets/stars.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(TestApp());
 }
 
-class TestApp extends StatelessWidget {
+class TestApp extends StatefulWidget {
   const TestApp({super.key});
 
+  @override
+  State<TestApp> createState() => _TestAppState();
+}
+
+class _TestAppState extends State<TestApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,11 +28,7 @@ class TestApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-        body: HomePageQuickOptions(
-          onEditTapped: (){},
-          onBasicTapped: (){},
-          onAdvancedTapped: (){},
-        ),
+        body: StarredPasswords()
       ),
     );
   }
