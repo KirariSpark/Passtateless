@@ -1,4 +1,4 @@
-import 'package:passtateless/widgets/stars.dart';
+import 'package:passtateless/pages/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -28,7 +28,7 @@ class _TestAppState extends State<TestApp> {
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-        body: StarredPasswords()
+        body: HomePage()
       ),
     );
   }

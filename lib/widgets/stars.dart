@@ -22,15 +22,19 @@ class _StarredPasswordsState extends State<StarredPasswords> {
     if (_starredPasswords.isEmpty) {
       return <ListTile>[
         ListTile(
+          shape: styles.uniRoundedBorder,
+          onTap: (){},
           leading: Icon(Icons.not_interested),
           title: Text("没有收藏"),
           subtitle: Text("前往管理页面添加收藏项，以在此处快速访问"),
         )
       ];
     } else {
-      return [
+      return <ListTile>[
         for (final (index, item) in _starredPasswords.indexed)
           ListTile(
+            shape: styles.uniRoundedBorder,
+            onTap: (){},
             leading: Text('${index + 1}', style: Theme.of(context).textTheme.titleLarge),
             title: Text(item['identifier'] ?? '未命名'),
             subtitle: Text(_getPresetText(item['preset'])),
@@ -60,10 +64,10 @@ class _StarredPasswordsState extends State<StarredPasswords> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: styles.uniBorderRadius,
         border: BoxBorder.all(
-          color: ColorScheme.of(context).primary
-        )
+          color: ColorScheme.of(context).onPrimaryContainer
+        ),
+        borderRadius: styles.uniBorderRadius
       ),
       child: Padding(
         padding: styles.uniInsetsSmall,
