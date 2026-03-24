@@ -16,6 +16,8 @@ TextStyle uniHintTextStyle = const TextStyle(fontSize: 12, color: Colors.grey);
 
 BoxConstraints uniBoxConstraints = const BoxConstraints(maxWidth: 1010);
 
+BoxConstraints uniTileWidthConstraint = const BoxConstraints(maxWidth: 400);
+
 EdgeInsets uniInsetsSmall = const EdgeInsets.all(8);
 
 const double uniSpacingMedium = 8;

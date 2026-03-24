@@ -1,4 +1,4 @@
-import 'package:passtateless/pages/home.dart';
+import 'package:passtateless/pages/pwd_edit.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -28,7 +28,7 @@ class _TestAppState extends State<TestApp> {
       ),
       themeMode: ThemeMode.system,
       home: Scaffold(
-        body: HomePage()
+        body: PwdEditPage()
       ),
     );
   }

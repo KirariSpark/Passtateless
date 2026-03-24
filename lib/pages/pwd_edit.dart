@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+import 'package:passtateless/widgets/uni_styles.dart' as styles;
+
+class PwdEditPage extends StatelessWidget {
+  const PwdEditPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: styles.uniInsetsSmall,
+        child: Center(
+          child: Column(
+            spacing: 8,
+            children: <Widget>[
+              ConstrainedBox(
+                constraints: styles.uniTileWidthConstraint,
+                child: Row(
+                  children: [
+                    Text("编辑密码：", style: Theme.of(context).textTheme.titleLarge),
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          label: const Text("档案名"),
+                          border: const OutlineInputBorder()
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              styles.uniSizedBoxMedium,
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        label: Text("用户名"),
+                        border: OutlineInputBorder()
+                      ),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        label: Text("账号"),
+                        border: OutlineInputBorder()
+                      ),
+                    ),
+                  )
+                ]
+              ),
+              Wrap(
+                spacing: 8,
+                children: <Widget>[
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: SwitchListTile(
+                      value: false,
+                      onChanged: (bool value){},
+                      title: Text("移除数字"),
+                      shape: styles.uniRoundedBorder
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: SwitchListTile(
+                      value: false,
+                      onChanged: (bool value){},
+                      title: Text("移除字母"),
+                      shape: styles.uniRoundedBorder
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: SwitchListTile(
+                      value: false,
+                      onChanged: (bool value){},
+                      title: Text("移除特殊字符"),
+                      shape: styles.uniRoundedBorder
+                    ),
+                  ),
+                ],
+              ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: <Widget>[
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: ElevatedButton(
+                      onPressed: (){},
+                      style: styles.uniButtonStyle,
+                      child: Text("保存"),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: ElevatedButton(
+                      onPressed: (){},
+                      style: styles.uniButtonStyle,
+                      child: Text("放弃"),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        )
+      ),
+    );
+  }
+
+}
