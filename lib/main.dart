@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/app_provider.dart';
-import 'providers/config_provider.dart';
 import 'pages/generate.dart' as generate;
 import 'pages/generate_config.dart' as generate_config;
-import 'pages/correction_config.dart' as correction_config;
 import 'pages/help_tab.dart' as help_tab;
+import 'pages/home.dart' as home_page;
+import 'modules/providers/app_provider.dart';
+import 'modules/providers/config_provider.dart';
 import 'widgets/uni_styles.dart' as styles;
 
 void main() {
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AppProvider()),
-        ChangeNotifierProvider(create: (context) => ConfigProvider())
+        ChangeNotifierProvider(create: (context) => ConfigProvider()),
       ],
       child: MaterialApp(
         title: '密码生成器',
@@ -54,9 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
   double? _previousMaxWidth;
 
   final List<_Destination> _destinations = const [
+    _Destination(Icons.home_outlined, '主页'),
     _Destination(Icons.password, '生成'),
     _Destination(Icons.settings, '生成配置'),
-    _Destination(Icons.published_with_changes_rounded, '输入矫正'),
     _Destination(Icons.help_outline, '帮助'),
   ];
 
@@ -74,8 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
         bool needsUpdate = false;
 
         // 是否跨越了桌面宽屏宽度
-        final crossedDesktopWide =
-            (prevWidth < desktopWideWidth) != (currentWidth < desktopWideWidth);
+        final crossedDesktopWide = (prevWidth < desktopWideWidth) != (currentWidth < desktopWideWidth);
         if (crossedDesktopWide) {
           // 如果当前变宽了，则展开；否则收起
           final isEnteringWide = currentWidth >= desktopWideWidth;
@@ -87,11 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
         // 是否跨越了桌面窄屏宽度
         // 仅当从更窄进入时，确保收起
-        final crossedDesktopNarrow = (prevWidth < desktopNarrowWidth) !=
-            (currentWidth < desktopNarrowWidth);
-        if (crossedDesktopNarrow &&
-            currentWidth >= desktopNarrowWidth &&
-            currentWidth < desktopWideWidth) {
+        final crossedDesktopNarrow = (prevWidth < desktopNarrowWidth) != (currentWidth < desktopNarrowWidth);
+        if (crossedDesktopNarrow && currentWidth >= desktopNarrowWidth && currentWidth < desktopWideWidth) {
           if (_isRailExtended) {
             _isRailExtended = false;
             needsUpdate = true;
@@ -121,11 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 appProvider.currentIndex = index;
               },
               destinations: _destinations
-                  .map((d) => NavigationDestination(
-                icon: Icon(d.icon),
-                selectedIcon: Icon(d.icon),
-                label: d.label,
-              ))
+                  .map((d) => NavigationDestination(icon: Icon(d.icon), selectedIcon: Icon(d.icon), label: d.label))
                   .toList(),
             ),
           );
@@ -153,17 +145,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               // 导航
               destinations: _destinations
-                  .map((d) => NavigationRailDestination(
-                icon: Icon(d.icon),
-                selectedIcon: Icon(d.icon),
-                label: Text(d.label, style: theme.textTheme.bodyMedium),
-              )).toList(),
+                  .map(
+                    (d) => NavigationRailDestination(
+                      icon: Icon(d.icon),
+                      selectedIcon: Icon(d.icon),
+                      label: Text(d.label, style: theme.textTheme.bodyMedium),
+                    ),
+                  )
+                  .toList(),
             ),
-            Expanded(
-              child: Scaffold(
-                body: _buildBodyContent(context, appProvider),
-              ),
-            ),
+            Expanded(child: Scaffold(body: _buildBodyContent(context, appProvider))),
           ],
         );
       },
@@ -174,9 +165,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return IndexedStack(
       index: appProvider.currentIndex,
       children: const [
+        home_page.HomePage(),
         generate.HomeTab(),
         generate_config.ConfigTab(),
-        correction_config.CorrectionTab(),
         help_tab.HelpTab(),
       ],
     );

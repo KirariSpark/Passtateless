@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:zxcvbn/zxcvbn.dart';
 import 'package:passtateless/widgets/uni_styles.dart' as styles;
 import 'package:passtateless/scripts/utils.dart' as utils;
-import 'package:passtateless/providers/app_provider.dart';
-import 'package:passtateless/providers/config_provider.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/config_provider.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
@@ -56,20 +56,6 @@ class HomeTab extends StatelessWidget {
                         spacing: 10,
                         runSpacing: 10,
                         children: [
-                          // 使用输入矫正
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 500),
-                            child: SwitchListTile(
-                              value: appProvider.useCorrection,
-                              onChanged: (value) =>
-                                appProvider.useCorrection = value,
-                              secondary:
-                                const Icon(Icons.published_with_changes),
-                              title: const Text("使用输入矫正"),
-                              subtitle: const Text("矫正你的输入的大小写和内容"),
-                              shape: styles.uniRoundedBorder,
-                            ),
-                          ),
                           // 移除特殊字符
                           ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 500),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:passtateless/providers/app_provider.dart';
-import 'package:passtateless/providers/config_provider.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/config_provider.dart';
 import 'package:passtateless/scripts/utils.dart' as utils;
 import 'package:passtateless/widgets/uni_styles.dart' as styles;
 
