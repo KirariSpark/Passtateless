@@ -48,6 +48,24 @@ void showAlertQuick(String title, String content, String buttonText, BuildContex
     )
   );
 }
+/// 便捷地显示只有一个按钮的AlertDialog，它的内容是一个Widget而非字符串
+void showAlertQuickWidget(String title, Widget content, String buttonText, BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: styles.uniRoundedBorder,
+      title: Text(title),
+      content: content,
+      actions: [
+        TextButton(
+          style: styles.uniButtonStyle,
+          onPressed: () {Navigator.pop(context);},
+          child: Text(buttonText)
+        )
+      ],
+    )
+  );
+}
 
 /// 便捷地显示不可撤销操作确认AlertDialog
 void showConfirmDialogQuick(BuildContext context, VoidCallback? function, String title) {

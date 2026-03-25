@@ -8,17 +8,17 @@ class PwdProvider extends ChangeNotifier {
     "platform": "测试数据1",
     "preset": "simple",
     "removeSp": true,
-    "removeDigits": true,
+    "removeDigits": false,
     "removeAlpha": true,
     "starred": false
   },{
-    "identifier": "测试数据1",
-    "userName": "测试数据1",
-    "platform": "测试数据1",
+    "identifier": "测试数据2",
+    "userName": "测试数据2",
+    "platform": "测试数据2",
     "preset": "simple",
     "removeSp": true,
     "removeDigits": true,
-    "removeAlpha": true,
+    "removeAlpha": false,
     "starred": true
   }];
   List<Map<String, dynamic>> get pwdList => _pwdList;

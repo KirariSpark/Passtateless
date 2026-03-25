@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
               SizedBox(height: styles.layoutSpacing),
               HomePageQuickOptions(
                 onEditTapped: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PwdList()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
                 },
                 onBasicTapped: (){},
                 onAdvancedTapped: (){}
