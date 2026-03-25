@@ -18,6 +18,8 @@ BoxConstraints uniBoxConstraints = const BoxConstraints(maxWidth: 1010);
 
 BoxConstraints tileWidthConstraint = const BoxConstraints(maxWidth: 400);
 
+BoxConstraints tileHeightConstraint = const BoxConstraints(maxHeight: 300);
+
 EdgeInsets uniInsetsSmall = const EdgeInsets.all(8);
 
 const double layoutSpacing = 8;

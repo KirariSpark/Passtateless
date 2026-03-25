@@ -8,9 +8,11 @@
   "preset": "生成使用的预设，可能是simple、complex、bank或custom",
   "removeSp": true,
   "removeDigits": true,
-  "removeAlpha": true
+  "removeAlpha": true,
+  "starred": false
 }
 ```
 
-后三者分别为是否移除特殊字符、数字和字母的标记。  
-`custom`预设不会存储生成配置。
+后三个`remove`分别为是否移除特殊字符、数字和字母的标记。  
+`custom`预设不会存储生成配置。  
+`starred`标记该配置是否被收藏。
