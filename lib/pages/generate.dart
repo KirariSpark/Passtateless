@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zxcvbn/zxcvbn.dart';
 import 'package:passtateless/widgets/uni_styles.dart' as styles;
 import 'package:passtateless/scripts/utils.dart' as utils;
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/config_provider.dart';
 
@@ -142,9 +143,9 @@ class HomeTab extends StatelessWidget {
                           master: v2Provider.masterPassword.text
                         );
                         if (appProvider.generateRes.$1 == 1) {
-                          utils.showSnackBarQuick(appProvider.generateRes.$2, context);
+                          ui.showSnackBarQuick(appProvider.generateRes.$2, context);
                         } else {
-                          utils.showSnackBarQuick("密码已生成", context);
+                          ui.showSnackBarQuick("密码已生成", context);
                         }
                       },
                       style: styles.uniButtonStyle,
@@ -159,10 +160,10 @@ class HomeTab extends StatelessWidget {
                       onPressed: () {
                         // 生成不成功或没有生成
                         if (appProvider.generateRes.$1 != 0) {
-                          utils.showAlertQuick("评估密码", "你需要先进行一次成功的生成", "确定", context);
+                          ui.showAlertQuick("评估密码", "你需要先进行一次成功的生成", "确定", context);
                         // 生成成功.但生成结果为空
                         } else if (appProvider.generateRes.$2 == "") {
-                          utils.showAlertQuick("评估密码", "没有密码", "确定", context);
+                          ui.showAlertQuick("评估密码", "没有密码", "确定", context);
                         // 生成成功
                         } else {
                           Result eval = Zxcvbn().evaluate(appProvider.generateRes.$2);

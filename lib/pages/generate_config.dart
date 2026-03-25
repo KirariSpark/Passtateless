@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/config_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/scripts/utils.dart' as utils;
 import 'package:passtateless/widgets/uni_styles.dart' as styles;
 
@@ -16,7 +17,7 @@ class _ConfigTabState extends State<ConfigTab> {
   void _showSnackBarQuick(String content) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        utils.showSnackBarQuick(content, context);
+        ui.showSnackBarQuick(content, context);
       }
     });
   }
@@ -62,7 +63,7 @@ class _ConfigTabState extends State<ConfigTab> {
                       IconButton(
                         tooltip: "覆盖保存的文件",
                         onPressed: () async {
-                          utils.showConfirmDialogQuick(
+                          ui.showConfirmDialogQuick(
                             context,
                               () async {
                                 final (int, String) saveRes = await configProvider.saveConfig();
@@ -157,7 +158,7 @@ class _ConfigTabState extends State<ConfigTab> {
                         style: styles.uniButtonStyle,
                         tooltip: "删除保存的文件",
                         onPressed: () async {
-                          utils.showConfirmDialogQuick(
+                          ui.showConfirmDialogQuick(
                             context,
                             () async {
                               final (int, String) delRes = await configProvider.deleteConfig();

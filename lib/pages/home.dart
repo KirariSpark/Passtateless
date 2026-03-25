@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
                 LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     double currentWidth = constraints.maxWidth;
-                    double targetWidth = ui.calculateWrapWidth(
+                    double targetWidth = ui.calcWidthConstraint(
                       currentWidth,
                       false,
                       maxColumns: 3

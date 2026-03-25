@@ -8,7 +8,6 @@ import 'package:passtateless/scripts/utils.dart' as utils;
 ///
 /// [input] 用户输入的原始字符串
 /// [customRules] 用户自定义的矫正规则映射表
-/// [useCorrection] 是否启用输入矫正
 /// [removeSpChar] 是否移除特殊字符
 /// [removeAlpha] 是否移除字母
 /// [removeDigits] 是否移除数字
@@ -17,7 +16,6 @@ import 'package:passtateless/scripts/utils.dart' as utils;
 (int status, String result) uniPasswordGen({
   required String input,
   required Map<String, dynamic> customRules,
-  required bool useCorrection,
   required bool removeSpChar,
   required bool removeAlpha,
   required bool removeDigits,
@@ -26,24 +24,6 @@ import 'package:passtateless/scripts/utils.dart' as utils;
 }) {
   // 输入预处理和矫正
   String processedInput = input;
-
-  if (useCorrection) {
-    final inputLower = input.toLowerCase();
-
-    // 输入矫正
-    // 内置映射
-    if (utils.builtinMappings.containsKey(inputLower)) {
-      processedInput = utils.builtinMappings[inputLower]!;
-    }
-    // 自定义规则
-    else if (customRules.containsKey(inputLower)) {
-      processedInput = customRules[inputLower];
-    }
-    // 都没有匹配到
-    else {
-      processedInput = input;
-    }
-  }
 
   // 输入不能为空
   if (processedInput.isEmpty) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
-import 'package:passtateless/scripts/file_manager.dart' as file_manager;
+import 'package:passtateless/modules/file_mgr/file_mgr.dart' as file_manager;
 import 'package:passtateless/scripts/main_generator.dart';
 
 class AppProvider extends ChangeNotifier {
@@ -43,14 +43,6 @@ class AppProvider extends ChangeNotifier {
   }
 
   // ————密码相关状态————
-  // 使用矫正
-  bool _useCorrection = true;
-  bool get useCorrection => _useCorrection;
-  set useCorrection(bool value) {
-    _useCorrection = value;
-    notifyListeners();
-  }
-
   // 移除特殊字符
   bool _removeSpChar = false;
   bool get removeSpChar => _removeSpChar;
@@ -110,7 +102,6 @@ class AppProvider extends ChangeNotifier {
       _generateRes = uniPasswordGen(
         input: rawInput,
         customRules: _customRuleMap,
-        useCorrection: _useCorrection,
         removeSpChar: _removeSpChar,
         removeAlpha: _removeAlpha,
         removeDigits: _removeDigits,

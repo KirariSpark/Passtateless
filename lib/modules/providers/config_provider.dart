@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:passtateless/scripts/file_manager.dart' as file_manager;
+import 'package:passtateless/modules/file_mgr/file_mgr.dart' as file_manager;
 
 class ConfigProvider extends ChangeNotifier {
   bool _featureEnabled = false;
