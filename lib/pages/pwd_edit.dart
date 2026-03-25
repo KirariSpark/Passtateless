@@ -84,6 +84,37 @@ class PwdEditPage extends StatelessWidget {
                       shape: styles.uniRoundedBorder
                     ),
                   ),
+                  ConstrainedBox(
+                    constraints: styles.uniTileWidthConstraint,
+                    child: ListTile(
+                      title: Text("生成预设"),
+                      trailing: DropdownMenu(
+                        dropdownMenuEntries: [
+                          DropdownMenuEntry(
+                            value: "simple",
+                            label: "简易",
+                            style: styles.uniButtonStyle
+                          ),
+                          DropdownMenuEntry(
+                            value: "complex",
+                            label: "复杂",
+                            style: styles.uniButtonStyle
+                          ),
+                          DropdownMenuEntry(
+                            value: "bank",
+                            label: "支付",
+                            style: styles.uniButtonStyle
+                          ),
+                          DropdownMenuEntry(
+                            value: "custom",
+                            label: "自定义",
+                            style: styles.uniButtonStyle
+                          )
+                        ]
+                      ),
+                      shape: styles.uniRoundedBorder
+                    ),
+                  ),
                 ],
               ),
               Wrap(
