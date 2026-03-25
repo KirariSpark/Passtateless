@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:passtateless/scripts/parser.dart' as parser;
-import 'package:passtateless/scripts/utils.dart' as utils;
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 
 /// 统一密码生成器函数
 ///

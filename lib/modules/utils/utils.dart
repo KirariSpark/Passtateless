@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 
+/// 将生成预设的英文键值映射为中文描述
+String getPresetText(String? preset) {
+  switch (preset) {
+    case 'simple':
+      return '简单模式';
+    case 'complex':
+      return '复杂模式';
+    case 'bank':
+      return '支付密码模式';
+    case 'custom':
+      return '自定义模式';
+    default:
+      return '未知模式';
+  }
+}
+
 /// 解析JSON - 可选是否显示SnackBar
 Map<String, String> parseJSON(String jsonString, {BuildContext? context, bool showSnackBar = true}) {
   // 处理空字符串的情况

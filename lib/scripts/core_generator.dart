@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'utils.dart' as utils;
+import '../modules/utils/utils.dart' as utils;
 
 // ————————Xorshift算法————————
 /// Xorshift32算法实现

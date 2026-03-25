@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/config_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/scripts/utils.dart' as utils;
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/widgets/uni_styles.dart' as styles;
 
 class ConfigTab extends StatefulWidget {

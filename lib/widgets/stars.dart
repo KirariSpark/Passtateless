@@ -1,26 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/widgets/uni_styles.dart' as styles;
 import 'package:passtateless/modules/providers/pwd_provider.dart' as pwd_provider;
 
 class StarredPasswords extends StatelessWidget {
   const StarredPasswords({super.key});
-
-  // 将 preset 的英文键值映射为中文描述
-  String _getPresetText(String? preset) {
-    switch (preset) {
-      case 'simple':
-        return '简单模式';
-      case 'complex':
-        return '复杂模式';
-      case 'bank':
-        return '支付密码模式';
-      case 'custom':
-        return '自定义模式';
-      default:
-        return '未知模式';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +41,13 @@ class StarredPasswords extends StatelessWidget {
       ];
     } else {
       return <ListTile>[
-        for (final (index, item) in starredPasswords.indexed)
-          ListTile(
-            shape: styles.uniRoundedBorder,
-            onTap: (){},
-            leading: Text('${index + 1}', style: Theme.of(context).textTheme.titleLarge),
-            title: Text(item['identifier'] ?? '未命名'),
-            subtitle: Text(_getPresetText(item['preset'])),
-          ),
+        for (final (index, item) in starredPasswords.indexed) ListTile(
+          shape: styles.uniRoundedBorder,
+          onTap: (){},
+          leading: Text('${index + 1}', style: Theme.of(context).textTheme.titleLarge),
+          title: Text(item['identifier'] ?? '未命名'),
+          subtitle: Text(utils.getPresetText(item['preset'])),
+        ),
       ];
     }
   }
