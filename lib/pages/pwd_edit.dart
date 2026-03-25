@@ -14,7 +14,7 @@ class PwdEditPage extends StatelessWidget {
             spacing: 8,
             children: <Widget>[
               ConstrainedBox(
-                constraints: styles.uniTileWidthConstraint,
+                constraints: styles.tileWidthConstraint,
                 child: Row(
                   children: [
                     Text("编辑密码：", style: Theme.of(context).textTheme.titleLarge),
@@ -35,7 +35,7 @@ class PwdEditPage extends StatelessWidget {
                 runSpacing: 8,
                 children: [
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: TextField(
                       decoration: const InputDecoration(
                         label: Text("用户名"),
@@ -44,7 +44,7 @@ class PwdEditPage extends StatelessWidget {
                     ),
                   ),
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: TextField(
                       decoration: InputDecoration(
                         label: Text("账号"),
@@ -58,7 +58,7 @@ class PwdEditPage extends StatelessWidget {
                 spacing: 8,
                 children: <Widget>[
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: SwitchListTile(
                       value: false,
                       onChanged: (bool value){},
@@ -67,7 +67,7 @@ class PwdEditPage extends StatelessWidget {
                     ),
                   ),
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: SwitchListTile(
                       value: false,
                       onChanged: (bool value){},
@@ -76,7 +76,7 @@ class PwdEditPage extends StatelessWidget {
                     ),
                   ),
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: SwitchListTile(
                       value: false,
                       onChanged: (bool value){},
@@ -85,7 +85,7 @@ class PwdEditPage extends StatelessWidget {
                     ),
                   ),
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: ListTile(
                       title: Text("生成预设"),
                       trailing: DropdownMenu(
@@ -122,7 +122,7 @@ class PwdEditPage extends StatelessWidget {
                 runSpacing: 8,
                 children: <Widget>[
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: ElevatedButton(
                       onPressed: (){},
                       style: styles.uniButtonStyle,
@@ -130,7 +130,7 @@ class PwdEditPage extends StatelessWidget {
                     ),
                   ),
                   ConstrainedBox(
-                    constraints: styles.uniTileWidthConstraint,
+                    constraints: styles.tileWidthConstraint,
                     child: ElevatedButton(
                       onPressed: (){},
                       style: styles.uniButtonStyle,

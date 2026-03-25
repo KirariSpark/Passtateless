@@ -40,7 +40,7 @@ class HomePageQuickOptions extends StatelessWidget {
             onTap: onBasicTapped,
             leading: Icon(Icons.settings),
             title: Text("基础设置"),
-            subtitle: Text("生成预设、后处理等基础生成器设置"),
+            subtitle: Text("主密码等基础生成器设置"),
             trailing: Icon(Icons.arrow_forward),
             shape: styles.uniRoundedBorder,
           ),

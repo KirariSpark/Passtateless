@@ -36,7 +36,7 @@ class HomeTab extends StatelessWidget {
                       "输入一个你能记住的“种子”",
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    const SizedBox(height: styles.uniSpacingMedium),
+                    const SizedBox(height: styles.layoutSpacing),
                     // 输入框
                     ConstrainedBox(
                       constraints: styles.uniBoxConstraints,
@@ -48,7 +48,7 @@ class HomeTab extends StatelessWidget {
                         controller: appProvider.inputTextController,
                       ),
                     ),
-                    const SizedBox(height: styles.uniSpacingMedium),
+                    const SizedBox(height: styles.layoutSpacing),
                     // 开关
                     ConstrainedBox(
                       constraints: styles.uniBoxConstraints,
@@ -109,7 +109,7 @@ class HomeTab extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: styles.uniSpacingMedium),
+                    const SizedBox(height: styles.layoutSpacing),
                   ],
                 ),
               ),
@@ -122,8 +122,8 @@ class HomeTab extends StatelessWidget {
                 width: double.infinity,
                 child: Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: styles.uniSpacingMedium,
-                  runSpacing: styles.uniSpacingMedium,
+                  spacing: styles.layoutSpacing,
+                  runSpacing: styles.layoutSpacing,
                   children: <Widget>[
                     // 查看当前密码
                     IconButton(

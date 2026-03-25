@@ -40,7 +40,7 @@ class _ConfigTabState extends State<ConfigTab> {
               alignment: Alignment.topCenter,
               padding: const EdgeInsets.all(8),
               child: Column(
-                spacing: styles.uniSpacingMedium,
+                spacing: styles.layoutSpacing,
                 children: <Widget>[
                   // 顶部按钮组 Wrap
                   Wrap(
