@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'pages/generate.dart' as generate;
-import 'pages/generate_config.dart' as generate_config;
-import 'pages/help_tab.dart' as help_tab;
-import 'pages/home.dart' as home_page;
+import 'ui/pages/generate.dart' as generate;
+import 'ui/pages/generate_config.dart' as generate_config;
+import 'ui/pages/help_tab.dart' as help_tab;
+import 'ui/pages/home.dart' as home_page;
+import 'ui/widgets/uni_styles.dart' as styles;
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/config_provider.dart';
-import 'widgets/uni_styles.dart' as styles;
+import 'modules/providers/pwd_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AppProvider()),
         ChangeNotifierProvider(create: (context) => ConfigProvider()),
+        ChangeNotifierProvider(create: (context) => PwdProvider()),
       ],
       child: MaterialApp(
         title: '密码生成器',

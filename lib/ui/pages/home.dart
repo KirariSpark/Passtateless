@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/widgets/stars.dart';
-import 'package:passtateless/widgets/quick_options.dart';
-import 'package:passtateless/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/widgets/stars.dart';
+import 'package:passtateless/ui/widgets/quick_options.dart';
+import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/pages/pwd_list.dart';
+import 'package:passtateless/ui/pages/pwd_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

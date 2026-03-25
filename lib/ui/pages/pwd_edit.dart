@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
 
 class PwdEditPage extends StatelessWidget {
   const PwdEditPage({super.key});

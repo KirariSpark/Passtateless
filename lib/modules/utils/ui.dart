@@ -1,4 +1,4 @@
-import 'package:passtateless/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
 import 'package:flutter/material.dart';
 
 /// 计算宽度约束
