@@ -42,4 +42,16 @@ class PwdProvider extends ChangeNotifier {
     notifyListeners();
     return (0, "");
   }
+
+  /// 更新指定项的收藏状态
+  void switchStarState(int index) {
+    _pwdList[index]["starred"] = !_pwdList[index]["starred"];
+    notifyListeners();
+  }
+
+  /// 从所有密码中移除指定项
+  void removeRecord(int index) {
+    _pwdList.removeAt(index);
+    notifyListeners();
+  }
 }

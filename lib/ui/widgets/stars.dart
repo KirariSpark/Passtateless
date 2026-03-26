@@ -34,7 +34,6 @@ class StarredPasswords extends StatelessWidget {
         ListTile(
           shape: styles.uniRoundedBorder,
           onTap: (){},
-          leading: const Icon(Icons.not_interested),
           title: const Text("没有收藏"),
           subtitle: const Text("前往管理页面添加收藏项，以在此处快速访问"),
         )
@@ -44,8 +43,7 @@ class StarredPasswords extends StatelessWidget {
         for (final (index, item) in starredPasswords.indexed) ListTile(
           shape: styles.uniRoundedBorder,
           onTap: (){},
-          leading: Text('${index + 1}', style: Theme.of(context).textTheme.titleLarge),
-          title: Text(item['identifier'] ?? '未命名'),
+          title: Text(item['identifier'] == "" ? "未命名" : item['identifier']),
           subtitle: Text(utils.getPresetText(item['preset'])),
         ),
       ];

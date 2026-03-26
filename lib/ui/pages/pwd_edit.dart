@@ -37,194 +37,236 @@ class _PwdEditPageState extends State<PwdEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final pwdList = context.watch<PwdProvider>().pwdList;
-    final currentItem = pwdList[widget._index];
+    try {
+      final pwdList = context.watch<PwdProvider>().pwdList;
+      final currentItem = pwdList[widget._index];
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_outlined),
-          style: styles.uniButtonStyle,
+      return Scaffold(
+        appBar: AppBar(
+          elevation: 1,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.arrow_back_outlined),
+            style: styles.uniButtonStyle,
+          ),
+          title: Text("编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}"),
         ),
-        title: Text("编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}"),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: styles.uniInsetsSmall,
-          child: Center(
-            child: Column(
-              spacing: 8,
-              children: <Widget>[
-                // 文本框区域
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: TextField(
-                        controller: _identifierController,
-                        onChanged: (value) {
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "identifier", value
-                          );
-                        },
-                        decoration: const InputDecoration(
-                          label: Text("档案名"),
-                          border: OutlineInputBorder()
-                        ),
-                      ),
-                    ),
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: TextField(
-                        controller: _userNameController,
-                        onChanged: (value) {
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "userName", value
-                          );
-                        },
-                        decoration: const InputDecoration(
-                          label: Text("用户名"),
-                          border: OutlineInputBorder()
-                        ),
-                      ),
-                    ),
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: TextField(
-                        controller: _accountController,
-                        onChanged: (value) {
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "account", value
-                          );
-                        },
-                        decoration: const InputDecoration(
-                          label: Text("账号"),
-                          border: OutlineInputBorder()
-                        ),
-                      ),
-                    )
-                  ]
-                ),
-
-                // 开关区域
-                Wrap(
-                  spacing: 8,
-                  children: <Widget>[
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: SwitchListTile(
-                        value: currentItem["removeDigits"],
-                        onChanged: (bool value){
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "removeDigits", value
-                          );
-                        },
-                        title: const Text("移除数字"),
-                        shape: styles.uniRoundedBorder
-                      ),
-                    ),
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: SwitchListTile(
-                        value: currentItem["removeAlpha"],
-                        onChanged: (bool value){
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "removeAlpha", value
-                          );
-                        },
-                        title: const Text("移除字母"),
-                        shape: styles.uniRoundedBorder
-                      ),
-                    ),
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: SwitchListTile(
-                        value: currentItem["removeSp"],
-                        onChanged: (bool value){
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "removeSp", value
-                          );
-                        },
-                        title: const Text("移除特殊字符"),
-                        shape: styles.uniRoundedBorder
-                      ),
-                    ),
-                  ],
-                ),
-                ConstrainedBox(
-                  constraints: styles.tileWidthConstraint,
-                  child: ListTile(
-                    onTap: (){
-                      ui.showAlertQuickWidget(
-                        "选择预设",
-                        SingleChildScrollView(
-                          child: RadioGroup(
-                            groupValue: pwdList[widget._index]["preset"].toString(),
-                            onChanged: (value){
-                              Provider.of<PwdProvider>(context, listen: false).setValue(
-                                widget._index, "preset", value
-                              );
-                              Navigator.pop(context);
-                            },
-                            child: Column(
-                              children: [
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("simple")),
-                                  subtitle: Text("简易预设"),
-                                  shape: styles.uniRoundedBorder,
-                                  value: "simple",
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("complex")),
-                                  subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                  shape: styles.uniRoundedBorder,
-                                  value: "complex"
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("bank")),
-                                  subtitle: Text("生成六位的纯数字密码"),
-                                  shape: styles.uniRoundedBorder,
-                                  value: "bank"
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("custom")),
-                                  subtitle: Text("完全自定义整个生成流程"),
-                                  shape: styles.uniRoundedBorder,
-                                  value: "custom"
-                                )
-                              ],
-                            )
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: styles.uniInsetsSmall,
+            child: Center(
+              child: Column(
+                spacing: 8,
+                children: <Widget>[
+                  // 文本框区域
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: TextField(
+                          controller: _identifierController,
+                          onChanged: (value) {
+                            Provider.of<PwdProvider>(context, listen: false).setValue(
+                              widget._index, "identifier", value
+                            );
+                          },
+                          decoration: const InputDecoration(
+                            label: Text("档案名"),
+                            border: OutlineInputBorder()
                           ),
                         ),
-                        "取消",
-                        context
-                      );
-                    },
-                    title: const Text("生成预设"),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          utils.getPresetText(currentItem["preset"]),
-                          style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: TextField(
+                          controller: _userNameController,
+                          onChanged: (value) {
+                            Provider.of<PwdProvider>(context, listen: false).setValue(
+                              widget._index, "userName", value
+                            );
+                          },
+                          decoration: const InputDecoration(
+                            label: Text("用户名"),
+                            border: OutlineInputBorder()
+                          ),
                         ),
-                        Icon(Icons.arrow_drop_down)
-                      ],
-                    ),
-                    shape: styles.uniRoundedBorder
+                      ),
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: TextField(
+                          controller: _accountController,
+                          onChanged: (value) {
+                            Provider.of<PwdProvider>(context, listen: false).setValue(
+                              widget._index, "account", value
+                            );
+                          },
+                          decoration: const InputDecoration(
+                            label: Text("账号"),
+                            border: OutlineInputBorder()
+                          ),
+                        ),
+                      )
+                    ]
                   ),
-                ),
-              ],
+
+                  // 开关区域
+                  Wrap(
+                    spacing: 8,
+                    children: <Widget>[
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: SwitchListTile(
+                          value: currentItem["removeDigits"],
+                          onChanged: (bool value){
+                            Provider.of<PwdProvider>(context, listen: false).setValue(
+                              widget._index, "removeDigits", value
+                            );
+                          },
+                          title: const Text("移除数字"),
+                          shape: styles.uniRoundedBorder
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: SwitchListTile(
+                          value: currentItem["removeAlpha"],
+                          onChanged: (bool value){
+                            Provider.of<PwdProvider>(context, listen: false).setValue(
+                              widget._index, "removeAlpha", value
+                            );
+                          },
+                          title: const Text("移除字母"),
+                          shape: styles.uniRoundedBorder
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: SwitchListTile(
+                          value: currentItem["removeSp"],
+                          onChanged: (bool value){
+                            Provider.of<PwdProvider>(context, listen: false).setValue(
+                              widget._index, "removeSp", value
+                            );
+                          },
+                          title: const Text("移除特殊字符"),
+                          shape: styles.uniRoundedBorder
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // 预设
+                  ConstrainedBox(
+                    constraints: styles.tileWidthConstraint,
+                    child: ListTile(
+                      onTap: (){
+                        ui.showAlertQuickWidget(
+                          "选择预设",
+                          SingleChildScrollView(
+                            child: RadioGroup(
+                              groupValue: pwdList[widget._index]["preset"].toString(),
+                              onChanged: (value){
+                                Provider.of<PwdProvider>(context, listen: false).setValue(
+                                  widget._index, "preset", value
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: Column(
+                                children: [
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("simple")),
+                                    subtitle: Text("简易预设"),
+                                    shape: styles.uniRoundedBorder,
+                                    value: "simple",
+                                  ),
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("complex")),
+                                    subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                    shape: styles.uniRoundedBorder,
+                                    value: "complex"
+                                  ),
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("bank")),
+                                    subtitle: Text("生成六位的纯数字密码"),
+                                    shape: styles.uniRoundedBorder,
+                                    value: "bank"
+                                  ),
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("custom")),
+                                    subtitle: Text("完全自定义整个生成流程"),
+                                    shape: styles.uniRoundedBorder,
+                                    value: "custom"
+                                  )
+                                ],
+                              )
+                            ),
+                          ),
+                          "取消",
+                          context
+                        );
+                      },
+                      title: const Text("生成预设"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            utils.getPresetText(currentItem["preset"]),
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          Icon(Icons.arrow_drop_down)
+                        ],
+                      ),
+                      shape: styles.uniRoundedBorder
+                    ),
+                  ),
+
+                  // 危险区
+                  ConstrainedBox(
+                    constraints: styles.tileWidthConstraint,
+                    child: TextButton(
+                      onPressed: (){
+                        ui.showConfirmDialogQuick(
+                          context,
+                          (){
+                            Provider.of<PwdProvider>(context, listen: false).removeRecord(widget._index);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          "确认删除"
+                        );
+                      },
+                      style: styles.uniButtonStyle,
+                      child: Text(
+                        "删除这条记录",
+                        style: TextStyle(
+                          color: ColorScheme.of(context).error,
+                          fontWeight: FontWeight.w800
+                        ),
+                      )
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    } on RangeError catch (_) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("已删除的项"),
+        ),
+        body: Center(
+          child: Text(
+            "此条目已被删除",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      );
+    }
   }
 }
