@@ -4,7 +4,7 @@
 {
   "identifier": "用于标识这一密码条目的名称，显示给用户看",
   "userName": "用户名，也可以是其他用于标识唯一的账号的信息",
-  "platform": "当前密码用于的平台",
+  "account": "当前密码对应的账号",
   "preset": "生成使用的预设，可能是simple、complex、bank或custom",
   "removeSp": true,
   "removeDigits": true,
