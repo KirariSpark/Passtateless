@@ -10,7 +10,7 @@ String getPresetText(String? preset) {
     case 'complex':
       return '复杂模式';
     case 'bank':
-      return '支付密码模式';
+      return '支付密码';
     case 'custom':
       return '自定义模式';
     default:

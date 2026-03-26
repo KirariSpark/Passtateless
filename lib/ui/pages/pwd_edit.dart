@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
 import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/utils/utils.dart' as utils;
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
 class PwdEditPage extends StatefulWidget {
@@ -40,6 +42,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 1,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -152,29 +155,71 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         shape: styles.uniRoundedBorder
                       ),
                     ),
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: ListTile(
-                        title: const Text("生成预设"),
-                        trailing: DropdownMenu(
-                          initialSelection: currentItem["preset"], // 设置初始值
-                          onSelected: (value) {
-                            Provider.of<PwdProvider>(context, listen: false).setValue(
-                              widget._index, "preset", value
-                            );
-                          },
-                          dropdownMenuEntries: const [
-                            DropdownMenuEntry(value: "simple", label: "简易"),
-                            DropdownMenuEntry(value: "complex", label: "复杂"),
-                            DropdownMenuEntry(value: "bank", label: "支付"),
-                            DropdownMenuEntry(value: "custom", label: "自定义")
-                          ]
-                        ),
-                        shape: styles.uniRoundedBorder
-                      ),
-                    ),
                   ],
-                )
+                ),
+                ConstrainedBox(
+                  constraints: styles.tileWidthConstraint,
+                  child: ListTile(
+                    onTap: (){
+                      ui.showAlertQuickWidget(
+                        "选择预设",
+                        SingleChildScrollView(
+                          child: RadioGroup(
+                            groupValue: pwdList[widget._index]["preset"].toString(),
+                            onChanged: (value){
+                              Provider.of<PwdProvider>(context, listen: false).setValue(
+                                widget._index, "preset", value
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Column(
+                              children: [
+                                RadioListTile(
+                                  title: Text(utils.getPresetText("simple")),
+                                  subtitle: Text("简易预设"),
+                                  shape: styles.uniRoundedBorder,
+                                  value: "simple",
+                                ),
+                                RadioListTile(
+                                  title: Text(utils.getPresetText("complex")),
+                                  subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                  shape: styles.uniRoundedBorder,
+                                  value: "complex"
+                                ),
+                                RadioListTile(
+                                  title: Text(utils.getPresetText("bank")),
+                                  subtitle: Text("生成六位的纯数字密码"),
+                                  shape: styles.uniRoundedBorder,
+                                  value: "bank"
+                                ),
+                                RadioListTile(
+                                  title: Text(utils.getPresetText("custom")),
+                                  subtitle: Text("完全自定义整个生成流程"),
+                                  shape: styles.uniRoundedBorder,
+                                  value: "custom"
+                                )
+                              ],
+                            )
+                          ),
+                        ),
+                        "取消",
+                        context
+                      );
+                    },
+                    title: const Text("生成预设"),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          utils.getPresetText(currentItem["preset"]),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        Icon(Icons.arrow_drop_down)
+                      ],
+                    ),
+                    shape: styles.uniRoundedBorder
+                  ),
+                ),
               ],
             ),
           ),
