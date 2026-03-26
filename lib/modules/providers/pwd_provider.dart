@@ -21,19 +21,34 @@ class PwdProvider extends ChangeNotifier {
       "removeDigits": true,
       "removeAlpha": false,
       "starred": true
+    },
+    {
+      "identifier": "测试数据3",
+      "userName": "测试数据3",
+      "account": "测试数据3",
+      "preset": "custom",
+      "removeSp": true,
+      "removeDigits": false,
+      "removeAlpha": false,
+      "starred": true
     }
   ];
+
+  List<Map<String, dynamic>> _stars = [];
+  List<int> _mapStarredIndex2Original = []; // 收藏列表的每一项对应在完整列表的位置
 
   List<Map<String, dynamic>> get pwdList => _pwdList;
 
   List<Map<String, dynamic>> get starredPwds {
-    List<Map<String, dynamic>> stars = [];
-    for (var item in _pwdList) {
+    _stars = [];
+    _mapStarredIndex2Original = [];
+    for (var(index, item) in _pwdList.indexed) {
       if (item["starred"]) {
-        stars.add(item);
+        _stars.add(item);
+        _mapStarredIndex2Original.add(index);
       }
     }
-    return stars;
+    return _stars;
   }
 
   /// 更新指定项的数据
@@ -46,6 +61,14 @@ class PwdProvider extends ChangeNotifier {
   /// 更新指定项的收藏状态
   void switchStarState(int index) {
     _pwdList[index]["starred"] = !_pwdList[index]["starred"];
+    notifyListeners();
+  }
+
+  /// 从收藏列表更新指定项的收藏状态 - 它会同步更新完整列表
+  void switchStarStateFromStarred(int index) {
+    int indexInOriginal = _mapStarredIndex2Original[index];
+    _stars.removeAt(index);
+    _pwdList[indexInOriginal]["starred"] = !_pwdList[indexInOriginal]["starred"];
     notifyListeners();
   }
 
