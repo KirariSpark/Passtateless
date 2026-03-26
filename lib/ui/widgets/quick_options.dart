@@ -30,34 +30,6 @@ class HomePageQuickOptions extends StatelessWidget {
             trailing: Icon(Icons.arrow_forward),
             shape: styles.uniRoundedBorder
           ),
-        ),
-        // 基础设置
-        ConstrainedBox(
-          constraints: BoxConstraints(
-              maxWidth: 400
-          ),
-          child: ListTile(
-            onTap: onBasicTapped,
-            leading: Icon(Icons.settings),
-            title: Text("基础设置"),
-            subtitle: Text("主密码等基础生成器设置"),
-            trailing: Icon(Icons.arrow_forward),
-            shape: styles.uniRoundedBorder,
-          ),
-        ),
-        // 高级设置
-        ConstrainedBox(
-          constraints: BoxConstraints(
-              maxWidth: 400
-          ),
-          child: ListTile(
-            onTap: onAdvancedTapped,
-            leading: Icon(Icons.code),
-            title: Text("高级设置"),
-            subtitle: Text("自定义生成方案等高级生成器设置"),
-            trailing: Icon(Icons.arrow_forward),
-            shape: styles.uniRoundedBorder,
-          ),
         )
       ],
     );

@@ -77,4 +77,21 @@ class PwdProvider extends ChangeNotifier {
     _pwdList.removeAt(index);
     notifyListeners();
   }
+
+  /// 在所有记录条目结尾增加一条空记录，通常用于新增
+  void addEmptyRecord() {
+    _pwdList.add(
+        {
+          "identifier": "",
+          "userName": "",
+          "account": "",
+          "preset": "simple",
+          "removeSp": false,
+          "removeDigits": false,
+          "removeAlpha": false,
+          "starred": false
+        }
+    );
+    notifyListeners();
+  }
 }

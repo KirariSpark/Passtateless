@@ -57,8 +57,73 @@ class PwdListPage extends StatelessWidget {
           )
         );
       }
-
       return temp;
+    }
+  }
+
+  Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
+    if (pwdList.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_outlined),
+            style: styles.uniButtonStyle,
+          ),
+          title: const Text("所有密码"),
+        ),
+        body: Container(
+          padding: styles.uniInsetsSmall,
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: styles.tileWidthConstraint,
+            child: ListTile(
+              onTap: (){},
+              shape: styles.uniRoundedBorder,
+              leading: Icon(Icons.not_interested),
+              title: const Text("没有密码"),
+              subtitle: const Text("点击右下角的 + 以增加一条密码"),
+            ),
+          )
+        ),
+        floatingActionButton: ElevatedButton(
+          onPressed: (){},
+          style: styles.uniButtonStyle,
+          child: const Icon(Icons.add),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_outlined),
+            style: styles.uniButtonStyle,
+          ),
+          title: const Text("所有密码"),
+        ),
+        body: Container(
+          padding: styles.uniInsetsSmall,
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            child: Wrap(
+              children: _buildList(pwdList, context),
+            ),
+          )
+        ),
+        floatingActionButton: ElevatedButton(
+          onPressed: (){
+            Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
+          },
+          style: styles.uniButtonStyle,
+          child: const Icon(Icons.add),
+        ),
+      );
     }
   }
 
@@ -66,24 +131,6 @@ class PwdListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final pwdList = context.watch<PwdProvider>().pwdList;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_outlined),
-          style: styles.uniButtonStyle,
-        ),
-        title: const Text("所有密码"),
-      ),
-      body: Container(
-        padding: styles.uniInsetsSmall,
-        alignment: Alignment.topCenter,
-        child: Wrap(
-          children: _buildList(pwdList, context)
-        ),
-      ),
-    );
+    return _buildUi(pwdList, context);
   }
 }
