@@ -32,6 +32,7 @@ class PwdListPage extends StatelessWidget {
                 throw UnimplementedError("暂未实现点击复制逻辑");
               },
               shape: styles.uniRoundedBorder,
+              tileColor: ColorScheme.of(context).surfaceContainer,
               title: Text(item["identifier"] == "" ? "未命名" : item["identifier"]),
               subtitle: Text("${item["userName"]} @ ${item["account"]}"),
               trailing: Row(
@@ -85,11 +86,15 @@ class PwdListPage extends StatelessWidget {
               leading: Icon(Icons.not_interested),
               title: const Text("没有密码"),
               subtitle: const Text("点击右下角的 + 以增加一条密码"),
+              tileColor: ColorScheme.of(context).surfaceContainer,
             ),
           )
         ),
         floatingActionButton: ElevatedButton(
-          onPressed: (){},
+          onPressed: (){
+            Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
+          },
           style: styles.uniButtonStyle,
           child: const Icon(Icons.add),
         ),
@@ -111,6 +116,8 @@ class PwdListPage extends StatelessWidget {
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
             child: Wrap(
+              spacing: styles.layoutSpacing,
+              runSpacing: styles.layoutSpacing,
               children: _buildList(pwdList, context),
             ),
           )

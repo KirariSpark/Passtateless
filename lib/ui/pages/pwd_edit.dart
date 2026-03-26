@@ -124,7 +124,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                 ),
                 // 开关区域
                 Wrap(
-                  spacing: 8,
+                  spacing: styles.layoutSpacing,
+                  runSpacing: styles.layoutSpacing,
                   children: <Widget>[
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
@@ -136,7 +137,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           );
                         },
                         title: const Text("移除数字"),
-                        shape: styles.uniRoundedBorder
+                        shape: styles.uniRoundedBorder,
+                        tileColor: ColorScheme.of(context).surfaceContainer
                       ),
                     ),
                     ConstrainedBox(
@@ -149,7 +151,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           );
                         },
                         title: const Text("移除字母"),
-                        shape: styles.uniRoundedBorder
+                        shape: styles.uniRoundedBorder,
+                        tileColor: ColorScheme.of(context).surfaceContainer
                       ),
                     ),
                     ConstrainedBox(
@@ -162,7 +165,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           );
                         },
                         title: const Text("移除特殊字符"),
-                        shape: styles.uniRoundedBorder
+                        shape: styles.uniRoundedBorder,
+                        tileColor: ColorScheme.of(context).surfaceContainer
                       ),
                     ),
                   ],
@@ -228,7 +232,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         Icon(Icons.arrow_drop_down)
                       ],
                     ),
-                    shape: styles.uniRoundedBorder
+                    shape: styles.uniRoundedBorder,
+                    tileColor: ColorScheme.of(context).surfaceContainer,
                   ),
                 ),
                 // 危险区

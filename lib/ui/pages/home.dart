@@ -11,34 +11,21 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Center(
-        child: Padding(
+      child: SafeArea(
+        child: Container(
+          alignment: Alignment.center,
           padding: styles.uniInsetsSmall,
           child: Column(
             children: [
-              LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  double currentWidth = constraints.maxWidth;
-                  double targetWidth = ui.calcWidthConstraint(
-                    currentWidth,
-                    false,
-                    maxColumns: 3
-                  );
-                  return ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: targetWidth
-                    ),
-                    child: StarredPasswords()
-                  );
-                }
+              ConstrainedBox(
+                constraints: styles.pageWidthConstraint,
+                child: StarredPasswords()
               ),
               SizedBox(height: styles.layoutSpacing),
               HomePageQuickOptions(
                 onEditTapped: (){
                   Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
-                },
-                onBasicTapped: (){},
-                onAdvancedTapped: (){}
+                }
               )
             ],
           ),

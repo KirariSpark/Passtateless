@@ -12,9 +12,9 @@ RoundedRectangleBorder uniRoundedBorder = const RoundedRectangleBorder(
 
 BorderRadius uniBorderRadius = BorderRadius.circular(5);
 
-TextStyle uniHintTextStyle = const TextStyle(fontSize: 12, color: Colors.grey);
-
 BoxConstraints uniBoxConstraints = const BoxConstraints(maxWidth: 1010);
+
+BoxConstraints pageWidthConstraint = const BoxConstraints(maxWidth: 800);
 
 BoxConstraints tileWidthConstraint = const BoxConstraints(maxWidth: 400);
 
