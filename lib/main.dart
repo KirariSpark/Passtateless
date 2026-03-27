@@ -137,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
               extended: _isRailExtended,
               // 上部
               leading: IconButton(
-                style: styles.uniButtonStyle,
+                style: styles.buttonStyle,
                 onPressed: () {
                   setState(() {
                     _isRailExtended = !_isRailExtended;

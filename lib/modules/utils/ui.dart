@@ -3,23 +3,30 @@ import 'package:flutter/material.dart';
 
 /// 计算宽度约束
 /// [availableWidth]: 父容器提供的最大可用宽度
-/// [useSpacing]: 是否在计算中加入间隔，true则使用layoutSpacing，false则间隔为0
+/// [useSpacing]: 是否在计算中加入间隔
 /// [maxColumns]: 允许的最大列数限制，默认为100（即相当于不限制）
-double calcWidthConstraint(double availableWidth, bool useSpacing, {int maxColumns = 100}) {
+/// [usePadding]: 是否在计算时引入内边距
+double calcWidthConstraint(double availableWidth, bool useSpacing, {int maxColumns = 100, bool usePadding = false}) {
   final double tileWidth = styles.tileWidthConstraint.maxWidth;
   final double spacing = useSpacing ? styles.layoutSpacing : 0.0;
+  final double padding = usePadding ? styles.layoutSpacing : 0.0;
 
   if (tileWidth <= 0) return availableWidth;
 
-  // 计算可用宽度下自然排列的列数
-  int columns = ((availableWidth + spacing) / (tileWidth + spacing)).floor();
+  // 1. 计算除去内边距后的实际内容可用宽度
+  final double effectiveWidth = availableWidth - padding * 2;
 
-  // 使用 clamp 限制列数范围：最少1列，最多 maxColumns 列
+  // 2. 在有效宽度下计算自然排列的列数
+  // 公式推导：n * tileWidth + (n-1) * spacing <= effectiveWidth
+  int columns = ((effectiveWidth + spacing) / (tileWidth + spacing)).floor();
+
+  // 3. 使用 clamp 限制列数范围：最少1列，最多 maxColumns 列
   columns = columns.clamp(1, maxColumns);
 
-  // 计算总宽度：n个Tile宽度 + (n-1)个间隔
-  return columns * tileWidth + (columns - 1) * spacing;
+  // 4. 计算总宽度：n个Tile宽度 + (n-1)个间隔 + 左右内边距
+  return columns * tileWidth + (columns - 1) * spacing + padding * 2;
 }
+
 
 /// 便捷地显示SnackBar
 void showSnackBarQuick(String content, BuildContext context) {
@@ -35,12 +42,12 @@ void showAlertQuick(String title, String content, String buttonText, BuildContex
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      shape: styles.uniRoundedBorder,
+      shape: styles.roundedBorder,
       title: Text(title),
       content: Text(content),
       actions: [
         TextButton(
-          style: styles.uniButtonStyle,
+          style: styles.buttonStyle,
           onPressed: () {Navigator.pop(context);},
           child: Text(buttonText)
         )
@@ -53,12 +60,12 @@ void showAlertQuickWidget(String title, Widget content, String buttonText, Build
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      shape: styles.uniRoundedBorder,
+      shape: styles.roundedBorder,
       title: Text(title),
       content: content,
       actions: [
         TextButton(
-          style: styles.uniButtonStyle,
+          style: styles.buttonStyle,
           onPressed: () {Navigator.pop(context);},
           child: Text(buttonText)
         )
@@ -72,19 +79,19 @@ void showConfirmDialogQuick(BuildContext context, VoidCallback? function, String
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      shape: styles.uniRoundedBorder,
+      shape: styles.roundedBorder,
       title: Text(title),
       content: const Text("此操作不可撤销"),
       actions: [
         // 取消
         TextButton(
-          style: styles.uniButtonStyle,
+          style: styles.buttonStyle,
           onPressed: () => Navigator.pop(context),
           child: const Text("取消")
         ),
         // 确定
         TextButton(
-            style: styles.uniButtonStyle,
+            style: styles.buttonStyle,
           onPressed: function,
           child: Text(
             "确定",

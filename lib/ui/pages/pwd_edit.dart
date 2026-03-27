@@ -59,7 +59,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
             Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back_outlined),
-          style: styles.uniButtonStyle,
+          style: styles.buttonStyle,
         ),
         title: Text("编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}"),
       ),
@@ -75,6 +75,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
+                    // 档案名
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: TextField(
@@ -84,12 +85,15 @@ class _PwdEditPageState extends State<PwdEditPage> {
                             widget._index, "identifier", value
                           );
                         },
-                        decoration: const InputDecoration(
-                          label: Text("档案名"),
-                          border: OutlineInputBorder()
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                          label: const Text("档案名"),
+                          border: const OutlineInputBorder()
                         ),
                       ),
                     ),
+                    // 用户名
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: TextField(
@@ -99,12 +103,15 @@ class _PwdEditPageState extends State<PwdEditPage> {
                             widget._index, "userName", value
                           );
                         },
-                        decoration: const InputDecoration(
-                          label: Text("用户名"),
-                          border: OutlineInputBorder()
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                          label: const Text("用户名"),
+                          border: const OutlineInputBorder()
                         ),
                       ),
                     ),
+                    // 账号
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: TextField(
@@ -114,9 +121,11 @@ class _PwdEditPageState extends State<PwdEditPage> {
                             widget._index, "account", value
                           );
                         },
-                        decoration: const InputDecoration(
-                          label: Text("账号"),
-                          border: OutlineInputBorder()
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                          label: const Text("账号"),
+                          border: const OutlineInputBorder()
                         ),
                       ),
                     )
@@ -127,6 +136,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                   spacing: styles.layoutSpacing,
                   runSpacing: styles.layoutSpacing,
                   children: <Widget>[
+                    // 移除数字
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: SwitchListTile(
@@ -137,10 +147,11 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           );
                         },
                         title: const Text("移除数字"),
-                        shape: styles.uniRoundedBorder,
-                        tileColor: ColorScheme.of(context).surfaceContainer
+                        shape: styles.roundedBorder,
+                        tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
                       ),
                     ),
+                    // 移除字母
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: SwitchListTile(
@@ -151,10 +162,11 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           );
                         },
                         title: const Text("移除字母"),
-                        shape: styles.uniRoundedBorder,
-                        tileColor: ColorScheme.of(context).surfaceContainer
+                        shape: styles.roundedBorder,
+                        tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
                       ),
                     ),
+                    // 移除特殊字符
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: SwitchListTile(
@@ -165,13 +177,13 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           );
                         },
                         title: const Text("移除特殊字符"),
-                        shape: styles.uniRoundedBorder,
-                        tileColor: ColorScheme.of(context).surfaceContainer
+                        shape: styles.roundedBorder,
+                        tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
                       ),
                     ),
                   ],
                 ),
-                // 预设
+                // 预设选项
                 ConstrainedBox(
                   constraints: styles.tileWidthConstraint,
                   child: ListTile(
@@ -192,25 +204,25 @@ class _PwdEditPageState extends State<PwdEditPage> {
                                 RadioListTile(
                                   title: Text(utils.getPresetText("simple")),
                                   subtitle: Text("简易预设"),
-                                  shape: styles.uniRoundedBorder,
+                                  shape: styles.roundedBorder,
                                   value: "simple",
                                 ),
                                 RadioListTile(
                                   title: Text(utils.getPresetText("complex")),
                                   subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                  shape: styles.uniRoundedBorder,
+                                  shape: styles.roundedBorder,
                                   value: "complex"
                                 ),
                                 RadioListTile(
                                   title: Text(utils.getPresetText("bank")),
                                   subtitle: Text("生成六位的纯数字密码"),
-                                  shape: styles.uniRoundedBorder,
+                                  shape: styles.roundedBorder,
                                   value: "bank"
                                 ),
                                 RadioListTile(
                                   title: Text(utils.getPresetText("custom")),
                                   subtitle: Text("完全自定义整个生成流程"),
-                                  shape: styles.uniRoundedBorder,
+                                  shape: styles.roundedBorder,
                                   value: "custom"
                                 )
                               ],
@@ -232,8 +244,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         Icon(Icons.arrow_drop_down)
                       ],
                     ),
-                    shape: styles.uniRoundedBorder,
-                    tileColor: ColorScheme.of(context).surfaceContainer,
+                    shape: styles.roundedBorder,
+                    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
                   ),
                 ),
                 // 危险区
@@ -256,7 +268,10 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         "确认删除"
                       );
                     },
-                    style: styles.uniButtonStyle,
+                    style: ElevatedButton.styleFrom(
+                      shape: styles.roundedBorder,
+                      backgroundColor: ColorScheme.of(context).errorContainer
+                    ),
                     child: Text(
                       "删除这条记录",
                       style: TextStyle(

@@ -55,7 +55,7 @@ class _ConfigTabState extends State<ConfigTab> {
                           final (int, String) loadRes = await configProvider.loadConfig();
                           _showSnackBarQuick(loadRes.$2);
                         },
-                        style: styles.uniButtonStyle,
+                        style: styles.buttonStyle,
                         icon: const Icon(Icons.folder_open),
                       ),
                       // 保存当前文件
@@ -72,7 +72,7 @@ class _ConfigTabState extends State<ConfigTab> {
                             "确认覆盖"
                           );
                         },
-                        style: styles.uniButtonStyle,
+                        style: styles.buttonStyle,
                         icon: const Icon(Icons.save_outlined),
                       ),
                       // 打开示例文件
@@ -86,16 +86,16 @@ class _ConfigTabState extends State<ConfigTab> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text("选择示例文件"),
-                              shape: styles.uniRoundedBorder,
+                              shape: styles.roundedBorder,
                               // 操作按钮
                               actions: [
                                 TextButton(
-                                  style: styles.uniButtonStyle,
+                                  style: styles.buttonStyle,
                                   onPressed: () => Navigator.pop(context),
                                   child: const Text("取消")
                                 ),
                                 TextButton(
-                                  style: styles.uniButtonStyle,
+                                  style: styles.buttonStyle,
                                   onPressed: () {
                                     configProvider.loadDemoFiles();
                                     Navigator.pop(context);
@@ -125,7 +125,7 @@ class _ConfigTabState extends State<ConfigTab> {
                               ),
                             ));
                         },
-                        style: styles.uniButtonStyle,
+                        style: styles.buttonStyle,
                         icon: const Icon(Icons.lightbulb_outline),
                       ),
                       // 查看警告
@@ -136,12 +136,12 @@ class _ConfigTabState extends State<ConfigTab> {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              shape: styles.uniRoundedBorder,
+                              shape: styles.roundedBorder,
                               title: const Text("当前警告"),
                               content: Text(appProvider.v2Warnings == "" ? "没有警告" : appProvider.v2Warnings),
                               actions: [
                                 TextButton(
-                                  style: styles.uniButtonStyle,
+                                  style: styles.buttonStyle,
                                   onPressed: () {Navigator.pop(context);},
                                   child: const Text("确定")
                                 )
@@ -149,12 +149,12 @@ class _ConfigTabState extends State<ConfigTab> {
                             )
                           );
                         },
-                        style: styles.uniButtonStyle,
+                        style: styles.buttonStyle,
                         icon: const Icon(Icons.warning_amber_rounded),
                       ),
                       // 删除保存的文件
                       IconButton(
-                        style: styles.uniButtonStyle,
+                        style: styles.buttonStyle,
                         tooltip: "删除保存的文件",
                         onPressed: () async {
                           ui.showConfirmDialogQuick(

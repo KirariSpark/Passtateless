@@ -65,7 +65,7 @@ class HomeTab extends StatelessWidget {
                               secondary: const Icon(Icons.star_border),
                               title: const Text("移除特殊字符"),
                               subtitle: const Text("移除密码中的特殊字符"),
-                              shape: styles.uniRoundedBorder
+                              shape: styles.roundedBorder
                             ),
                           ),
                           // 移除字母
@@ -77,7 +77,7 @@ class HomeTab extends StatelessWidget {
                               secondary: const Icon(Icons.abc_rounded),
                               title: const Text("移除字母"),
                               subtitle: const Text("移除密码中的字母"),
-                              shape: styles.uniRoundedBorder,
+                              shape: styles.roundedBorder,
                             ),
                           ),
                           // 移除数字
@@ -89,7 +89,7 @@ class HomeTab extends StatelessWidget {
                               secondary: const Icon(Icons.onetwothree_rounded),
                               title: const Text("移除数字"),
                               subtitle: const Text("移除密码中的数字"),
-                              shape: styles.uniRoundedBorder,
+                              shape: styles.roundedBorder,
                             ),
                           ),
                         ],
@@ -119,18 +119,18 @@ class HomeTab extends StatelessWidget {
                           context: context,
                           builder: (context) => AlertDialog(
                             content: Text(appProvider.generateRes.$2),
-                            shape: styles.uniRoundedBorder,
+                            shape: styles.roundedBorder,
                             title: const Text("当前密码"),
                             actions: <Widget>[
                               TextButton(
-                                style: styles.uniButtonStyle,
+                                style: styles.buttonStyle,
                                 onPressed: () => Navigator.pop(context),
                                 child: const Text("确定"))
                             ],
                           )
                         );
                       },
-                      style: styles.uniButtonStyle,
+                      style: styles.buttonStyle,
                       icon: const Icon(Icons.preview_outlined)
                     ),
                     // 生成密码
@@ -147,7 +147,7 @@ class HomeTab extends StatelessWidget {
                           ui.showSnackBarQuick("密码已生成", context);
                         }
                       },
-                      style: styles.uniButtonStyle,
+                      style: styles.buttonStyle,
                       icon: Icon(
                         color: Theme.of(context).colorScheme.primary,
                         Icons.play_circle
@@ -170,7 +170,7 @@ class HomeTab extends StatelessWidget {
                             context: context,
                             builder: (context) => AlertDialog(
                               scrollable: true,
-                              shape: styles.uniRoundedBorder,
+                              shape: styles.roundedBorder,
                               title: const Text("评估密码"),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -208,7 +208,7 @@ class HomeTab extends StatelessWidget {
                                 ),
                               actions: [
                                 TextButton(
-                                  style: styles.uniButtonStyle,
+                                  style: styles.buttonStyle,
                                   onPressed: () {Navigator.pop(context);},
                                   child: const Text("确定")
                                 )
@@ -217,7 +217,7 @@ class HomeTab extends StatelessWidget {
                           );
                         }
                       },
-                      style: styles.uniButtonStyle,
+                      style: styles.buttonStyle,
                       icon: const Icon(Icons.fact_check_outlined)
                     )
                   ],

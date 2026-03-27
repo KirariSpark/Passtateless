@@ -15,19 +15,26 @@ class HomePage extends StatelessWidget {
         child: Container(
           alignment: Alignment.center,
           padding: styles.uniInsetsSmall,
-          child: Column(
-            children: [
-              ConstrainedBox(
-                constraints: styles.pageWidthConstraint,
-                child: StarredPasswords()
-              ),
-              SizedBox(height: styles.layoutSpacing),
-              HomePageQuickOptions(
-                onEditTapped: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
-                }
-              )
-            ],
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return Column(
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 3, usePadding: true)
+                    ),
+                    child: StarredPasswords()
+                  ),
+                  SizedBox(height: styles.layoutSpacing),
+                  HomePageQuickOptions(
+                    maxWidth: ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 3, usePadding: true),
+                    onEditTapped: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
+                    }
+                  )
+                ],
+              );
+            },
           ),
         ),
       ),

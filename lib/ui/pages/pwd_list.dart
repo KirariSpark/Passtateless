@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/pages/pwd_edit.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 
@@ -14,7 +15,7 @@ class PwdListPage extends StatelessWidget {
           constraints: styles.tileWidthConstraint,
           child: ListTile(
             onTap: (){},
-            shape: styles.uniRoundedBorder,
+            shape: styles.roundedBorder,
             leading: Icon(Icons.not_interested),
             title: Text("没有密码"),
           ),
@@ -25,37 +26,15 @@ class PwdListPage extends StatelessWidget {
       // 构建列表
       for (var(index, item) in pwdList.indexed) {
         temp.add(
-          ConstrainedBox(
-            constraints: styles.tileWidthConstraint,
-            child: ListTile(
-              onTap: (){
-                throw UnimplementedError("暂未实现点击复制逻辑");
-              },
-              shape: styles.uniRoundedBorder,
-              tileColor: ColorScheme.of(context).surfaceContainer,
-              title: Text(item["identifier"] == "" ? "未命名" : item["identifier"]),
-              subtitle: Text("${item["userName"]} @ ${item["account"]}"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    style: styles.uniButtonStyle,
-                    onPressed: (){
-                      Provider.of<PwdProvider>(context, listen: false).switchStarState(index);
-                    },
-                    icon: item["starred"] ? Icon(Icons.star) : Icon(Icons.star_border)
-                  ),
-                  IconButton(
-                    style: styles.uniButtonStyle,
-                    onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: index)));
-                    },
-                    icon: Icon(Icons.edit)
-                  ),
-                ],
-              ),
-            )
-          )
+          PwdTile(
+            pwdRecord: pwdList[index],
+            onStarPressed: (){
+              Provider.of<PwdProvider>(context, listen: false).switchStarState(index);
+            },
+            onEditPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: index)));
+            }
+          ),
         );
       }
       return temp;
@@ -71,7 +50,7 @@ class PwdListPage extends StatelessWidget {
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back_outlined),
-            style: styles.uniButtonStyle,
+            style: styles.buttonStyle,
           ),
           title: const Text("所有密码"),
         ),
@@ -82,22 +61,23 @@ class PwdListPage extends StatelessWidget {
             constraints: styles.tileWidthConstraint,
             child: ListTile(
               onTap: (){},
-              shape: styles.uniRoundedBorder,
+              shape: styles.roundedBorder,
               leading: Icon(Icons.not_interested),
               title: const Text("没有密码"),
-              subtitle: const Text("点击右下角的 + 以增加一条密码"),
+              subtitle: const Text("点击页面底部的 + 以增加一条密码"),
               tileColor: ColorScheme.of(context).surfaceContainer,
             ),
           )
         ),
-        floatingActionButton: ElevatedButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: (){
             Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
             Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
           },
-          style: styles.uniButtonStyle,
+          shape: styles.roundedBorder,
           child: const Icon(Icons.add),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       );
     } else {
       return Scaffold(
@@ -107,7 +87,7 @@ class PwdListPage extends StatelessWidget {
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back_outlined),
-            style: styles.uniButtonStyle,
+            style: styles.buttonStyle,
           ),
           title: const Text("所有密码"),
         ),
@@ -122,14 +102,15 @@ class PwdListPage extends StatelessWidget {
             ),
           )
         ),
-        floatingActionButton: ElevatedButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: (){
             Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
             Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
           },
-          style: styles.uniButtonStyle,
+          shape: styles.roundedBorder,
           child: const Icon(Icons.add),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       );
     }
   }

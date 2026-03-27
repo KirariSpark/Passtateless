@@ -1,9 +1,11 @@
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/ui/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  // debugPaintSizeEnabled = true;
   runApp(TestApp());
 }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
 import 'package:passtateless/modules/providers/pwd_provider.dart';
-import 'package:passtateless/ui/pages/pwd_edit.dart';
+import 'package:passtateless/ui/widgets/pwd_tile.dart';
 
 class StarredPasswords extends StatelessWidget {
   const StarredPasswords({super.key});
@@ -14,51 +14,46 @@ class StarredPasswords extends StatelessWidget {
     return Container(
       constraints: styles.tileHeightConstraint,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: ColorScheme.of(context).onPrimaryContainer
-        ),
+        color: ColorScheme.of(context).secondaryContainer.withAlpha(175),
         borderRadius: styles.uniBorderRadius
       ),
-      child: Padding(
-        padding: styles.uniInsetsSmall,
-        child: SingleChildScrollView(
-          child: Column(
-            children: _buildList(context, starredPasswords),
-          ),
+      padding: styles.uniInsetsSmall,
+      child: SingleChildScrollView(
+        child: Wrap(
+          spacing: styles.layoutSpacing,
+          runSpacing: styles.layoutSpacing,
+          children: _buildList(context, starredPasswords),
         ),
       ),
     );
   }
 
-  List<ListTile> _buildList(BuildContext context, List<Map<String, dynamic>> starredPasswords) {
+  List<Widget> _buildList(BuildContext context, List<Map<String, dynamic>> starredPasswords) {
     if (starredPasswords.isEmpty) {
-      return <ListTile>[
-        ListTile(
-          shape: styles.uniRoundedBorder,
-          onTap: (){},
-          title: const Text("没有收藏"),
-          subtitle: const Text("前往管理页面添加收藏项，以在此处快速访问"),
+      return <Widget>[
+        Material(
+          shape: styles.roundedBorder,
+          child: ListTile(
+            shape: styles.roundedBorder,
+            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(180),
+            onTap: (){},
+            title: const Text("没有收藏"),
+            subtitle: const Text("前往管理页面添加收藏项，以在此处快速访问"),
+          ),
         )
       ];
     } else {
-      List<ListTile> temp = [];
-      for (var(index, item) in starredPasswords.indexed) {
+      List<Widget> temp = [];
+      for (var(index, _) in starredPasswords.indexed) {
         temp.add(
-          ListTile(
-            shape: styles.uniRoundedBorder,
-            onTap: (){
-              throw UnimplementedError("暂未实现点击复制逻辑");
+          PwdTile(
+            pwdRecord: starredPasswords[index],
+            onStarPressed: (){
+              Provider.of<PwdProvider>(context, listen: false).switchStarStateFromStarred(index);
             },
-            title: Text(item['identifier'] == "" ? "未命名" : item['identifier']),
-            subtitle: Text("${item["userName"]} @ ${item["account"]}"),
-            trailing: IconButton(
-              style: styles.uniButtonStyle,
-              onPressed: (){
-                Provider.of<PwdProvider>(context, listen: false).switchStarStateFromStarred(index);
-              },
-              icon: item["starred"] ? Icon(Icons.star) : Icon(Icons.star_border)
-            ),
-          ),
+            hasEditButton: false,
+            alpha: 180,
+          )
         );
       }
       return temp;

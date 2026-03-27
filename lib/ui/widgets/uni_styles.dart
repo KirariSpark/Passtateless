@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
-ButtonStyle uniButtonStyle = ElevatedButton.styleFrom(
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5))
-    )
+RoundedRectangleBorder roundedBorder = const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(5))
 );
 
-RoundedRectangleBorder uniRoundedBorder = const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(5))
+ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+    shape: roundedBorder
 );
 
 BorderRadius uniBorderRadius = BorderRadius.circular(5);
