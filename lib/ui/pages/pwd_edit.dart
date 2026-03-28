@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/providers/pwd_provider.dart';
-import 'package:passtateless/modules/utils/utils.dart' as utils;
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
 class PwdEditPage extends StatefulWidget {
@@ -62,6 +62,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
           icon: const Icon(Icons.arrow_back_outlined),
           style: styles.buttonStyle,
         ),
+        // 就是看这个档案有没有被命名，没有就显示未命名
         title: Text("编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}"),
       ),
       body: SingleChildScrollView(
@@ -79,55 +80,46 @@ class _PwdEditPageState extends State<PwdEditPage> {
                     // 档案名
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
-                      child: TextField(
+                      child: styled.buildTextField(
+                        context: context,
                         controller: _identifierController,
                         onChanged: (value) {
                           Provider.of<PwdProvider>(context, listen: false).setValue(
                             widget._index, "identifier", value
                           );
                         },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
-                          label: const Text("档案名"),
-                          border: const OutlineInputBorder()
-                        ),
-                      ),
+                        label: "档案名",
+                        alpha: styles.alphaSemitransparent
+                      )
                     ),
                     // 用户名
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
-                      child: TextField(
+                      child: styled.buildTextField(
+                        context: context,
                         controller: _userNameController,
                         onChanged: (value) {
                           Provider.of<PwdProvider>(context, listen: false).setValue(
                             widget._index, "userName", value
                           );
                         },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
-                          label: const Text("用户名"),
-                          border: const OutlineInputBorder()
-                        ),
-                      ),
+                        label: "用户名",
+                        alpha: styles.alphaSemitransparent
+                      )
                     ),
                     // 账号
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
-                      child: TextField(
+                      child: styled.buildTextField(
+                        context: context,
                         controller: _accountController,
                         onChanged: (value) {
                           Provider.of<PwdProvider>(context, listen: false).setValue(
                             widget._index, "account", value
                           );
                         },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
-                          label: const Text("账号"),
-                          border: const OutlineInputBorder()
-                        ),
+                        label: "账号",
+                        alpha: styles.alphaSemitransparent
                       ),
                     )
                   ]
@@ -187,54 +179,9 @@ class _PwdEditPageState extends State<PwdEditPage> {
                 // 预设选项
                 ConstrainedBox(
                   constraints: styles.tileWidthConstraint,
-                  child: ListTile(
-                    onTap: (){
-                      ui.showAlertQuickWidget(
-                        "选择预设",
-                        SingleChildScrollView(
-                          child: RadioGroup(
-                            groupValue: pwdList[widget._index]["preset"].toString(),
-                            onChanged: (value){
-                              Provider.of<PwdProvider>(context, listen: false).setValue(
-                                widget._index, "preset", value
-                              );
-                              Navigator.pop(context);
-                            },
-                            child: Column(
-                              children: [
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("simple")),
-                                  subtitle: Text("简易预设"),
-                                  shape: styles.roundedBorder,
-                                  value: "simple",
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("complex")),
-                                  subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                  shape: styles.roundedBorder,
-                                  value: "complex"
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("bank")),
-                                  subtitle: Text("生成六位的纯数字密码"),
-                                  shape: styles.roundedBorder,
-                                  value: "bank"
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("custom")),
-                                  subtitle: Text("完全自定义整个生成流程"),
-                                  shape: styles.roundedBorder,
-                                  value: "custom"
-                                )
-                              ],
-                            )
-                          ),
-                        ),
-                        "取消",
-                        context
-                      );
-                    },
-                    title: const Text("生成预设"),
+                  child: styled.buildListTile(
+                    context: context,
+                    title: "生成预设",
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -245,8 +192,53 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         Icon(Icons.arrow_drop_down)
                       ],
                     ),
-                    shape: styles.roundedBorder,
-                    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                    alpha: styles.alphaSemitransparent,
+                    onTapped: (){
+                      ui.showAlertQuickWidget(
+                          "选择预设",
+                          SingleChildScrollView(
+                            child: RadioGroup(
+                                groupValue: pwdList[widget._index]["preset"].toString(),
+                                onChanged: (value){
+                                  Provider.of<PwdProvider>(context, listen: false).setValue(
+                                      widget._index, "preset", value
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                child: Column(
+                                  children: [
+                                    RadioListTile(
+                                      title: Text(utils.getPresetText("simple")),
+                                      subtitle: Text("简易预设"),
+                                      shape: styles.roundedBorder,
+                                      value: "simple",
+                                    ),
+                                    RadioListTile(
+                                        title: Text(utils.getPresetText("complex")),
+                                        subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                        shape: styles.roundedBorder,
+                                        value: "complex"
+                                    ),
+                                    RadioListTile(
+                                        title: Text(utils.getPresetText("bank")),
+                                        subtitle: Text("生成六位的纯数字密码"),
+                                        shape: styles.roundedBorder,
+                                        value: "bank"
+                                    ),
+                                    RadioListTile(
+                                        title: Text(utils.getPresetText("custom")),
+                                        subtitle: Text("完全自定义整个生成流程"),
+                                        shape: styles.roundedBorder,
+                                        value: "custom"
+                                    )
+                                  ],
+                                )
+                            ),
+                          ),
+                          "取消",
+                          context
+                      );
+                    },
                   ),
                 ),
                 // 危险区
@@ -261,7 +253,6 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           setState(() {
                             _isDeleting = true;
                           });
-
                           Provider.of<PwdProvider>(context, listen: false).removeRecord(widget._index);
                           Navigator.pop(context);
                           Navigator.pop(context);

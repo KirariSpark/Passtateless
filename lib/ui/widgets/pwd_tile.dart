@@ -7,6 +7,8 @@ class PwdTile extends StatelessWidget {
   final void Function()? _onEditPressed;
   final bool _hasEditButton;
   final int _alpha;
+
+  /// 用于显示密码的改版ListTile
   const PwdTile({
     super.key,
     required Map<String, dynamic> pwdRecord,
@@ -56,13 +58,13 @@ class PwdTile extends StatelessWidget {
                 style: styles.buttonStyle,
                 onPressed: _onStarPressed,
                 icon: _pwdRecord["starred"] ? Icon(
-                  Icons.star, color: ColorScheme.of(context).primary
+                  Icons.star, color: ColorScheme.of(context).primary.withAlpha(styles.alphaSemitransparent)
                 ) : Icon(Icons.star_border)
               ),
               ?_hasEditButton ? IconButton(
-                  style: styles.buttonStyle,
-                  onPressed: _onEditPressed,
-                  icon: Icon(Icons.edit_outlined)
+                style: styles.buttonStyle,
+                onPressed: _onEditPressed,
+                icon: Icon(Icons.edit_outlined)
               ) : null
             ],
           ),

@@ -1,8 +1,8 @@
-import 'package:passtateless/ui/widgets/eval_res.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/eval_res.dart';
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:zxcvbn/zxcvbn.dart';
 
 class PwdEvalPage extends StatefulWidget {

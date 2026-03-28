@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/ui/pages/pwd_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
-import 'package:passtateless/ui/pages/pwd_edit.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:provider/provider.dart';
 
 class PwdListPage extends StatelessWidget {
   const PwdListPage({super.key});
@@ -24,7 +24,7 @@ class PwdListPage extends StatelessWidget {
     } else {
       List<Widget> temp = [];
       // 构建列表
-      for (var(index, item) in pwdList.indexed) {
+      for (var(index, _) in pwdList.indexed) {
         temp.add(
           PwdTile(
             pwdRecord: pwdList[index],
