@@ -3,6 +3,7 @@ import 'package:passtateless/ui/widgets/stars.dart';
 import 'package:passtateless/ui/widgets/quick_options.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/pages/pwd_eval.dart';
 import 'package:passtateless/ui/pages/pwd_list.dart';
 
 class HomePage extends StatelessWidget {
@@ -31,7 +32,9 @@ class HomePage extends StatelessWidget {
                     onEditTapped: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
                     },
-                    onEvalTapped: (){},
+                    onEvalTapped: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEvalPage()));
+                    },
                   )
                 ],
               );

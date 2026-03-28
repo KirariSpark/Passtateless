@@ -8,7 +8,7 @@ ButtonStyle buttonStyle = ElevatedButton.styleFrom(
     shape: roundedBorder
 );
 
-BorderRadius uniBorderRadius = BorderRadius.circular(5);
+BorderRadius borderRadius = BorderRadius.circular(5);
 
 BoxConstraints uniBoxConstraints = const BoxConstraints(maxWidth: 1010);
 
@@ -28,7 +28,13 @@ InputDecoration uniInputDecoration(String label) {
     return InputDecoration(
         label: Text(label),
         border: OutlineInputBorder(
-            borderRadius: uniBorderRadius,
+            borderRadius: borderRadius,
         ),
     );
 }
+
+const int alphaTransparent = 0;
+
+const int alphaOpaque = 224;
+
+const int alphaSemitransparent = 192;

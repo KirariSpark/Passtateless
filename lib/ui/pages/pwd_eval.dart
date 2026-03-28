@@ -1,8 +1,10 @@
 import 'package:passtateless/ui/widgets/eval_res.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:zxcvbn/zxcvbn.dart';
 
 class PwdEvalPage extends StatelessWidget {
   const PwdEvalPage({super.key});
@@ -20,14 +22,22 @@ class PwdEvalPage extends StatelessWidget {
           style: styles.buttonStyle,
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
+      body: Container(
+        alignment: Alignment.topCenter,
+        child: Container(
+          padding: styles.uniInsetsSmall,
           constraints: styles.pageWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
+              spacing: styles.layoutSpacing,
               children: <Widget>[
-                TextField(
-
+                styled.buildTextField(
+                  context: context,
+                  label: "评估对象",
+                  alpha: styles.alphaSemitransparent
+                ),
+                EvalRes(
+                  evalRes: Zxcvbn().evaluate("i am using this as password come fight me lol"),
                 )
               ],
             ),

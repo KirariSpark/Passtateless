@@ -19,10 +19,10 @@ class HelpTab extends StatelessWidget {
           constraints: styles.uniBoxConstraints,
           decoration: BoxDecoration(
             color: Theme.of(context).hoverColor,
-            borderRadius: styles.uniBorderRadius,
+            borderRadius: styles.borderRadius,
           ),
           child: ClipRRect(
-            borderRadius: styles.uniBorderRadius,
+            borderRadius: styles.borderRadius,
             child: Markdown(data: appProvider.helpContent),
           ),
         ),
