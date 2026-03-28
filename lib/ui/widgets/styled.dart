@@ -35,19 +35,19 @@ TextField buildTextField({
   required BuildContext context,
   TextEditingController? controller,
   void Function(String)? onChanged,
-  void Function()? onEditingComplete,
   String? label,
-  int? alpha
+  int? alpha,
+  bool passwordMode = false
 }) {
   return TextField(
     controller: controller,
     onChanged: onChanged,
-    onEditingComplete: onEditingComplete,
     decoration: InputDecoration(
       filled: true,
       fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255),
       label: label == null ? null : Text(label),
       border: const OutlineInputBorder()
     ),
+    obscureText: passwordMode,
   );
 }
