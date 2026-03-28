@@ -1,4 +1,4 @@
-import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
 
 /// 计算宽度约束
@@ -102,26 +102,5 @@ void showConfirmDialogQuick(BuildContext context, VoidCallback? function, String
         )
       ],
     )
-  );
-}
-
-/// 构建预定义了风格的ListTile
-ListTile buildListTile({
-  required String title,
-  required BuildContext context,
-  IconData? leading,
-  String? subtitle,
-  Widget? trailing,
-  void Function()? onTapped,
-  int? alpha
-}) {
-  return ListTile(
-    onTap: onTapped,
-    leading: leading == null ? null : Icon(leading),
-    title: Text(title),
-    subtitle: subtitle == null ? null : Text(subtitle),
-    trailing: trailing,
-    shape: styles.roundedBorder,
-    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255),
   );
 }

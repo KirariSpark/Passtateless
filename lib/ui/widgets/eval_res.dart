@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:zxcvbn/zxcvbn.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/styles.dart' as styles;
 
 // 评分 - 文本
 const Map<int, String> scoreTextMap = {
@@ -39,7 +40,7 @@ class EvalRes extends StatelessWidget {
       spacing: styles.layoutSpacing,
       children: [
         // 评分
-        ui.buildListTile(
+        styled.buildListTile(
           title: "评分",
           subtitle: (evalRes.score! + 1).toString(),
           context: context,
@@ -50,21 +51,21 @@ class EvalRes extends StatelessWidget {
           alpha: 175
         ),
         // guesses
-        ui.buildListTile(
+        styled.buildListTile(
           title: "预估猜测次数",
           subtitle: evalRes.guesses.toString(),
           context: context,
           alpha: 175
         ),
         // 警告
-        ui.buildListTile(
+        styled.buildListTile(
           title: "警告",
           subtitle: evalRes.feedback.warning == "" ? "没有警告" : evalRes.feedback.warning ?? "",
           context: context,
           alpha: 175
         ),
         // 建议
-        ui.buildListTile(
+        styled.buildListTile(
           title: "建议",
           context: context,
           subtitle: _getSuggestionStr(),

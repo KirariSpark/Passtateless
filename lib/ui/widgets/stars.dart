@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 

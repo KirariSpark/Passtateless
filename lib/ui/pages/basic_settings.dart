@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/styles.dart' as styles;
 
 class BasicSettingPage extends StatelessWidget {
   const BasicSettingPage({super.key});

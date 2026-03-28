@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class HomePageQuickOptions extends StatelessWidget {
   final void Function()? onEditTapped;
@@ -19,24 +20,22 @@ class HomePageQuickOptions extends StatelessWidget {
         spacing: styles.layoutSpacing,
         children: [
           // 密码管理
-          ListTile(
-            onTap: onEditTapped,
-            leading: Icon(Icons.format_list_bulleted),
-            title: Text("密码管理"),
-            subtitle: Text("增加、删除或修改你的密码"),
+          styled.buildListTile(
+            title: "密码管理",
+            subtitle: "增加、删除或修改你的密码",
+            leading: Icons.format_list_bulleted,
             trailing: Icon(Icons.arrow_forward),
-            shape: styles.roundedBorder,
-            tileColor: ColorScheme.of(context).surfaceContainerLowest,
+            onTapped: onEditTapped,
+            context: context
           ),
           // 密码评估
-          ListTile(
-            onTap: onEvalTapped,
-            leading: Icon(Icons.checklist),
-            title: Text("密码评估"),
-            subtitle: Text("评估密码强度，并获取相关建议"),
-            trailing: Icon(Icons.arrow_forward),
-            shape: styles.roundedBorder,
-            tileColor: ColorScheme.of(context).surfaceContainerLowest,
+          styled.buildListTile(
+            title: "密码评估",
+            subtitle: "评估密码强度，并获取相关建议",
+            leading: Icons.checklist,
+              trailing: Icon(Icons.arrow_forward),
+            onTapped: onEvalTapped,
+            context: context
           )
         ],
       ),

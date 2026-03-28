@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/widgets/stars.dart';
 import 'package:passtateless/ui/widgets/quick_options.dart';
-import 'package:passtateless/ui/widgets/uni_styles.dart' as styles;
+import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd_list.dart';
 
