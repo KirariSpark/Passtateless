@@ -125,7 +125,8 @@ class HomeTab extends StatelessWidget {
                               TextButton(
                                 style: styles.buttonStyle,
                                 onPressed: () => Navigator.pop(context),
-                                child: const Text("确定"))
+                                child: const Text("确定")
+                              )
                             ],
                           )
                         );

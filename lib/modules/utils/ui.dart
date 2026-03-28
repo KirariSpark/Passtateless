@@ -27,7 +27,6 @@ double calcWidthConstraint(double availableWidth, bool useSpacing, {int maxColum
   return columns * tileWidth + (columns - 1) * spacing + padding * 2;
 }
 
-
 /// 便捷地显示SnackBar
 void showSnackBarQuick(String content, BuildContext context) {
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -55,6 +54,7 @@ void showAlertQuick(String title, String content, String buttonText, BuildContex
     )
   );
 }
+
 /// 便捷地显示只有一个按钮的AlertDialog，它的内容是一个Widget而非字符串
 void showAlertQuickWidget(String title, Widget content, String buttonText, BuildContext context) {
   showDialog(
@@ -102,5 +102,26 @@ void showConfirmDialogQuick(BuildContext context, VoidCallback? function, String
         )
       ],
     )
+  );
+}
+
+/// 构建预定义了风格的ListTile
+ListTile buildListTile({
+  required String title,
+  required BuildContext context,
+  IconData? leading,
+  String? subtitle,
+  Widget? trailing,
+  void Function()? onTapped,
+  int? alpha
+}) {
+  return ListTile(
+    onTap: onTapped,
+    leading: leading == null ? null : Icon(leading),
+    title: Text(title),
+    subtitle: subtitle == null ? null : Text(subtitle),
+    trailing: trailing,
+    shape: styles.roundedBorder,
+    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255),
   );
 }
