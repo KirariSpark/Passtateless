@@ -35,4 +35,5 @@
 ]
 ```
 
-若没有参数，可以不传`args`
+若没有参数，可以不传`args`  
+`name`的值均和`modules\generator\core.dart`中的方法相同
