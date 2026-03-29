@@ -131,55 +131,6 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
-  /// 从缓存加载规则
-  Future<(int stat, String errors)> loadFromCache() async {
-    final loadRes = await file_manager.loadCorrections();
-    if (loadRes.$1 == 0) {
-      _customRuleMap = loadRes.$2;
-      _correctionInputController.text = json.encode(loadRes.$2);
-      notifyListeners();
-      return (0, loadRes.$3);
-    } else {
-      return (1, loadRes.$3);
-    }
-  }
-
-  /// 覆盖缓存规则
-  Future<(int stat, String errors)> saveToCache() async {
-    final correctionsInput = _correctionInputController.text;
-
-    try {
-      // 验证JSON格式
-      final tempMap = json.decode(correctionsInput) as Map<String, dynamic>;
-      final allValuesAreString = tempMap.values.every((v) => v is String);
-      if (!allValuesAreString) {
-        return (1, "所有值必须为字符串");
-      }
-      // 保存
-      final saveRes = await file_manager.saveCorrections(correctionsInput);
-      return saveRes;
-    } catch (e) {
-      return (1, e.toString());
-    }
-  }
-
-  /// 删除缓存
-  Future<(int stat, String errors)> deleteCache() async {
-    try {
-      final delRes = await file_manager.deleteCorrections();
-      if (delRes.$1 == 0) {
-        _customRuleMap = {};
-        _correctionInputController.clear();
-        notifyListeners();
-        return delRes;
-      } else {
-        return delRes;
-      }
-    } catch (e) {
-      return (1, e.toString());
-    }
-  }
-
   // 加载帮助内容
   Future<void> _loadHelp() async {
     try {

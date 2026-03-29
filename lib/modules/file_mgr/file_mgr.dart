@@ -1,7 +1,6 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'dart:convert';
 
 /// 获取缓存目录路径
 Future<Directory> _getCacheDirectory() async {
@@ -78,58 +77,6 @@ Future<(int stat, String errors)> deleteFile(String relativePath) async {
     }
   } catch (e) {
     return (2, e.toString());
-  }
-}
-
-/// 从缓存文件加载自定义规则，对readFile的简单封装
-///
-/// 返回第一个状态码（1失败0成功），第二个为加载的规则，第三个为错误信息
-Future<(int stat, Map<String, dynamic> rules, String errors)> loadCorrections() async {
-  try {
-    const relativePath = 'password_generator_cache/cached_corrections.json';
-    final content = await readFile(relativePath);
-    if (content != null) {
-      return (0, json.decode(content) as Map<String, dynamic>, "加载成功");
-    }
-    return (1, {"": ""}, "缓存不存在或为空");
-  } catch (e) {
-    return (1, {"": ""}, e.toString());
-  }
-}
-
-/// 保存自定义规则到缓存文件，对writeFile的简单封装
-///
-/// [correctionsJson] 矫正规则的JSON字符串
-///
-/// 返回的第一个值为状态码（成功0失败1），第二个为错误信息
-Future<(int, String)> saveCorrections(String correctionsJson) async {
-  if (correctionsJson.isEmpty) {
-    return (1, "输入为空");
-  }
-
-  try {
-    const relativePath = 'password_generator_cache/cached_corrections.json';
-    await writeFile(relativePath, correctionsJson);
-    return (0, "保存成功");
-  } catch (e) {
-    return (1, e.toString());
-  }
-}
-
-/// 删除缓存文件，对deleteFile的简单封装
-///
-/// 返回的第一个值为状态码（成功0失败1），第二个为错误信息
-Future<(int, String)> deleteCorrections() async {
-  try {
-    const relativePath = 'password_generator_cache/cached_corrections.json';
-    final delStat = await deleteFile(relativePath);
-    if (delStat.$1 == 0) {
-      return (0, "删除成功");
-    } else {
-      return (1, delStat.$2);
-    }
-  } catch (e) {
-    return (1, e.toString());
   }
 }
 
