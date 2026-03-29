@@ -16,15 +16,12 @@ class HelpTab extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         alignment: AlignmentGeometry.topCenter,
         child: Container(
-          constraints: styles.uniBoxConstraints,
           decoration: BoxDecoration(
-            color: Theme.of(context).hoverColor,
-            borderRadius: styles.borderRadius,
+            color: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+            borderRadius: styles.borderRadius
           ),
-          child: ClipRRect(
-            borderRadius: styles.borderRadius,
-            child: Markdown(data: appProvider.helpContent),
-          ),
+          constraints: styles.pageWidthConstraint,
+          child: Markdown(data: appProvider.helpContent)
         ),
       ),
     );

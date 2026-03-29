@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/ui/pages/pwd_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -13,12 +14,13 @@ class PwdListPage extends StatelessWidget {
       return <Widget>[
         ConstrainedBox(
           constraints: styles.tileWidthConstraint,
-          child: ListTile(
-            onTap: (){},
-            shape: styles.roundedBorder,
-            leading: Icon(Icons.not_interested),
-            title: Text("没有密码"),
-          ),
+          child: styled.buildListTile(
+            title: "没有密码",
+            subtitle: "点击页面底部的 + 以新增一条密码",
+            leading: Icons.not_interested,
+            alpha: styles.alphaSemitransparent,
+            context: context
+          )
         )
       ];
     } else {
@@ -33,7 +35,8 @@ class PwdListPage extends StatelessWidget {
             },
             onEditPressed: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: index)));
-            }
+            },
+            alpha: styles.alphaSemitransparent,
           ),
         );
       }
@@ -42,77 +45,38 @@ class PwdListPage extends StatelessWidget {
   }
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
-    if (pwdList.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back_outlined),
-            style: styles.buttonStyle,
-          ),
-          title: const Text("所有密码"),
-        ),
-        body: Container(
-          padding: styles.uniInsetsSmall,
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: styles.tileWidthConstraint,
-            child: ListTile(
-              onTap: (){},
-              shape: styles.roundedBorder,
-              leading: Icon(Icons.not_interested),
-              title: const Text("没有密码"),
-              subtitle: const Text("点击页面底部的 + 以增加一条密码"),
-              tileColor: ColorScheme.of(context).surfaceContainer,
-            ),
-          )
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
-            Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
           },
-          shape: styles.roundedBorder,
-          child: const Icon(Icons.add),
+          icon: Icon(Icons.arrow_back_outlined),
+          style: styles.buttonStyle,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back_outlined),
-            style: styles.buttonStyle,
+        title: const Text("所有密码"),
+      ),
+      body: Container(
+        padding: styles.uniInsetsSmall,
+        alignment: Alignment.topCenter,
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: styles.layoutSpacing,
+            runSpacing: styles.layoutSpacing,
+            children: _buildList(pwdList, context),
           ),
-          title: const Text("所有密码"),
-        ),
-        body: Container(
-          padding: styles.uniInsetsSmall,
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: styles.layoutSpacing,
-              runSpacing: styles.layoutSpacing,
-              children: _buildList(pwdList, context),
-            ),
-          )
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
-            Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
-          },
-          shape: styles.roundedBorder,
-          child: const Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      );
-    }
+        )
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
+        },
+        shape: styles.roundedBorder,
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
   }
 
   @override
