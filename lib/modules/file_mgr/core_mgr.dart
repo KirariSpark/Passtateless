@@ -1,4 +1,5 @@
 import 'package:path_provider/path_provider.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'dart:io';
 
 /// 获取缓存目录路径
@@ -22,20 +23,20 @@ Future<Directory> _getCacheDirectory() async {
 ///
 /// [relativePath]要读取的文件相对于缓存路径的相对路径
 ///
-/// 返回 状态码、错误和结果
-Future<(int stat, String errors, String res)> readTextFile(String relativePath) async {
+/// 返回 错误码和结果
+Future<(ErrorCode, String res)> readTextFile(String relativePath) async {
   try {
     final baseDir = await _getCacheDirectory();
     final filePath = '${baseDir.path}/$relativePath';
     final file = File(filePath);
 
     if (await file.exists()) {
-      return (0, "", await file.readAsString());
+      return (ErrorCode.success, await file.readAsString());
+    } else {
+      return (ErrorCode.fileNotExist, "");
     }
-
-    return (1, "文件不存在", "");
   } catch (e) {
-    return (2, e.toString(), "");
+    return (ErrorCode.unknown, "");
   }
 }
 
@@ -43,7 +44,7 @@ Future<(int stat, String errors, String res)> readTextFile(String relativePath) 
 ///
 /// [relativePath]要写入的文件相对于缓存路径的相对路径
 /// [content]要写入的内容
-Future<(int stat, String errors)> writeTextFile(String relativePath, String content) async {
+Future<(ErrorCode, String errors)> writeTextFile(String relativePath, String content) async {
   try {
     final baseDir = await _getCacheDirectory();
     final filePath = '${baseDir.path}/$relativePath';
@@ -57,9 +58,9 @@ Future<(int stat, String errors)> writeTextFile(String relativePath, String cont
 
     await file.writeAsString(content);
 
-    return (0, "");
+    return (ErrorCode.success, "");
   } catch (e) {
-    return (1, e.toString());
+    return (ErrorCode.unknown, e.toString());
   }
 }
 
@@ -67,7 +68,7 @@ Future<(int stat, String errors)> writeTextFile(String relativePath, String cont
 ///
 /// [relativePath]要删除的文件相对于缓存路径的相对路径
 /// 返回值 0 成功，1 不存在， 2 出错
-Future<(int stat, String errors)> deleteFile(String relativePath) async {
+Future<(ErrorCode, String errors)> deleteFile(String relativePath) async {
   try {
     final baseDir = await _getCacheDirectory();
     final filePath = '${baseDir.path}/$relativePath';
@@ -75,11 +76,11 @@ Future<(int stat, String errors)> deleteFile(String relativePath) async {
 
     if (await file.exists()) {
       await file.delete();
-      return (0, "删除成功");
+      return (ErrorCode.success, "删除成功");
     } else {
-      return (1, "目标文件不存在");
+      return (ErrorCode.fileNotExist, "目标文件不存在");
     }
   } catch (e) {
-    return (2, e.toString());
+    return (ErrorCode.unknown, e.toString());
   }
 }
