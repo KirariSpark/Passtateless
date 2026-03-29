@@ -36,18 +36,22 @@ TextField buildTextField({
   TextEditingController? controller,
   void Function(String)? onChanged,
   String? label,
-  int? alpha,
-  bool passwordMode = false
+  int alpha = 255,
+  bool passwordMode = false,
+  bool multiline = false,
+  int? maxLines = 1
 }) {
   return TextField(
     controller: controller,
     onChanged: onChanged,
     decoration: InputDecoration(
       filled: true,
-      fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255),
+      fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha),
       label: label == null ? null : Text(label),
       border: const OutlineInputBorder()
     ),
     obscureText: passwordMode,
+    keyboardType: multiline ? TextInputType.multiline : null,
+    maxLines: maxLines,
   );
 }

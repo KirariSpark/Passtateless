@@ -6,6 +6,7 @@
   "userName": "用户名，也可以是其他用于标识唯一的账号的信息",
   "account": "当前密码对应的账号",
   "preset": "生成使用的预设，可能是simple、complex、bank或custom",
+  "custom": "自定义模式下的生成配置",
   "removeSp": true,
   "removeDigits": true,
   "removeAlpha": true,
@@ -13,6 +14,5 @@
 }
 ```
 
-后三个`remove`分别为是否移除特殊字符、数字和字母的标记。  
-`custom`预设不会存储生成配置。  
+后三个`remove`分别为是否移除特殊字符、数字和字母的标记。
 `starred`标记该配置是否被收藏。

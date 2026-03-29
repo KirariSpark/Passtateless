@@ -10,7 +10,8 @@ class PwdProvider extends ChangeNotifier {
       "removeSp": true,
       "removeDigits": false,
       "removeAlpha": true,
-      "starred": false
+      "starred": false,
+      "custom": ""
     },
     {
       "identifier": "测试数据2",
@@ -20,7 +21,8 @@ class PwdProvider extends ChangeNotifier {
       "removeSp": true,
       "removeDigits": true,
       "removeAlpha": false,
-      "starred": true
+      "starred": true,
+      "custom": ""
     },
     {
       "identifier": "测试数据3",
@@ -30,7 +32,8 @@ class PwdProvider extends ChangeNotifier {
       "removeSp": true,
       "removeDigits": false,
       "removeAlpha": false,
-      "starred": true
+      "starred": true,
+      "custom": ""
     }
   ];
 
@@ -89,7 +92,8 @@ class PwdProvider extends ChangeNotifier {
         "removeSp": false,
         "removeDigits": false,
         "removeAlpha": false,
-        "starred": false
+        "starred": false,
+        "custom": ""
       }
     );
     notifyListeners();
