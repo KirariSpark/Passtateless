@@ -4,6 +4,7 @@ import 'package:passtateless/ui/pages/pwd_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
+import 'package:passtateless/ui/pages/pwd_view.dart';
 import 'package:provider/provider.dart';
 
 class PwdListPage extends StatelessWidget {
@@ -36,6 +37,16 @@ class PwdListPage extends StatelessWidget {
             onEditPressed: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: index)));
             },
+            onTapped: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
+                identifier: pwdList[index]["identifier"],
+                userName: pwdList[index]["userName"],
+                account: pwdList[index]["account"],
+                removeDigits: pwdList[index]["removeDigits"],
+                removeAlpha: pwdList[index]["removeAlpha"],
+                removeSp: pwdList[index]["removeSp"],
+              )));
+            },
             alpha: styles.alphaSemitransparent,
           ),
         );
@@ -60,10 +71,23 @@ class PwdListPage extends StatelessWidget {
         padding: styles.uniInsetsSmall,
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
-          child: Wrap(
-            spacing: styles.layoutSpacing,
-            runSpacing: styles.layoutSpacing,
-            children: _buildList(pwdList, context),
+          child: Column(
+            children: [
+              // 主列表区域
+              Wrap(
+                spacing: styles.layoutSpacing,
+                runSpacing: styles.layoutSpacing,
+                children: _buildList(pwdList, context),
+              ),
+              // 防止列表被FAB挡住
+              SizedBox(height: 25),
+              // TODO
+              TextField(
+                decoration: InputDecoration(
+                  border: InputBorder.none
+                ),
+              )
+            ],
           ),
         )
       ),
@@ -82,7 +106,6 @@ class PwdListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pwdList = context.watch<PwdProvider>().pwdList;
-
     return _buildUi(pwdList, context);
   }
 }

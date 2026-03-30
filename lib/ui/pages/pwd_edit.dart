@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
@@ -18,7 +17,6 @@ class _PwdEditPageState extends State<PwdEditPage> {
   late TextEditingController _identifierController;
   late TextEditingController _userNameController;
   late TextEditingController _accountController;
-  late TextEditingController _customController;
 
   bool _isDeleting = false;
 
@@ -29,7 +27,6 @@ class _PwdEditPageState extends State<PwdEditPage> {
     _identifierController = TextEditingController(text: data["identifier"]);
     _userNameController = TextEditingController(text: data["userName"]);
     _accountController = TextEditingController(text: data["account"]);
-    _customController = TextEditingController(text: data["custom"]);
   }
 
   @override
@@ -37,7 +34,6 @@ class _PwdEditPageState extends State<PwdEditPage> {
     _identifierController.dispose();
     _userNameController.dispose();
     _accountController.dispose();
-    _customController.dispose();
     super.dispose();
   }
 
@@ -178,89 +174,6 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       ),
                     )
                   ],
-                ),
-                // 生成预设
-                ConstrainedBox(
-                  constraints: styles.tileWidthConstraint,
-                  child: styled.buildListTile(
-                    context: context,
-                    title: "生成预设",
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          utils.getPresetText(currentItem["preset"]),
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        Icon(Icons.arrow_drop_down)
-                      ],
-                    ),
-                    alpha: styles.alphaSemitransparent,
-                    onTapped: (){
-                      ui.showAlertQuickWidget(
-                        "选择预设",
-                        SingleChildScrollView(
-                          child: RadioGroup(
-                            groupValue: pwdList[widget._index]["preset"].toString(),
-                            onChanged: (value){
-                              Provider.of<PwdProvider>(context, listen: false).setValue(
-                                widget._index, "preset", value
-                              );
-                              Navigator.pop(context);
-                            },
-                            child: Column(
-                              children: [
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("simple")),
-                                  subtitle: Text("简易预设"),
-                                  shape: styles.roundedBorder,
-                                  value: "simple",
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("complex")),
-                                  subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                  shape: styles.roundedBorder,
-                                  value: "complex"
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("bank")),
-                                  subtitle: Text("生成六位的纯数字密码"),
-                                  shape: styles.roundedBorder,
-                                  value: "bank"
-                                ),
-                                RadioListTile(
-                                  title: Text(utils.getPresetText("custom")),
-                                  subtitle: Text("完全自定义整个生成流程"),
-                                  shape: styles.roundedBorder,
-                                  value: "custom"
-                                )
-                              ],
-                            )
-                          ),
-                        ),
-                        "取消",
-                        context
-                      );
-                    },
-                  ),
-                ),
-                // 自定义规则
-                ConstrainedBox(
-                  constraints: styles.tileWidthConstraint,
-                  child: pwdList[widget._index]["preset"].toString() == "custom" ?
-                    styled.buildTextField(
-                      context: context,
-                      label: "自定义规则",
-                      onChanged: (value) {
-                        Provider.of<PwdProvider>(context, listen: false).setValue(
-                          widget._index, "custom", value
-                        );
-                      },
-                      alpha: styles.alphaSemitransparent,
-                      controller: _customController,
-                      multiline: true,
-                      maxLines: 5
-                    ) : null,
                 ),
                 // 危险区
                 ConstrainedBox(

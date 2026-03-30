@@ -39,6 +39,7 @@ TextField buildTextField({
   int alpha = 255,
   bool passwordMode = false,
   bool multiline = false,
+  bool readonly = false,
   int? maxLines = 1
 }) {
   return TextField(
@@ -53,5 +54,6 @@ TextField buildTextField({
     obscureText: passwordMode,
     keyboardType: multiline ? TextInputType.multiline : null,
     maxLines: maxLines,
+    readOnly: readonly,
   );
 }

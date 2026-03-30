@@ -5,6 +5,7 @@ class PwdTile extends StatelessWidget {
   final Map<String, dynamic> _pwdRecord;
   final void Function()? _onStarPressed;
   final void Function()? _onEditPressed;
+  final void Function()? _onTapped;
   final bool _hasEditButton;
   final int _alpha;
 
@@ -14,12 +15,14 @@ class PwdTile extends StatelessWidget {
     required Map<String, dynamic> pwdRecord,
     required void Function()? onStarPressed,
     void Function()? onEditPressed,
+    void Function()? onTapped,
     bool hasEditButton = true,
     int alpha = 255
   }) :
     _onStarPressed = onStarPressed,
     _pwdRecord = pwdRecord,
     _onEditPressed = onEditPressed,
+    _onTapped = onTapped,
     _hasEditButton = hasEditButton,
     _alpha = alpha;
 
@@ -44,9 +47,7 @@ class PwdTile extends StatelessWidget {
       child: Material(
         shape: styles.roundedBorder,
         child: ListTile(
-          onTap: (){
-            throw UnimplementedError("暂未实现点击复制逻辑");
-          },
+          onTap: _onTapped,
           shape: styles.roundedBorder,
           tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(_alpha),
           title: Text(_pwdRecord["identifier"] == "" ? "未命名" : _pwdRecord["identifier"]),

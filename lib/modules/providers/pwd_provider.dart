@@ -6,34 +6,28 @@ class PwdProvider extends ChangeNotifier {
       "identifier": "测试数据1",
       "userName": "测试数据1",
       "account": "测试数据1",
-      "preset": "simple",
       "removeSp": true,
       "removeDigits": false,
       "removeAlpha": true,
-      "starred": false,
-      "custom": ""
+      "starred": false
     },
     {
       "identifier": "测试数据2",
       "userName": "测试数据2",
       "account": "测试数据2",
-      "preset": "complex",
       "removeSp": true,
       "removeDigits": true,
       "removeAlpha": false,
-      "starred": true,
-      "custom": ""
+      "starred": true
     },
     {
       "identifier": "测试数据3",
       "userName": "测试数据3",
       "account": "测试数据3",
-      "preset": "custom",
       "removeSp": true,
       "removeDigits": false,
       "removeAlpha": false,
-      "starred": true,
-      "custom": ""
+      "starred": true
     }
   ];
 
@@ -88,12 +82,10 @@ class PwdProvider extends ChangeNotifier {
         "identifier": "",
         "userName": "",
         "account": "",
-        "preset": "simple",
         "removeSp": false,
         "removeDigits": false,
         "removeAlpha": false,
-        "starred": false,
-        "custom": ""
+        "starred": false
       }
     );
     notifyListeners();
