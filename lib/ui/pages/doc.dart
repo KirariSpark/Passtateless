@@ -30,7 +30,9 @@ class DocPage extends StatelessWidget {
       doc = docProvider.basicDoc;
     } else if (mode == "faq"){
       doc = docProvider.faqDoc;
-    } else {
+    } else if (mode == "get_started"){
+      doc = docProvider.getStartedDoc;
+    }  else {
       doc = "不存在此文档";
     }
 

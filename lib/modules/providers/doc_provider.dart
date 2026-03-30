@@ -24,6 +24,9 @@ class DocProvider extends ChangeNotifier {
   String _faqDoc = "正在加载";
   String get faqDoc => _faqDoc;
 
+  String _getStartedDoc = "正在加载";
+  String get getStartedDoc => _getStartedDoc;
+
   // 加载JSON文档
   Future<void> _loadHelp() async {
     try {
@@ -55,6 +58,11 @@ class DocProvider extends ChangeNotifier {
       _faqDoc = await rootBundle.loadString("assets/docs/faq.md");
     } catch (e) {
       _faqDoc = "加载失败: $e";
+    }
+    try {
+      _getStartedDoc = await rootBundle.loadString("assets/docs/get_started.md");
+    } catch (e) {
+      _getStartedDoc = "加载失败: $e";
     }
     notifyListeners();
   }

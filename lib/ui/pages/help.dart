@@ -45,6 +45,17 @@ class HelpPage extends StatelessWidget {
                   context: context
                 ),
                 styled.buildListTile(
+                  title: "开始使用",
+                  subtitle: "第一次使用？查看此文档以快速上手",
+                  trailing: Icon(Icons.arrow_forward),
+                  onTapped: () {
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => DocPage(title: "开始使用", mode: "get_started"))
+                    );
+                  },
+                  context: context
+                ),
+                styled.buildListTile(
                   title: "JSON 基础",
                   subtitle: "了解基础的 JSON 语法，用于编写自定义生成设置",
                   trailing: Icon(Icons.arrow_forward),
