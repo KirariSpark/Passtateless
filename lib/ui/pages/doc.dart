@@ -4,16 +4,31 @@ import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:provider/provider.dart';
 
-class JsonDocPage extends StatelessWidget {
-  const JsonDocPage({super.key});
+class DocPage extends StatelessWidget {
+  final String title;
+  final String mode;
+
+  /// 构造函数
+  ///
+  /// [mode] 决定了选择哪个文档来展示，支持 json、formatting
+  const DocPage({super.key, required this.title, required this.mode});
 
   @override
   Widget build(BuildContext context) {
     final docProvider = Provider.of<DocProvider>(context);
+    late final String doc;
+
+    if (mode == "json") {
+      doc = docProvider.jsonDoc;
+    } else if (mode == "formatting") {
+      doc = docProvider.formattingDoc;
+    } else {
+      doc = "不存在此文档";
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("帮助：JSON 语法"),
+        title: Text("帮助：$title"),
         leading: IconButton(
           onPressed: () {Navigator.pop(context);},
           icon: const Icon(Icons.arrow_back_outlined),
@@ -29,7 +44,10 @@ class JsonDocPage extends StatelessWidget {
             borderRadius: styles.borderRadius
           ),
           constraints: styles.pageWidthConstraint,
-          child: Markdown(data: docProvider.jsonDoc)
+          child: Markdown(
+            data: doc,
+            // imageDirectory: "assets/",
+          )
         ),
       ),
     );

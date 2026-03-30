@@ -69,6 +69,7 @@ flutter:
   assets:
    - assets/examples/
    - assets/docs/
+   - assets/docs/imgs/formatting/
    - assets/help.md
 
   # An image asset can refer to one or more resolution-specific "variants", see
