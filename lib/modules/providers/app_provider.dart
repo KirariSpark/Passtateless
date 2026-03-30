@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passtateless/scripts/main_generator.dart';
@@ -13,16 +12,6 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 页面标题
-  final List<String> pageTitles = ['生成密码', 'V2生成器', '矫正规则', '帮助'];
-  String get currentTitle => pageTitles[_currentIndex];
-  // 自定义规则
-  Map<String, dynamic> _customRuleMap = {};
-  Map<String, dynamic> get customRuleMap => _customRuleMap;
-  void setCustomRules(Map<String, dynamic> map) {
-    _customRuleMap = map;
-  }
-
   // 帮助内容
   String _helpContent = '正在加载帮助';
   String get helpContent => _helpContent;
@@ -30,11 +19,6 @@ class AppProvider extends ChangeNotifier {
   // ————控制器————
   final TextEditingController _inputTextController = TextEditingController();
   TextEditingController get inputTextController => _inputTextController;
-
-  final TextEditingController _correctionInputController =
-      TextEditingController();
-  TextEditingController get correctionInputController =>
-      _correctionInputController;
 
   AppProvider() {
     _loadHelp();
@@ -99,7 +83,6 @@ class AppProvider extends ChangeNotifier {
 
       _generateRes = uniPasswordGen(
         input: rawInput,
-        customRules: _customRuleMap,
         removeSpChar: _removeSpChar,
         removeAlpha: _removeAlpha,
         removeDigits: _removeDigits,
@@ -109,24 +92,6 @@ class AppProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-  }
-
-  /// 解析 JSON 规则
-  (int stat, String errors) parseJSON(String jsonString) {
-    try {
-      final parsed = json.decode(jsonString) as Map<String, dynamic>;
-      final allValuesAreString = parsed.values.every((v) => v is String);
-
-      if (!allValuesAreString) {
-        return (1, "所有值必须为字符串");
-      }
-
-      _customRuleMap = parsed;
-      notifyListeners();
-      return (0, "解析成功");
-    } catch (e) {
-      return (1, e.toString());
-    }
   }
 
   // 加载帮助内容
@@ -144,7 +109,6 @@ class AppProvider extends ChangeNotifier {
   @override
   void dispose() {
     _inputTextController.dispose();
-    _correctionInputController.dispose();
     super.dispose();
   }
 }

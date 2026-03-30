@@ -7,7 +7,6 @@ import 'package:passtateless/modules/utils/utils.dart' as utils;
 /// 如果第一项为0，说明生成成功，第二项返回密码；否则生成失败，返回错误信息
 ///
 /// [input] 用户输入的原始字符串
-/// [customRules] 用户自定义的矫正规则映射表
 /// [removeSpChar] 是否移除特殊字符
 /// [removeAlpha] 是否移除字母
 /// [removeDigits] 是否移除数字
@@ -15,7 +14,6 @@ import 'package:passtateless/modules/utils/utils.dart' as utils;
 /// [master] 主密码
 (int status, String result) uniPasswordGen({
   required String input,
-  required Map<String, dynamic> customRules,
   required bool removeSpChar,
   required bool removeAlpha,
   required bool removeDigits,
