@@ -12,6 +12,9 @@ class DocProvider extends ChangeNotifier {
   String _formattingDoc = "正在加载";
   String get formattingDoc => _formattingDoc;
 
+  String _tipDoc = "正在加载";
+  String get tipDoc => _tipDoc;
+
   // 加载JSON文档
   Future<void> _loadHelp() async {
     try {
@@ -23,6 +26,11 @@ class DocProvider extends ChangeNotifier {
       _formattingDoc = await rootBundle.loadString("assets/docs/formatting.md");
     } catch (e) {
       _formattingDoc = "加载失败: $e";
+    }
+    try {
+      _tipDoc = await rootBundle.loadString("assets/docs/config_tips.md");
+    } catch (e) {
+      _tipDoc = "加载失败: $e";
     }
     notifyListeners();
   }

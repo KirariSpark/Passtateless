@@ -74,8 +74,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
             spacing: styles.layoutSpacing,
             children: <Widget>[
               Expanded(
-                child: ElevatedButton(
-                  style: styles.buttonStyle,
+                child: TextButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaOpaque),
+                    shape: styles.roundedBorder
+                  ),
                   onPressed: (){
                     var res = utils.formatJSON(_configController.text);
                     if (res.$1 == ErrorCode.success) {
@@ -90,8 +93,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 ),
               ),
               Expanded(
-                child: ElevatedButton(
-                  style: styles.buttonStyle,
+                child: TextButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaOpaque),
+                    shape: styles.roundedBorder
+                  ),
                   onPressed: (){
                     ui.showAlertQuickWidget(
                       "选择帮助",
@@ -122,7 +128,13 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               styled.buildListTile(
                                 title: "生成规则提示",
                                 alpha: styles.alphaTransparent,
-                                onTapped: (){},
+                                onTapped: (){
+                                  Navigator.pop(context);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DocPage(
+                                    title: "提示",
+                                    mode: "tip"
+                                  )));
+                                },
                                 context: context
                               ),
                               styled.buildListTile(
@@ -319,10 +331,13 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       // 视情况选择是否显示配置编辑页面
                       ?_showConfigEdit(),
                       // 复制按钮
-                      ElevatedButton(
-                        onPressed: _onCopyClicked,
-                        style: styles.buttonStyle,
-                        child: const Text("复制密码"),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _onCopyClicked,
+                          style: styles.buttonStyle,
+                          child: const Text("复制密码"),
+                        ),
                       ),
                     ],
                   )
