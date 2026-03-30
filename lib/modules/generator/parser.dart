@@ -113,7 +113,6 @@ import 'package:passtateless/modules/core/error_codes.dart';
       }
     } catch (e) {
       // 捕获参数类型转换失败、索引越界、或 Generator 内部主动抛出的 ArgumentError 等异常
-      // 假设已定义无效参数的错误码
       return (ErrorCode.invalidArgs, generator.password);
     }
   }

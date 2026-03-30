@@ -10,7 +10,7 @@ class DocPage extends StatelessWidget {
 
   /// 构造函数
   ///
-  /// [mode] 决定了选择哪个文档来展示，支持 json、formatting、tip
+  /// [mode] 决定了选择哪个文档来展示，支持 json、formatting、tip和cfg
   const DocPage({super.key, required this.title, required this.mode});
 
   @override
@@ -24,6 +24,8 @@ class DocPage extends StatelessWidget {
       doc = docProvider.formattingDoc;
     } else if (mode == "tip"){
       doc = docProvider.tipDoc;
+    } else if (mode == "cfg"){
+      doc = docProvider.cfgDoc;
     } else {
       doc = "不存在此文档";
     }

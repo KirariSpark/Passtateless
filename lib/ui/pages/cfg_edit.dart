@@ -66,9 +66,14 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 },
                 context: context),
               styled.buildListTile(
-                title: "生成规则语法",
+                title: "生成配置",
                 alpha: styles.alphaTransparent,
-                onTapped: () {},
+                onTapped: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => DocPage(title: "生成配置", mode: "cfg"))
+                  );
+                },
                 context: context
               ),
               styled.buildListTile(
