@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'dart:convert';
 
@@ -16,69 +15,6 @@ String getPresetText(String? preset) {
       return '自定义模式';
     default:
       return '未知模式';
-  }
-}
-
-/// 解析JSON - 可选是否显示SnackBar
-Map<String, String> parseJSON(String jsonString, {BuildContext? context, bool showSnackBar = true}) {
-  // 处理空字符串的情况
-  if (jsonString.trim().isEmpty) {
-    if (context != null && showSnackBar) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("JSON字符串不能为空"),
-        showCloseIcon: true,
-      ));
-    }
-    return {};
-  }
-
-  try {
-    Map<String, dynamic> resolvedMap = json.decode(jsonString);
-
-    // 检查所有值是否都是字符串
-    bool allValuesString = resolvedMap.values.every((value) => value is String);
-
-    if (!allValuesString) {
-      if (context != null && showSnackBar) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("所有值必须为字符串"),
-          showCloseIcon: true,
-        ));
-      }
-      return {};
-    }
-
-    // 转换为 Map<String, String>
-    Map<String, String> resolvedStringMap =
-        resolvedMap.map((key, value) => MapEntry(key, value as String));
-
-    // 解析成功
-    if (context != null && showSnackBar) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("解析成功"),
-        showCloseIcon: true,
-      ));
-    }
-
-    return resolvedStringMap;
-  } on FormatException catch (e) {
-    // JSON格式错误
-    if (context != null && showSnackBar) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("JSON格式错误: ${e.message}"),
-        showCloseIcon: true,
-      ));
-    }
-    return {};
-  } catch (e) {
-    // 其他错误
-    if (context != null && showSnackBar) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("解析失败: $e"),
-        showCloseIcon: true,
-      ));
-    }
-    return {};
   }
 }
 
