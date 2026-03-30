@@ -44,10 +44,7 @@ class DocPage extends StatelessWidget {
             borderRadius: styles.borderRadius
           ),
           constraints: styles.pageWidthConstraint,
-          child: Markdown(
-            data: doc,
-            // imageDirectory: "assets/",
-          )
+          child: Markdown(data: doc)
         ),
       ),
     );
