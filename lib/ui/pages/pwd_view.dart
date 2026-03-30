@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
-import 'package:passtateless/ui/pages/doc.dart';
+import 'package:passtateless/ui/pages/cfg_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';
-import 'package:re_highlight/languages/json.dart';
-import 'package:re_highlight/styles/a11y-dark.dart';
-import 'package:re_highlight/styles/a11y-light.dart';
 
 class PwdViewPage extends StatefulWidget {
   final String identifier;
@@ -33,141 +29,51 @@ class _PwdViewPageState extends State<PwdViewPage> {
   final void Function() _onCopyClicked = (){};
 
   /// 根据当前预设决定是否显示自定义规则
-  Column? _showConfigEdit(){
+  Widget? _showConfigEdit() {
     if (_preset == "custom") {
-      return Column(
-        spacing: styles.layoutSpacing,
-        children: <Widget>[
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: 200),
-            child: CodeEditor(
-              wordWrap: false,
-              controller: _configController,
-              style: CodeEditorStyle(
-                codeTheme: CodeHighlightTheme(
-                  languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-                  theme: ColorScheme.of(context).brightness == Brightness.light ?
-                      a11YLightTheme : a11YDarkTheme
-                ),
-                fontSize: 14,
-                backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent)
-              ),
-              borderRadius: styles.borderRadius,
-              indicatorBuilder: (context, editingController, chunkController, notifier) {
-                return Row(
-                  children: [
-                    DefaultCodeLineNumber(
-                      controller: editingController,
-                      notifier: notifier,
-                    ),
-                    DefaultCodeChunkIndicator(
-                      width: 20,
-                      controller: chunkController,
-                      notifier: notifier
-                    )
-                  ],
-                );
-              },
+      return styled.buildListTile(
+        context: context,
+        title: "配置生成规则",
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "点击编辑",
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
-          ),
-          Row(
-            spacing: styles.layoutSpacing,
-            children: <Widget>[
-              Expanded(
-                child: TextButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaOpaque),
-                    shape: styles.roundedBorder
-                  ),
-                  onPressed: (){
-                    var res = utils.formatJSON(_configController.text);
-                    if (res.$1 == ErrorCode.success) {
-                      setState(() {
-                        _configController.text = utils.formatJSON(_configController.text).$2;
-                      });
-                    } else {
-                      ui.showSnackBarQuick("JSON 格式错误", context);
-                    }
-                  },
-                  child: const Text("格式化")
-                ),
+            const Icon(Icons.arrow_forward_ios, size: 16)
+          ],
+        ),
+        alpha: styles.alphaSemitransparent,
+        onTapped: () async {
+          // 跳转并等待返回结果
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CfgEditPage(
+                // 把当前的文本传给新页面
+                initialText: _configController.text,
               ),
-              Expanded(
-                child: TextButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaOpaque),
-                    shape: styles.roundedBorder
-                  ),
-                  onPressed: (){
-                    ui.showAlertQuickWidget(
-                      "选择帮助",
-                      ConstrainedBox(
-                        constraints: styles.tileWidthConstraint,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            spacing: styles.layoutSpacing,
-                            children: <Widget>[
-                              styled.buildListTile(
-                                title: "JSON 语法基础",
-                                alpha: styles.alphaTransparent,
-                                onTapped: (){
-                                  Navigator.pop(context);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DocPage(
-                                    title: "JSON 语法",
-                                    mode: "json"
-                                  )));
-                                },
-                                context: context
-                              ),
-                              styled.buildListTile(
-                                title: "生成规则语法",
-                                alpha: styles.alphaTransparent,
-                                onTapped: (){},
-                                context: context
-                              ),
-                              styled.buildListTile(
-                                title: "生成规则提示",
-                                alpha: styles.alphaTransparent,
-                                onTapped: (){
-                                  Navigator.pop(context);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DocPage(
-                                    title: "提示",
-                                    mode: "tip"
-                                  )));
-                                },
-                                context: context
-                              ),
-                              styled.buildListTile(
-                                title: "格式化与可读性",
-                                alpha: styles.alphaTransparent,
-                                onTapped: (){
-                                  Navigator.pop(context);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DocPage(
-                                    title: "格式化与可读性",
-                                    mode: "formatting"
-                                  )));
-                                },
-                                context: context
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      "取消",
-                      context
-                    );
-                  },
-                  child: const Text("帮助")
-                ),
-              )
-            ],
-          )
-        ],
+            ),
+          );
+
+          // 如果用户点击了保存(result不为空)，则更新本地的控制器
+          if (result != null && result is String) {
+            setState(() {
+              _configController.text = result;
+            });
+            // 发送通知
+            if (mounted) {
+              ui.showSnackBarQuick("编辑结果已保存", context);
+            }
+          }
+        },
       );
     } else {
       return null;
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -268,65 +174,62 @@ class _PwdViewPageState extends State<PwdViewPage> {
                         ]
                       ),
                       // 生成预设
-                      ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: maxWidth),
-                        child: styled.buildListTile(
-                          context: context,
-                          title: "生成预设",
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                utils.getPresetText(_preset),
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                              Icon(Icons.arrow_drop_down)
-                            ],
-                          ),
-                          alpha: styles.alphaSemitransparent,
-                          onTapped: (){
-                            ui.showAlertQuickWidget(
-                              "选择预设",
-                              RadioGroup(
-                                groupValue: _preset,
-                                onChanged: (value){
-                                  setState(() {_preset = value ?? "simple";});
-                                  Navigator.pop(context);
-                                },
-                                child: Column(
-                                  children: [
-                                    RadioListTile(
-                                      title: Text(utils.getPresetText("simple")),
-                                      subtitle: Text("简易预设"),
-                                      shape: styles.roundedBorder,
-                                      value: "simple",
-                                    ),
-                                    RadioListTile(
-                                      title: Text(utils.getPresetText("complex")),
-                                      subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                      shape: styles.roundedBorder,
-                                      value: "complex"
-                                    ),
-                                    RadioListTile(
-                                      title: Text(utils.getPresetText("bank")),
-                                      subtitle: Text("生成六位的纯数字密码"),
-                                      shape: styles.roundedBorder,
-                                      value: "bank"
-                                    ),
-                                    RadioListTile(
-                                      title: Text(utils.getPresetText("custom")),
-                                      subtitle: Text("完全自定义整个生成流程"),
-                                      shape: styles.roundedBorder,
-                                      value: "custom"
-                                    )
-                                  ],
-                                )
-                              ),
-                              "取消",
-                              context
-                            );
-                          },
+                      styled.buildListTile(
+                        context: context,
+                        title: "生成预设",
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              utils.getPresetText(_preset),
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            Icon(Icons.arrow_drop_down)
+                          ],
                         ),
+                        alpha: styles.alphaSemitransparent,
+                        onTapped: (){
+                          ui.showAlertQuickWidget(
+                            "选择预设",
+                            RadioGroup(
+                              groupValue: _preset,
+                              onChanged: (value){
+                                setState(() {_preset = value ?? "simple";});
+                                Navigator.pop(context);
+                              },
+                              child: Column(
+                                children: [
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("simple")),
+                                    subtitle: Text("简易预设"),
+                                    shape: styles.roundedBorder,
+                                    value: "simple",
+                                  ),
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("complex")),
+                                    subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                    shape: styles.roundedBorder,
+                                    value: "complex"
+                                  ),
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("bank")),
+                                    subtitle: Text("生成六位的纯数字密码"),
+                                    shape: styles.roundedBorder,
+                                    value: "bank"
+                                  ),
+                                  RadioListTile(
+                                    title: Text(utils.getPresetText("custom")),
+                                    subtitle: Text("完全自定义整个生成流程"),
+                                    shape: styles.roundedBorder,
+                                    value: "custom"
+                                  )
+                                ],
+                              )
+                            ),
+                            "取消",
+                            context
+                          );
+                        },
                       ),
                       // 视情况选择是否显示配置编辑页面
                       ?_showConfigEdit(),
