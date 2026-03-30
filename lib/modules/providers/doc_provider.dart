@@ -18,6 +18,12 @@ class DocProvider extends ChangeNotifier {
   String _cfgDoc = "正在加载";
   String get cfgDoc => _cfgDoc;
 
+  String _basicDoc = "正在加载";
+  String get basicDoc => _basicDoc;
+
+  String _faqDoc = "正在加载";
+  String get faqDoc => _faqDoc;
+
   // 加载JSON文档
   Future<void> _loadHelp() async {
     try {
@@ -39,6 +45,16 @@ class DocProvider extends ChangeNotifier {
       _cfgDoc = await rootBundle.loadString("assets/docs/cfg.md");
     } catch (e) {
       _cfgDoc = "加载失败: $e";
+    }
+    try {
+      _basicDoc = await rootBundle.loadString("assets/docs/basic.md");
+    } catch (e) {
+      _basicDoc = "加载失败: $e";
+    }
+    try {
+      _faqDoc = await rootBundle.loadString("assets/docs/faq.md");
+    } catch (e) {
+      _faqDoc = "加载失败: $e";
     }
     notifyListeners();
   }

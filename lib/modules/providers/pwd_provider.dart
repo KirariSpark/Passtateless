@@ -1,45 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/file_mgr/json_mgr.dart';
+import 'package:passtateless/modules/core/paths.dart';
 
 class PwdProvider extends ChangeNotifier {
-  final List<Map<String, dynamic>> _pwdList = [
-    {
-      "identifier": "测试数据1",
-      "userName": "测试数据1",
-      "account": "测试数据1",
-      "removeSp": true,
-      "removeDigits": false,
-      "removeAlpha": true,
-      "starred": false
-    },
-    {
-      "identifier": "测试数据2",
-      "userName": "测试数据2",
-      "account": "测试数据2",
-      "removeSp": true,
-      "removeDigits": true,
-      "removeAlpha": false,
-      "starred": true
-    },
-    {
-      "identifier": "测试数据3",
-      "userName": "测试数据3",
-      "account": "测试数据3",
-      "removeSp": true,
-      "removeDigits": false,
-      "removeAlpha": false,
-      "starred": true
-    }
-  ];
-
+  List<Map<String, dynamic>> _pwdList = [];
   List<Map<String, dynamic>> _stars = [];
-  List<int> _mapStarredIndex2Original = []; // 收藏列表的每一项对应在完整列表的位置
+  // 收藏列表的每一项对应在完整列表的位置
+  List<int> _mapStarredIndex2Original = [];
 
   List<Map<String, dynamic>> get pwdList => _pwdList;
-
   List<Map<String, dynamic>> get starredPwds {
     _stars = [];
     _mapStarredIndex2Original = [];
-    for (var(index, item) in _pwdList.indexed) {
+    for (var (index, item) in _pwdList.indexed) {
       if (item["starred"]) {
         _stars.add(item);
         _mapStarredIndex2Original.add(index);
@@ -77,17 +51,51 @@ class PwdProvider extends ChangeNotifier {
 
   /// 在所有记录条目结尾增加一条空记录，通常用于新增
   void addEmptyRecord() {
-    _pwdList.add(
-      {
-        "identifier": "",
-        "userName": "",
-        "account": "",
-        "removeSp": false,
-        "removeDigits": false,
-        "removeAlpha": false,
-        "starred": false
-      }
-    );
+    _pwdList.add({
+      "identifier": "",
+      "userName": "example",
+      "account": "example.com",
+      "removeSp": false,
+      "removeDigits": false,
+      "removeAlpha": false,
+      "starred": false
+    });
     notifyListeners();
+  }
+
+  /// 读取加密的归档文件
+  ///
+  /// [masterPwd] 主密码，用于解密文件
+  /// 返回错误码
+  Future<ErrorCode> readArchive(String masterPwd) async {
+    final (errorCode, res) = await readEncryptedJsonFile(
+      Paths.pwdRecord.path,
+      masterPwd,
+    );
+
+    if (errorCode == ErrorCode.success) {
+      if (res is List) {
+        // 将读取到的 dynamic List 转换为 List<Map<String, dynamic>>
+        _pwdList = res.cast<Map<String, dynamic>>();
+        notifyListeners();
+        return ErrorCode.success;
+      } else {
+        return ErrorCode.jsonFormatError;
+      }
+    }
+    return errorCode;
+  }
+
+  /// 保存当前数据到加密的归档文件
+  ///
+  /// [masterPwd] 主密码，用于加密文件
+  /// 返回错误码
+  Future<ErrorCode> saveArchive(String masterPwd) async {
+    final (errorCode, _) = await writeEncryptedJsonFile(
+      Paths.pwdRecord.path,
+      _pwdList,
+      masterPwd,
+    );
+    return errorCode;
   }
 }
