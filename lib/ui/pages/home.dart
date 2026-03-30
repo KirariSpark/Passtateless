@@ -16,7 +16,6 @@ class HomePage extends StatelessWidget {
         child: Container(
           alignment: Alignment.center,
           padding: styles.uniInsetsSmall,
-          // constraints: styles.pageWidthConstraint,
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               return Column(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/pages/pwd_view.dart';
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
+import 'package:provider/provider.dart';
 
 class StarredPasswords extends StatelessWidget {
   const StarredPasswords({super.key});
@@ -35,7 +36,7 @@ class StarredPasswords extends StatelessWidget {
           shape: styles.roundedBorder,
           child: ListTile(
             shape: styles.roundedBorder,
-            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(180),
+            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
             onTap: (){},
             title: const Text("没有收藏"),
             subtitle: const Text("前往管理页面添加收藏项，以在此处快速访问"),
@@ -51,8 +52,18 @@ class StarredPasswords extends StatelessWidget {
             onStarPressed: (){
               Provider.of<PwdProvider>(context, listen: false).switchStarStateFromStarred(index);
             },
+            onTapped: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
+                identifier: starredPasswords[index]["identifier"],
+                userName: starredPasswords[index]["userName"],
+                account: starredPasswords[index]["account"],
+                removeDigits: starredPasswords[index]["removeDigits"],
+                removeAlpha: starredPasswords[index]["removeAlpha"],
+                removeSp: starredPasswords[index]["removeSp"]
+              )));
+            },
             hasEditButton: false,
-            alpha: 180,
+            alpha: styles.alphaSemitransparent,
           )
         );
       }
