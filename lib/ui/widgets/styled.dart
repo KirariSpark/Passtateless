@@ -26,7 +26,7 @@ ListTile buildListTile({
     subtitle: subtitle == null ? null : Text(subtitle),
     trailing: trailing,
     shape: styles.roundedBorder,
-    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255),
+    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255)
   );
 }
 
@@ -54,6 +54,7 @@ TextField buildTextField({
     obscureText: passwordMode,
     keyboardType: multiline ? TextInputType.multiline : null,
     maxLines: maxLines,
+    minLines: 1,
     readOnly: readonly,
   );
 }

@@ -61,6 +61,7 @@ void showAlertQuickWidget(String title, Widget content, String buttonText, Build
     context: context,
     builder: (context) => AlertDialog(
       shape: styles.roundedBorder,
+      scrollable: true,
       title: Text(title),
       content: content,
       actions: [

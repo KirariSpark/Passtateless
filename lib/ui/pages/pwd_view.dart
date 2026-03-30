@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
+import 'package:passtateless/ui/pages/doc_json.dart';
+import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:re_editor/re_editor.dart';
+import 'package:re_highlight/languages/json.dart';
+import 'package:re_highlight/styles/a11y-dark.dart';
+import 'package:re_highlight/styles/a11y-light.dart';
 
 class PwdViewPage extends StatefulWidget {
   final String identifier;
@@ -24,7 +29,7 @@ class PwdViewPage extends StatefulWidget {
 
 class _PwdViewPageState extends State<PwdViewPage> {
   String _preset = "simple";
-  final TextEditingController _configJsonController = TextEditingController(text: "[{\"name\":\"toBase64\"}]");
+  final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
   final void Function() _onCopyClicked = (){};
 
   /// 根据当前预设决定是否显示自定义规则
@@ -33,13 +38,37 @@ class _PwdViewPageState extends State<PwdViewPage> {
       return Column(
         spacing: styles.layoutSpacing,
         children: <Widget>[
-          styled.buildTextField(
-            context: context,
-            label: "生成规则",
-            multiline: true,
-            maxLines: 5,
-            controller: _configJsonController,
-            alpha: styles.alphaSemitransparent
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 200),
+            child: CodeEditor(
+              wordWrap: false,
+              controller: _configController,
+              style: CodeEditorStyle(
+                codeTheme: CodeHighlightTheme(
+                  languages: {'json': CodeHighlightThemeMode(mode: langJson)},
+                  theme: ColorScheme.of(context).brightness == Brightness.light ?
+                      a11YLightTheme : a11YDarkTheme
+                ),
+                fontSize: 14,
+                backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent)
+              ),
+              borderRadius: styles.borderRadius,
+              indicatorBuilder: (context, editingController, chunkController, notifier) {
+                return Row(
+                  children: [
+                    DefaultCodeLineNumber(
+                      controller: editingController,
+                      notifier: notifier,
+                    ),
+                    DefaultCodeChunkIndicator(
+                      width: 20,
+                      controller: chunkController,
+                      notifier: notifier
+                    )
+                  ],
+                );
+              },
+            ),
           ),
           Row(
             spacing: styles.layoutSpacing,
@@ -48,10 +77,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 child: ElevatedButton(
                   style: styles.buttonStyle,
                   onPressed: (){
-                    var res = utils.formatJSON(_configJsonController.text);
+                    var res = utils.formatJSON(_configController.text);
                     if (res.$1 == ErrorCode.success) {
                       setState(() {
-                        _configJsonController.text = utils.formatJSON(_configJsonController.text).$2;
+                        _configController.text = utils.formatJSON(_configController.text).$2;
                       });
                     } else {
                       ui.showSnackBarQuick("JSON 格式错误", context);
@@ -63,26 +92,56 @@ class _PwdViewPageState extends State<PwdViewPage> {
               Expanded(
                 child: ElevatedButton(
                   style: styles.buttonStyle,
-                  onPressed: _onCopyClicked,
-                  child: const Text("复制密码")
+                  onPressed: (){
+                    ui.showAlertQuickWidget(
+                      "选择帮助",
+                      ConstrainedBox(
+                        constraints: styles.tileWidthConstraint,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            spacing: styles.layoutSpacing,
+                            children: <Widget>[
+                              styled.buildListTile(
+                                title: "JSON 语法基础",
+                                alpha: styles.alphaTransparent,
+                                onTapped: (){
+                                  Navigator.pop(context);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => JsonDocPage()));
+                                },
+                                context: context
+                              ),
+                              styled.buildListTile(
+                                title: "生成规则语法",
+                                alpha: styles.alphaTransparent,
+                                onTapped: (){},
+                                context: context
+                              ),
+                              styled.buildListTile(
+                                title: "生成规则提示",
+                                alpha: styles.alphaTransparent,
+                                onTapped: (){},
+                                context: context
+                              ),
+                              styled.buildListTile(
+                                title: "格式化与可读性",
+                                alpha: styles.alphaTransparent,
+                                onTapped: (){},
+                                context: context
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      "取消",
+                      context
+                    );
+                  },
+                  child: const Text("帮助")
                 ),
               )
             ],
           )
         ],
-      );
-    } else {
-      return null;
-    }
-  }
-
-  /// 根据当前预设决定是否显示复制按钮
-  ElevatedButton? _showCopyButton(){
-    if (_preset != "custom") {
-      return ElevatedButton(
-        onPressed: _onCopyClicked,
-        style: styles.buttonStyle,
-        child: const Text("复制密码"),
       );
     } else {
       return null;
@@ -207,42 +266,40 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           onTapped: (){
                             ui.showAlertQuickWidget(
                               "选择预设",
-                              SingleChildScrollView(
-                                child: RadioGroup(
-                                  groupValue: _preset,
-                                  onChanged: (value){
-                                    setState(() {_preset = value ?? "simple";});
-                                    Navigator.pop(context);
-                                  },
-                                  child: Column(
-                                    children: [
-                                      RadioListTile(
-                                        title: Text(utils.getPresetText("simple")),
-                                        subtitle: Text("简易预设"),
-                                        shape: styles.roundedBorder,
-                                        value: "simple",
-                                      ),
-                                      RadioListTile(
-                                        title: Text(utils.getPresetText("complex")),
-                                        subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                        shape: styles.roundedBorder,
-                                        value: "complex"
-                                      ),
-                                      RadioListTile(
-                                        title: Text(utils.getPresetText("bank")),
-                                        subtitle: Text("生成六位的纯数字密码"),
-                                        shape: styles.roundedBorder,
-                                        value: "bank"
-                                      ),
-                                      RadioListTile(
-                                        title: Text(utils.getPresetText("custom")),
-                                        subtitle: Text("完全自定义整个生成流程"),
-                                        shape: styles.roundedBorder,
-                                        value: "custom"
-                                      )
-                                    ],
-                                  )
-                                ),
+                              RadioGroup(
+                                groupValue: _preset,
+                                onChanged: (value){
+                                  setState(() {_preset = value ?? "simple";});
+                                  Navigator.pop(context);
+                                },
+                                child: Column(
+                                  children: [
+                                    RadioListTile(
+                                      title: Text(utils.getPresetText("simple")),
+                                      subtitle: Text("简易预设"),
+                                      shape: styles.roundedBorder,
+                                      value: "simple",
+                                    ),
+                                    RadioListTile(
+                                      title: Text(utils.getPresetText("complex")),
+                                      subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                      shape: styles.roundedBorder,
+                                      value: "complex"
+                                    ),
+                                    RadioListTile(
+                                      title: Text(utils.getPresetText("bank")),
+                                      subtitle: Text("生成六位的纯数字密码"),
+                                      shape: styles.roundedBorder,
+                                      value: "bank"
+                                    ),
+                                    RadioListTile(
+                                      title: Text(utils.getPresetText("custom")),
+                                      subtitle: Text("完全自定义整个生成流程"),
+                                      shape: styles.roundedBorder,
+                                      value: "custom"
+                                    )
+                                  ],
+                                )
                               ),
                               "取消",
                               context
@@ -253,7 +310,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       // 视情况选择是否显示配置编辑页面
                       ?_showConfigEdit(),
                       // 复制按钮
-                      ?_showCopyButton()
+                      ElevatedButton(
+                        onPressed: _onCopyClicked,
+                        style: styles.buttonStyle,
+                        child: const Text("复制密码"),
+                      ),
                     ],
                   )
                 );

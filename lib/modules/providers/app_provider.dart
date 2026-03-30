@@ -1,8 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
-
-import 'package:passtateless/modules/file_mgr/file_mgr.dart' as file_manager;
 import 'package:passtateless/scripts/main_generator.dart';
 
 class AppProvider extends ChangeNotifier {
