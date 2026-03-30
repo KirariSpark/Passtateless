@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -46,7 +47,16 @@ class _PwdViewPageState extends State<PwdViewPage> {
               Expanded(
                 child: ElevatedButton(
                   style: styles.buttonStyle,
-                  onPressed: (){},
+                  onPressed: (){
+                    var res = utils.formatJSON(_configJsonController.text);
+                    if (res.$1 == ErrorCode.success) {
+                      setState(() {
+                        _configJsonController.text = utils.formatJSON(_configJsonController.text).$2;
+                      });
+                    } else {
+                      ui.showSnackBarQuick("JSON 格式错误", context);
+                    }
+                  },
                   child: const Text("格式化")
                 ),
               ),
@@ -196,46 +206,46 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           alpha: styles.alphaSemitransparent,
                           onTapped: (){
                             ui.showAlertQuickWidget(
-                                "选择预设",
-                                SingleChildScrollView(
-                                  child: RadioGroup(
-                                      groupValue: _preset,
-                                      onChanged: (value){
-                                        setState(() {_preset = value ?? "simple";});
-                                        Navigator.pop(context);
-                                      },
-                                      child: Column(
-                                        children: [
-                                          RadioListTile(
-                                            title: Text(utils.getPresetText("simple")),
-                                            subtitle: Text("简易预设"),
-                                            shape: styles.roundedBorder,
-                                            value: "simple",
-                                          ),
-                                          RadioListTile(
-                                              title: Text(utils.getPresetText("complex")),
-                                              subtitle: Text("复杂预设，使用更复杂的生成流程"),
-                                              shape: styles.roundedBorder,
-                                              value: "complex"
-                                          ),
-                                          RadioListTile(
-                                              title: Text(utils.getPresetText("bank")),
-                                              subtitle: Text("生成六位的纯数字密码"),
-                                              shape: styles.roundedBorder,
-                                              value: "bank"
-                                          ),
-                                          RadioListTile(
-                                              title: Text(utils.getPresetText("custom")),
-                                              subtitle: Text("完全自定义整个生成流程"),
-                                              shape: styles.roundedBorder,
-                                              value: "custom"
-                                          )
-                                        ],
+                              "选择预设",
+                              SingleChildScrollView(
+                                child: RadioGroup(
+                                  groupValue: _preset,
+                                  onChanged: (value){
+                                    setState(() {_preset = value ?? "simple";});
+                                    Navigator.pop(context);
+                                  },
+                                  child: Column(
+                                    children: [
+                                      RadioListTile(
+                                        title: Text(utils.getPresetText("simple")),
+                                        subtitle: Text("简易预设"),
+                                        shape: styles.roundedBorder,
+                                        value: "simple",
+                                      ),
+                                      RadioListTile(
+                                        title: Text(utils.getPresetText("complex")),
+                                        subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                        shape: styles.roundedBorder,
+                                        value: "complex"
+                                      ),
+                                      RadioListTile(
+                                        title: Text(utils.getPresetText("bank")),
+                                        subtitle: Text("生成六位的纯数字密码"),
+                                        shape: styles.roundedBorder,
+                                        value: "bank"
+                                      ),
+                                      RadioListTile(
+                                        title: Text(utils.getPresetText("custom")),
+                                        subtitle: Text("完全自定义整个生成流程"),
+                                        shape: styles.roundedBorder,
+                                        value: "custom"
                                       )
-                                  ),
+                                    ],
+                                  )
                                 ),
-                                "取消",
-                                context
+                              ),
+                              "取消",
+                              context
                             );
                           },
                         ),

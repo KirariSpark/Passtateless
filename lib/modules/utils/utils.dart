@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'dart:convert';
 
 
@@ -83,15 +84,15 @@ Map<String, String> parseJSON(String jsonString, {BuildContext? context, bool sh
 
 /// 格式化 JSON 字符串
 ///
-/// 输出为一个record，分别为(格式化结果，格式化状态(成功0 失败1)，错误信息(成功时为空))
-(String json, int status, String error) formatJSON(String jsonString) {
+/// 输出为一个record，第一个是错误码，第二个是结果
+(ErrorCode, String) formatJSON(String jsonString) {
   try {
     // 使用缩进格式化
     final parsed = jsonDecode(jsonString);
     const encoder = JsonEncoder.withIndent('  ');
-    return (encoder.convert(parsed), 0, "");
+    return (ErrorCode.success, encoder.convert(parsed));
   } catch (e) {
-    return (jsonString, 1, e.toString());
+    return (ErrorCode.jsonFormatError, jsonString);
   }
 }
 
