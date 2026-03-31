@@ -153,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBodyContent(Axis scrollDirection, AppProvider appProvider) {
     return PageView(
+      key: ValueKey(scrollDirection),
       controller: appProvider.pageController,
       scrollDirection: scrollDirection,
       children: [
