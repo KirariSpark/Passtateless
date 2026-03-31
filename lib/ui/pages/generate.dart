@@ -138,15 +138,7 @@ class HomeTab extends StatelessWidget {
                     IconButton(
                       tooltip: "生成密码",
                       onPressed: () {
-                        appProvider.genPassword(
-                          v2Config: v2Provider.v2ConfigJson.text,
-                          master: v2Provider.masterPassword.text
-                        );
-                        if (appProvider.generateRes.$1 == 1) {
-                          ui.showSnackBarQuick(appProvider.generateRes.$2, context);
-                        } else {
-                          ui.showSnackBarQuick("密码已生成", context);
-                        }
+                        ui.showSnackBarQuick("此页面已被弃用", context);
                       },
                       style: styles.buttonStyle,
                       icon: Icon(
