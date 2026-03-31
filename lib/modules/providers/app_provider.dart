@@ -19,6 +19,9 @@ class AppProvider extends ChangeNotifier {
   // ————控制器————
   final TextEditingController _inputTextController = TextEditingController();
   TextEditingController get inputTextController => _inputTextController;
+  final PageController _pageController = PageController();
+  PageController get pageController => _pageController;
+
 
   AppProvider() {
     _loadHelp();

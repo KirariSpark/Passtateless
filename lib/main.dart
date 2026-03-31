@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:provider/provider.dart';
-
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/config_provider.dart';
 import 'modules/providers/pwd_provider.dart';
@@ -53,6 +52,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Axis? _lastScrollDirection;
+
   @override
   Widget build(BuildContext context) {
     final appProvider = Provider.of<AppProvider>(context);
@@ -61,18 +62,39 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, constraints) {
         final currentWidth = constraints.maxWidth;
         const int desktopWidth = 500;
+        final currentAxis = currentWidth >= desktopWidth ? Axis.vertical : Axis.horizontal;
 
-        // --- 渲染逻辑 ---
-        // 移动端：底部导航
+        void onNavigate(int index) {
+          appProvider.currentIndex = index;
+          appProvider.pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+          );
+        }
+
+        // 当滚动方向发生改变时，安排一个帧后回调来恢复页面索引
+        if (_lastScrollDirection != null && _lastScrollDirection != currentAxis) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (appProvider.pageController.hasClients) {
+              appProvider.pageController.animateToPage(
+                appProvider.currentIndex,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+              );
+            }
+          });
+        }
+        _lastScrollDirection = currentAxis;
+
         if (currentWidth < desktopWidth) {
+          // 移动端：底部导航
           return Scaffold(
-            body: _buildBodyContent(context, appProvider),
+            body: _buildBodyContent(currentAxis, appProvider),
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: appProvider.currentIndex,
-              onTap: (index) {
-                appProvider.currentIndex = index;
-              },
-              items: [
+              onTap: onNavigate,
+              items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined),
                   activeIcon: Icon(Icons.home),
@@ -90,50 +112,50 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ],
               showUnselectedLabels: false,
+              elevation: 20,
+            ),
+          );
+        } else {
+          // 桌面/平板端：侧边栏
+          return Scaffold(
+            body: Row(
+              children: [
+                NavigationRail(
+                  scrollable: true,
+                  indicatorShape: styles.roundedBorder,
+                  selectedIndex: appProvider.currentIndex,
+                  onDestinationSelected: onNavigate,
+                  labelType: NavigationRailLabelType.all,
+                  elevation: 3,
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home),
+                      label: Text("主页")),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.key_outlined),
+                      selectedIcon: Icon(Icons.key),
+                      label: Text("生成")),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.help_outline),
+                      selectedIcon: Icon(Icons.help),
+                      label: Text("帮助"))
+                  ]
+                ),
+                Expanded(child: _buildBodyContent(currentAxis, appProvider)),
+              ],
             ),
           );
         }
-
-        // 桌面/平板端：侧边栏
-        return Row(
-          children: [
-            NavigationRail(
-              scrollable: true,
-              indicatorShape: styles.roundedBorder,
-              selectedIndex: appProvider.currentIndex,
-              onDestinationSelected: (int index) {
-                appProvider.currentIndex = index;
-              },
-              labelType: NavigationRailLabelType.all,
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home),
-                  label: Text("主页")
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.key_outlined),
-                  selectedIcon: Icon(Icons.key),
-                  label: Text("生成")
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.help_outline),
-                  selectedIcon: Icon(Icons.help),
-                  label: Text("帮助")
-                )
-              ]
-            ),
-            Expanded(child: Scaffold(body: _buildBodyContent(context, appProvider))),
-          ],
-        );
       },
     );
   }
 
-  Widget _buildBodyContent(BuildContext context, AppProvider appProvider) {
-    return IndexedStack(
-      index: appProvider.currentIndex,
-      children: const [
+  Widget _buildBodyContent(Axis scrollDirection, AppProvider appProvider) {
+    return PageView(
+      controller: appProvider.pageController,
+      scrollDirection: scrollDirection,
+      children: [
         home_page.HomePage(),
         generate.HomeTab(),
         help_tab.HelpPage(),
