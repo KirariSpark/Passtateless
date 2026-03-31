@@ -53,74 +53,43 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _isRailExtended = false;
-  double? _previousMaxWidth;
-
-  final List<_Destination> _destinations = const [
-    _Destination(Icons.home_outlined, '主页'),
-    _Destination(Icons.password, '生成'),
-    _Destination(Icons.help_outline, '帮助'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final appProvider = Provider.of<AppProvider>(context);
-    final theme = Theme.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final currentWidth = constraints.maxWidth;
-        final prevWidth = _previousMaxWidth ?? 0;
-        const int desktopWideWidth = 800;
-        const int desktopNarrowWidth = 500;
-        bool needsUpdate = false;
-
-        // 是否跨越了桌面宽屏宽度
-        final crossedDesktopWide = (prevWidth < desktopWideWidth) != (currentWidth < desktopWideWidth);
-        if (crossedDesktopWide) {
-          // 如果当前变宽了，则展开；否则收起
-          final isEnteringWide = currentWidth >= desktopWideWidth;
-          if (_isRailExtended != isEnteringWide) {
-            _isRailExtended = isEnteringWide;
-            needsUpdate = true;
-          }
-        }
-
-        // 是否跨越了桌面窄屏宽度
-        // 仅当从更窄进入时，确保收起
-        final crossedDesktopNarrow = (prevWidth < desktopNarrowWidth) != (currentWidth < desktopNarrowWidth);
-        if (crossedDesktopNarrow && currentWidth >= desktopNarrowWidth && currentWidth < desktopWideWidth) {
-          if (_isRailExtended) {
-            _isRailExtended = false;
-            needsUpdate = true;
-          }
-        }
-
-        // 更新记录的宽度
-        _previousMaxWidth = currentWidth;
-
-        // 如果状态发生了改变，请求重绘
-        if (needsUpdate) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {});
-            }
-          });
-        }
+        const int desktopWidth = 500;
 
         // --- 渲染逻辑 ---
         // 移动端：底部导航
-        if (currentWidth < desktopNarrowWidth) {
+        if (currentWidth < desktopWidth) {
           return Scaffold(
             body: _buildBodyContent(context, appProvider),
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: appProvider.currentIndex,
-              onDestinationSelected: (int index) {
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: appProvider.currentIndex,
+              onTap: (index) {
                 appProvider.currentIndex = index;
               },
-              destinations: _destinations
-                  .map((d) => NavigationDestination(icon: Icon(d.icon), selectedIcon: Icon(d.icon), label: d.label))
-                  .toList(),
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home),
+                  label: "主页",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.key_outlined),
+                  activeIcon: Icon(Icons.key),
+                  label: "生成",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.help_outline),
+                  activeIcon: Icon(Icons.help),
+                  label: "帮助",
+                )
+              ],
+              showUnselectedLabels: false,
             ),
           );
         }
@@ -130,31 +99,29 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             NavigationRail(
               scrollable: true,
+              indicatorShape: styles.roundedBorder,
               selectedIndex: appProvider.currentIndex,
               onDestinationSelected: (int index) {
                 appProvider.currentIndex = index;
               },
-              extended: _isRailExtended,
-              // 上部
-              leading: IconButton(
-                style: styles.buttonStyle,
-                onPressed: () {
-                  setState(() {
-                    _isRailExtended = !_isRailExtended;
-                  });
-                },
-                icon: const Icon(Icons.menu_rounded),
-              ),
-              // 导航
-              destinations: _destinations
-                  .map(
-                    (d) => NavigationRailDestination(
-                      icon: Icon(d.icon),
-                      selectedIcon: Icon(d.icon),
-                      label: Text(d.label, style: theme.textTheme.bodyMedium),
-                    ),
-                  )
-                  .toList(),
+              labelType: NavigationRailLabelType.all,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: Text("主页")
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.key_outlined),
+                  selectedIcon: Icon(Icons.key),
+                  label: Text("生成")
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.help_outline),
+                  selectedIcon: Icon(Icons.help),
+                  label: Text("帮助")
+                )
+              ]
             ),
             Expanded(child: Scaffold(body: _buildBodyContent(context, appProvider))),
           ],
@@ -173,11 +140,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
   }
-}
-
-class _Destination {
-  final IconData icon;
-  final String label;
-
-  const _Destination(this.icon, this.label);
 }
