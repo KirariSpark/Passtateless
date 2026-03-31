@@ -1,5 +1,8 @@
 import 'package:passtateless/modules/generator/core.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/generator/builtin.dart' as builtin;
+import 'package:passtateless/modules/core/enums.dart' as enums;
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 
 /// 解析参数中的变量引用
 /// 如果参数以 # 开头，则解析为对应的变量值
@@ -17,8 +20,16 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
 }
 
 /// 运行输入的列表定义的生成操作
-(ErrorCode, String) parse(List<Map<String, dynamic>> commands, String input) {
+(ErrorCode, String) parse(
+  List<Map<String, dynamic>> commands,
+  String input,{
+    bool removeDigits = false,
+    bool removeAlpha = false,
+    bool removeSp = false
+}) {
   Generator generator = Generator(input);
+  String res = "";
+  // 生成流程
   for (var item in commands) {
     String name = item['name'] as String;
     // 如果没有 args 字段，默认赋为空列表
@@ -131,5 +142,35 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
       return (ErrorCode.invalidArgs, generator.password);
     }
   }
-  return (ErrorCode.success, generator.password);
+  // 记录结果以用于后处理
+  res = generator.password;
+  // 后处理流程
+  if (removeDigits) {
+    res = utils.removeDigits(res);
+  } else if (removeAlpha) {
+    res = utils.removeAlpha(res);
+  } else if (removeSp) {
+    res = utils.removeSpChar(res);
+  }
+  // 返回值
+  return (ErrorCode.success, res);
+}
+
+(ErrorCode, String) parseBuiltins(
+  enums.Presets cfg,
+  String input, {
+    bool removeDigits = false,
+    bool removeAlpha = false,
+    bool removeSp = false
+}) {
+  switch (cfg) {
+    case enums.Presets.simple:
+      return parse(builtin.simple, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
+    case enums.Presets.complex:
+      return parse(builtin.complex, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
+    case enums.Presets.bank:
+      return parse(builtin.bank, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
+    default:
+      return (ErrorCode.invalidArgs, "");
+  }
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/cfg_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/modules/core/enums.dart' as enums;
+import 'package:flutter/services.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:re_editor/re_editor.dart';
 
 class PwdViewPage extends StatefulWidget {
@@ -24,13 +27,12 @@ class PwdViewPage extends StatefulWidget {
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
-  String _preset = "simple";
+  enums.Presets _preset = enums.Presets.simple;
   final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
-  final void Function() _onCopyClicked = (){};
 
   /// 根据当前预设决定是否显示自定义规则
   Widget? _showConfigEdit() {
-    if (_preset == "custom") {
+    if (_preset == enums.Presets.custom) {
       return styled.buildListTile(
         context: context,
         title: "配置生成规则",
@@ -181,7 +183,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              utils.getPresetText(_preset),
+                              _preset.displayName,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             Icon(Icons.arrow_drop_down)
@@ -194,34 +196,34 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             RadioGroup(
                               groupValue: _preset,
                               onChanged: (value){
-                                setState(() {_preset = value ?? "simple";});
+                                setState(() {_preset = value ?? enums.Presets.simple;});
                                 Navigator.pop(context);
                               },
                               child: Column(
                                 children: [
                                   RadioListTile(
-                                    title: Text(utils.getPresetText("simple")),
-                                    subtitle: Text("简易预设"),
+                                    title: Text(enums.Presets.simple.displayName),
+                                    subtitle: Text("简易预设，适用于对安全性要求不高的场景"),
                                     shape: styles.roundedBorder,
-                                    value: "simple",
+                                    value: enums.Presets.simple,
                                   ),
                                   RadioListTile(
-                                    title: Text(utils.getPresetText("complex")),
-                                    subtitle: Text("复杂预设，使用更复杂的生成流程"),
+                                    title: Text(enums.Presets.complex.displayName),
+                                    subtitle: Text("使用更复杂的生成流程和 PBKDF2 算法"),
                                     shape: styles.roundedBorder,
-                                    value: "complex"
+                                    value: enums.Presets.complex
                                   ),
                                   RadioListTile(
-                                    title: Text(utils.getPresetText("bank")),
+                                    title: Text(enums.Presets.bank.displayName),
                                     subtitle: Text("生成六位的纯数字密码"),
                                     shape: styles.roundedBorder,
-                                    value: "bank"
+                                    value: enums.Presets.bank
                                   ),
                                   RadioListTile(
-                                    title: Text(utils.getPresetText("custom")),
+                                    title: Text(enums.Presets.custom.displayName),
                                     subtitle: Text("完全自定义整个生成流程"),
                                     shape: styles.roundedBorder,
-                                    value: "custom"
+                                    value: enums.Presets.custom
                                   )
                                 ],
                               )
@@ -237,7 +239,24 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _onCopyClicked,
+                          onPressed: (){
+                            if (<enums.Presets>[
+                              enums.Presets.simple,
+                              enums.Presets.complex,
+                              enums.Presets.bank
+                            ].contains(_preset)) {
+                              var res = parser.parseBuiltins(
+                                _preset,
+                                "${widget.identifier}: ${widget.userName} @ ${widget.account}"
+                              );
+                              if (res.$1 == ErrorCode.success) {
+                                Clipboard.setData(ClipboardData(text: res.$2));
+                                ui.showSnackBarQuick("密码已复制", context);
+                              } else {
+                                ui.showSnackBarQuick(res.$1.generic, context);
+                              }
+                            }
+                          },
                           style: styles.buttonStyle,
                           child: const Text("复制密码"),
                         ),

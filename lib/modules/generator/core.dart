@@ -42,19 +42,19 @@ class Generator {
   // ————————公共方法————————
   /// 将字符串转为base64字符串
   void toBase64() {
-    password = base64.encode(utf8.encode(password));
+    password = base64.encode(utf8.encode(original));
   }
 
   /// SHA256
   void toSHA256() {
-    var bytes = utf8.encode(password);
+    var bytes = utf8.encode(original);
     var digest = sha256.convert(bytes);
     password = digest.toString();
   }
 
   /// PBKDF2 (基于Hmac-SHA256)
   void toPBKDF2(String salt, [int iterations = 100]) {
-    var hmac = Hmac(sha256, utf8.encode(password));
+    var hmac = Hmac(sha256, utf8.encode(original));
     var saltBytes = utf8.encode(salt);
 
     // 补充4字节的块索引（大端序，这里取第1块，刚好满足SHA256的32字节输出）

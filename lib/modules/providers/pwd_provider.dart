@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
-import 'package:passtateless/modules/core/paths.dart';
+import 'package:passtateless/modules/core/enums.dart' as enums;
 
 class PwdProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _pwdList = [];
@@ -69,7 +69,7 @@ class PwdProvider extends ChangeNotifier {
   /// 返回错误码
   Future<ErrorCode> readArchive(String masterPwd) async {
     final (errorCode, res) = await readEncryptedJsonFile(
-      Paths.pwdRecord.path,
+      enums.Paths.pwdRecord.path,
       masterPwd,
     );
 
@@ -92,7 +92,7 @@ class PwdProvider extends ChangeNotifier {
   /// 返回错误码
   Future<ErrorCode> saveArchive(String masterPwd) async {
     final (errorCode, _) = await writeEncryptedJsonFile(
-      Paths.pwdRecord.path,
+      enums.Paths.pwdRecord.path,
       _pwdList,
       masterPwd,
     );
