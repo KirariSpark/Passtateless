@@ -1,14 +1,30 @@
 import 'package:passtateless/modules/generator/core.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 
+/// 解析参数中的变量引用
+/// 如果参数以 # 开头，则解析为对应的变量值
+dynamic _resolveArgVariable(dynamic arg, Generator generator) {
+  if (arg is String && arg.startsWith('#')) {
+    String variableName = arg.substring(1);
+    switch (variableName) {
+      case 'password':
+        return generator.password;
+      default:
+        throw ArgumentError('Unknown variable: $arg');
+    }
+  }
+  return arg;
+}
+
 /// 运行输入的列表定义的生成操作
 (ErrorCode, String) parse(List<Map<String, dynamic>> commands, String input) {
   Generator generator = Generator(input);
-
   for (var item in commands) {
     String name = item['name'] as String;
     // 如果没有 args 字段，默认赋为空列表
-    List<dynamic> args = (item['args'] as List<dynamic>?) ?? [];
+    List<dynamic> rawArgs = (item['args'] as List<dynamic>?) ?? [];
+    // 预处理参数：解析变量
+    List<dynamic> args = rawArgs.map((arg) => _resolveArgVariable(arg, generator)).toList();
 
     try {
       switch (name) {
@@ -108,14 +124,12 @@ import 'package:passtateless/modules/core/error_codes.dart';
           );
           break;
         default:
-        // 假设已定义未知命令的错误码
           return (ErrorCode.unknownCommand, generator.password);
       }
     } catch (e) {
-      // 捕获参数类型转换失败、索引越界、或 Generator 内部主动抛出的 ArgumentError 等异常
+      // 捕获参数类型转换失败、索引越界、变量解析错误或 Generator 内部主动抛出的异常
       return (ErrorCode.invalidArgs, generator.password);
     }
   }
-
   return (ErrorCode.success, generator.password);
 }
