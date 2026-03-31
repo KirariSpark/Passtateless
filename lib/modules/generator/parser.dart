@@ -1,7 +1,7 @@
-import 'package:passtateless/modules/generator/core.dart';
+import 'package:passtateless/modules/core/enums.dart' as enums;
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/generator/builtin.dart' as builtin;
-import 'package:passtateless/modules/core/enums.dart' as enums;
+import 'package:passtateless/modules/generator/core.dart';
 import 'package:passtateless/modules/utils/utils.dart' as utils;
 
 /// 解析参数中的变量引用

@@ -7,7 +7,8 @@ enum ErrorCode {
   fileNotExist(5, "文件 {item} 不存在", "请求的文件不存在"),
   decryptionFailed(6, "无法解密文件 {item}", "无法解密文件"),
   unknownCommand(7, "输入包含未知命令"),
-  invalidArgs(8, "输入包含无效参数");
+  invalidArgs(8, "输入包含无效参数"),
+  generateFailed(9, "无法生成满足要求的密码");
 
   final int code;
   final String _messageTemplate;
