@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:provider/provider.dart';
 import 'modules/providers/app_provider.dart';
-import 'modules/providers/config_provider.dart';
 import 'modules/providers/pwd_provider.dart';
 import 'ui/pages/help.dart' as help_tab;
 import 'ui/pages/home.dart' as home_page;
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AppProvider()),
-        ChangeNotifierProvider(create: (context) => ConfigProvider()),
         ChangeNotifierProvider(create: (context) => PwdProvider()),
         ChangeNotifierProvider(create: (context) => DocProvider()),
       ],
@@ -109,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings_outlined),
                   activeIcon: Icon(Icons.settings),
-                  label: "生成",
+                  label: "设置",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.help_outline),
@@ -142,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     NavigationRailDestination(
                       icon: Icon(Icons.settings_outlined),
                       selectedIcon: Icon(Icons.settings),
-                      label: Text("生成"),
+                      label: Text("设置"),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.help_outline),

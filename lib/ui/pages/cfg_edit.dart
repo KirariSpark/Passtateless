@@ -82,7 +82,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 onTapped: () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => DocPage(title: "提示", mode: "tip"))
+                      builder: (context) => DocPage(title: "提示", mode: "cfg_tips"))
                   );
                 },
                 context: context),
