@@ -6,7 +6,12 @@ import 'package:flutter/material.dart';
 /// [useSpacing]: 是否在计算中加入间隔
 /// [maxColumns]: 允许的最大列数限制，默认为100（即相当于不限制）
 /// [usePadding]: 是否在计算时引入内边距
-double calcWidthConstraint(double availableWidth, bool useSpacing, {int maxColumns = 100, bool usePadding = false}) {
+double calcWidthConstraint(
+  double availableWidth,
+  bool useSpacing, {
+  int maxColumns = 100,
+  bool usePadding = false,
+}) {
   final double tileWidth = styles.tileWidthConstraint.maxWidth;
   final double spacing = useSpacing ? styles.layoutSpacing : 0.0;
   final double padding = usePadding ? styles.layoutSpacing : 0.0;
@@ -30,14 +35,52 @@ double calcWidthConstraint(double availableWidth, bool useSpacing, {int maxColum
 /// 便捷地显示SnackBar
 void showSnackBarQuick(String content, BuildContext context) {
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    content: Text(content),
-    showCloseIcon: true,
-  ));
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text(content), showCloseIcon: true));
+}
+
+/// 便捷地显示AlertDialog
+void showAlertDialogQuick({
+  required String title,
+  required Widget content,
+  required void Function() action,
+  required String actionText,
+  required BuildContext context,
+  void Function()? action2,
+  String? action2Text,
+}) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: styles.roundedBorder,
+      title: Text(title),
+      content: content,
+      actions: <Widget>[
+        TextButton(
+          style: styles.buttonStyle,
+          onPressed: action,
+          child: Text(actionText),
+        ),
+        ?action2 == null
+            ? null
+            : TextButton(
+                style: styles.buttonStyle,
+                onPressed: action2,
+                child: Text(action2Text ?? ""),
+              ),
+      ],
+    ),
+  );
 }
 
 /// 便捷地显示只有一行字和一个按钮的AlertDialog
-void showAlertQuick(String title, String content, String buttonText, BuildContext context) {
+void showAlertQuick(
+  String title,
+  String content,
+  String buttonText,
+  BuildContext context,
+) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -47,16 +90,23 @@ void showAlertQuick(String title, String content, String buttonText, BuildContex
       actions: [
         TextButton(
           style: styles.buttonStyle,
-          onPressed: () {Navigator.pop(context);},
-          child: Text(buttonText)
-        )
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(buttonText),
+        ),
       ],
-    )
+    ),
   );
 }
 
 /// 便捷地显示只有一个按钮的AlertDialog，它的内容是一个Widget而非字符串
-void showAlertQuickWidget(String title, Widget content, String buttonText, BuildContext context) {
+void showAlertQuickWidget(
+  String title,
+  Widget content,
+  String buttonText,
+  BuildContext context,
+) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -67,16 +117,22 @@ void showAlertQuickWidget(String title, Widget content, String buttonText, Build
       actions: [
         TextButton(
           style: styles.buttonStyle,
-          onPressed: () {Navigator.pop(context);},
-          child: Text(buttonText)
-        )
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(buttonText),
+        ),
       ],
-    )
+    ),
   );
 }
 
 /// 便捷地显示不可撤销操作确认AlertDialog
-void showConfirmDialogQuick(BuildContext context, VoidCallback? function, String title) {
+void showConfirmDialogQuick(
+  BuildContext context,
+  VoidCallback? function,
+  String title,
+) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -88,20 +144,18 @@ void showConfirmDialogQuick(BuildContext context, VoidCallback? function, String
         TextButton(
           style: styles.buttonStyle,
           onPressed: () => Navigator.pop(context),
-          child: const Text("取消")
+          child: const Text("取消"),
         ),
         // 确定
         TextButton(
-            style: styles.buttonStyle,
+          style: styles.buttonStyle,
           onPressed: function,
           child: Text(
             "确定",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error
-            ),
-          )
-        )
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
       ],
-    )
+    ),
   );
 }

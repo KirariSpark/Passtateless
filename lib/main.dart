@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/config_provider.dart';
 import 'modules/providers/pwd_provider.dart';
-import 'ui/pages/generate.dart' as generate;
 import 'ui/pages/help.dart' as help_tab;
 import 'ui/pages/home.dart' as home_page;
+import 'ui/pages/basic_settings.dart';
 import 'ui/styles.dart' as styles;
 
 void main() {
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AppProvider()),
         ChangeNotifierProvider(create: (context) => ConfigProvider()),
         ChangeNotifierProvider(create: (context) => PwdProvider()),
-        ChangeNotifierProvider(create: (context) => DocProvider())
+        ChangeNotifierProvider(create: (context) => DocProvider()),
       ],
       child: MaterialApp(
         title: '密码生成器',
@@ -33,7 +33,10 @@ class MyApp extends StatelessWidget {
           fontFamily: 'SourceHans',
         ),
         darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey, brightness: Brightness.dark),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blueGrey,
+            brightness: Brightness.dark,
+          ),
           useMaterial3: true,
           fontFamily: 'SourceHans',
         ),
@@ -62,7 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, constraints) {
         final currentWidth = constraints.maxWidth;
         const int desktopWidth = 500;
-        final currentAxis = currentWidth >= desktopWidth ? Axis.vertical : Axis.horizontal;
+        final currentAxis = currentWidth >= desktopWidth
+            ? Axis.vertical
+            : Axis.horizontal;
 
         void onNavigate(int index) {
           appProvider.currentIndex = index;
@@ -74,7 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         // 当滚动方向发生改变时，安排一个帧后回调来恢复页面索引
-        if (_lastScrollDirection != null && _lastScrollDirection != currentAxis) {
+        if (_lastScrollDirection != null &&
+            _lastScrollDirection != currentAxis) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (appProvider.pageController.hasClients) {
               appProvider.pageController.animateToPage(
@@ -101,15 +107,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   label: "主页",
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.key_outlined),
-                  activeIcon: Icon(Icons.key),
+                  icon: Icon(Icons.settings_outlined),
+                  activeIcon: Icon(Icons.settings),
                   label: "生成",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.help_outline),
                   activeIcon: Icon(Icons.help),
                   label: "帮助",
-                )
+                ),
               ],
               showUnselectedLabels: false,
               elevation: 20,
@@ -131,16 +137,19 @@ class _MyHomePageState extends State<MyHomePage> {
                     NavigationRailDestination(
                       icon: Icon(Icons.home_outlined),
                       selectedIcon: Icon(Icons.home),
-                      label: Text("主页")),
+                      label: Text("主页"),
+                    ),
                     NavigationRailDestination(
-                      icon: Icon(Icons.key_outlined),
-                      selectedIcon: Icon(Icons.key),
-                      label: Text("生成")),
+                      icon: Icon(Icons.settings_outlined),
+                      selectedIcon: Icon(Icons.settings),
+                      label: Text("生成"),
+                    ),
                     NavigationRailDestination(
                       icon: Icon(Icons.help_outline),
                       selectedIcon: Icon(Icons.help),
-                      label: Text("帮助"))
-                  ]
+                      label: Text("帮助"),
+                    ),
+                  ],
                 ),
                 Expanded(child: _buildBodyContent(currentAxis, appProvider)),
               ],
@@ -155,10 +164,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return PageView(
       key: ValueKey(scrollDirection),
       controller: appProvider.pageController,
+      physics: NeverScrollableScrollPhysics(),
       scrollDirection: scrollDirection,
       children: [
         home_page.HomePage(),
-        generate.HomeTab(),
+        BasicSettingsPage(),
         help_tab.HelpPage(),
       ],
     );
