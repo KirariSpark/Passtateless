@@ -31,7 +31,6 @@ class BasicSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final appProvider = context.watch<AppProvider>();
-    // final label = RemindDays.fromValue(appProvider.remindDays).label;
 
     return Container(
       padding: styles.uniInsetsSmall,
@@ -40,25 +39,14 @@ class BasicSettingsPage extends StatelessWidget {
         child: Column(
           spacing: styles.layoutSpacing,
           children: [
-            Image.asset(
-              'assets/images/logo.png',
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.security,
-                  color: Theme.of(context).primaryColor,
-                );
-              },
-            ),
-            // 主密码
             ConstrainedBox(
               constraints: styles.pageWidthConstraint,
-              child: styled.buildTextField(
-                context: context,
-                label: "主密码",
-                alpha: styles.alphaSemitransparent,
-                passwordMode: true,
-              ),
+              child: styled.buildListTile(
+                title: "主密码",
+                leading: Icons.key,
+                trailing: Icon(Icons.arrow_forward),
+                context: context
+              )
             ),
             // 提醒我更改密码
             ConstrainedBox(
@@ -66,12 +54,12 @@ class BasicSettingsPage extends StatelessWidget {
               child: styled.buildListTile(
                 leading: Icons.calendar_today,
                 title: "提醒我更改主密码",
-                subtitle: "在设置的天数后，将会要求您更改主密码",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
-                  ui.showAlertQuickWidget(
-                    "选择时间",
-                    Column(
+                  ui.showAlertDialogQuick(
+                    title: "选择时间",
+                    content: Column(
+                      spacing: styles.layoutSpacing,
                       children: <Widget>[
                         Text("定期提醒您更改主密码，可以增强你的档案的安全性，并降低泄漏风险"),
                         RadioGroup(
@@ -79,14 +67,34 @@ class BasicSettingsPage extends StatelessWidget {
                           onChanged: (value) {},
                           child: Column(
                             children: <Widget>[
-                              RadioListTile(value: RemindDays.days180),
+                              RadioListTile(
+                                value: RemindDays.days60,
+                                title: Text(RemindDays.days60.displayName),
+                                shape: styles.roundedBorder,
+                              ),
+                              RadioListTile(
+                                value: RemindDays.days90,
+                                title: Text(RemindDays.days90.displayName),
+                                shape: styles.roundedBorder,
+                              ),
+                              RadioListTile(
+                                value: RemindDays.days180,
+                                title: Text(RemindDays.days180.displayName),
+                                shape: styles.roundedBorder,
+                              ),
+                              RadioListTile(
+                                value: RemindDays.never,
+                                title: Text(RemindDays.never.displayName),
+                                shape: styles.roundedBorder,
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    "",
-                    context,
+                    context: context,
+                    action: () {Navigator.pop(context);},
+                    actionText: '取消',
                   );
                 },
                 context: context,
@@ -119,7 +127,7 @@ class BasicSettingsPage extends StatelessWidget {
                 title: "关于",
                 trailing: Icon(Icons.arrow_forward),
               ),
-            ),
+            )
           ],
         ),
       ),

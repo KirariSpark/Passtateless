@@ -25,7 +25,7 @@ enum RemindDays {
   days60('60', '60天'),
   days90('90', '90天'),
   days180('180', '180天'),
-  never('0', '不要提醒我');
+  never('0', '关闭');
 
   final String value;
   final String displayName;

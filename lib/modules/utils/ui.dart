@@ -53,6 +53,7 @@ void showAlertDialogQuick({
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
+      scrollable: true,
       shape: styles.roundedBorder,
       title: Text(title),
       content: content,
@@ -62,13 +63,11 @@ void showAlertDialogQuick({
           onPressed: action,
           child: Text(actionText),
         ),
-        ?action2 == null
-            ? null
-            : TextButton(
-                style: styles.buttonStyle,
-                onPressed: action2,
-                child: Text(action2Text ?? ""),
-              ),
+        ?action2 == null ? null : TextButton(
+          style: styles.buttonStyle,
+          onPressed: action2,
+          child: Text(action2Text ?? ""),
+        ),
       ],
     ),
   );

@@ -18,10 +18,6 @@ class HelpPage extends StatelessWidget {
             child: Column(
               spacing: styles.layoutSpacing,
               children: <Widget>[
-                Text(
-                  "帮助文档总览",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
                 styled.buildListTile(
                   title: "基础信息",
                   subtitle: "关于无状态密码管理器和 Passtateless，你需要知道的一切",

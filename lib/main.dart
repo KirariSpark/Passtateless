@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => DocProvider()),
       ],
       child: MaterialApp(
-        title: '密码生成器',
+        title: 'Passtateless',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
           useMaterial3: true,
