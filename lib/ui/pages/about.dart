@@ -8,7 +8,39 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "关于", context: context)
+      appBar: styled.buildAppBar(title: "关于", context: context),
+      body: Center(
+        child: Container(
+          padding: styles.uniInsetsSmall,
+          constraints: styles.pageWidthConstraint,
+          child: Column(
+            children: [
+              Image.asset(
+                "assets/icon.png",
+                width: 100,
+              ),
+              styles.spacingSizedBox,
+              styles.spacingSizedBox,
+              Text(
+                "Passtateless",
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text("0.0.8 - alpha"),
+              styles.spacingSizedBox,
+              TextButton(
+                onPressed: (){},
+                style: styles.buttonStyle,
+                child: Text("开源许可证")
+              ),
+              TextButton(
+                onPressed: (){},
+                style: styles.buttonStyle,
+                child: Text("开源仓库")
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -63,9 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, constraints) {
         final currentWidth = constraints.maxWidth;
         const int desktopWidth = 500;
-        final currentAxis = currentWidth >= desktopWidth
-            ? Axis.vertical
-            : Axis.horizontal;
+        final currentAxis = currentWidth >= desktopWidth ? Axis.vertical : Axis.horizontal;
 
         void onNavigate(int index) {
           appProvider.currentIndex = index;
@@ -76,9 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         }
 
-        // 当滚动方向发生改变时，安排一个帧后回调来恢复页面索引
-        if (_lastScrollDirection != null &&
-            _lastScrollDirection != currentAxis) {
+        // 滚动方向改变时，重新布局前要做的事
+        if (_lastScrollDirection != null && _lastScrollDirection != currentAxis) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (appProvider.pageController.hasClients) {
               appProvider.pageController.animateToPage(

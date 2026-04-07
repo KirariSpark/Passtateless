@@ -4,6 +4,7 @@ import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/pages/about.dart';
 import 'package:provider/provider.dart';
 
 // 高级设置页面
@@ -98,7 +99,11 @@ class BasicSettingsPage extends StatelessWidget {
                       ],
                     ),
                     context: context,
-                    action: () {Navigator.pop(context);},
+                    action: () {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
                     actionText: '取消',
                   );
                 },
@@ -126,6 +131,9 @@ class BasicSettingsPage extends StatelessWidget {
                 leading: Icons.info_outlined,
                 title: "关于",
                 trailing: Icon(Icons.arrow_forward),
+                onTapped: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));
+                }
               ),
             ),
           ],
