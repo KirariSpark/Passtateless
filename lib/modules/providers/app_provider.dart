@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
 
 class AppProvider extends ChangeNotifier {
   // ————UI相关状态————
@@ -11,14 +12,19 @@ class AppProvider extends ChangeNotifier {
   }
 
   // ————控制器————
-  final TextEditingController _inputTextController = TextEditingController();
-  TextEditingController get inputTextController => _inputTextController;
   final PageController _pageController = PageController();
   PageController get pageController => _pageController;
 
+  // 设置项
+  var _remindMe = RemindDays.days180;
+  RemindDays get remindMe => _remindMe;
+  set remindMe(RemindDays value) {
+    _remindMe = value;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
-    _inputTextController.dispose();
     _pageController.dispose();
     super.dispose();
   }

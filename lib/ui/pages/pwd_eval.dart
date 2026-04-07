@@ -21,16 +21,7 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("评估密码"),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_outlined),
-          style: styles.buttonStyle,
-        ),
-      ),
+      appBar: styled.buildAppBar(title: "评估密码", context: context),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(

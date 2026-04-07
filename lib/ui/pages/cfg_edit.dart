@@ -60,42 +60,57 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 alpha: styles.alphaTransparent,
                 onTapped: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => DocPage(title: "JSON 语法", mode: "json"))
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DocPage(title: "JSON 语法", mode: "json"),
+                    ),
                   );
                 },
-                context: context),
+                context: context,
+              ),
               styled.buildListTile(
                 title: "生成配置",
                 alpha: styles.alphaTransparent,
                 onTapped: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => DocPage(title: "生成配置", mode: "cfg"))
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DocPage(title: "生成配置", mode: "cfg"),
+                    ),
                   );
                 },
-                context: context
+                context: context,
               ),
               styled.buildListTile(
                 title: "生成规则提示",
                 alpha: styles.alphaTransparent,
                 onTapped: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => DocPage(title: "提示", mode: "cfg_tips"))
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DocPage(title: "提示", mode: "cfg_tips"),
+                    ),
                   );
                 },
-                context: context),
+                context: context,
+              ),
               styled.buildListTile(
                 title: "格式化与可读性",
                 alpha: styles.alphaTransparent,
                 onTapped: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => DocPage(title: "格式化与可读性", mode: "formatting"))
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DocPage(title: "格式化与可读性", mode: "formatting")
+                    )
                   );
                 },
-                context: context)
+                context: context,
+              ),
             ],
           ),
         ),
@@ -108,24 +123,18 @@ class _CfgEditPageState extends State<CfgEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.close),
-          style: styles.buttonStyle,
-        ),
-        title: const Text("编辑生成规则"),
+      appBar: styled.buildAppBar(
+        title: "自定义规则",
+        context: context,
+        exitIcon: Icons.close,
         actions: [
           IconButton(
             onPressed: () {
-              // 带参数 pop，把编辑器里的内容传回上一页
               Navigator.pop(context, _configController.text);
             },
             icon: const Icon(Icons.save_outlined),
             style: styles.buttonStyle,
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -142,21 +151,16 @@ class _CfgEditPageState extends State<CfgEditPage> {
                     theme: ColorScheme.of(context).brightness == Brightness.light ? a11YLightTheme : a11YDarkTheme,
                   ),
                   fontSize: 14,
-                  backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                  backgroundColor: ColorScheme.of(
+                    context,
+                  ).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
                 ),
                 borderRadius: styles.borderRadius,
                 indicatorBuilder: (context, editingController, chunkController, notifier) {
                   return Row(
                     children: [
-                      DefaultCodeLineNumber(
-                        controller: editingController,
-                        notifier: notifier,
-                      ),
-                      DefaultCodeChunkIndicator(
-                        width: 20,
-                        controller: chunkController,
-                        notifier: notifier,
-                      )
+                      DefaultCodeLineNumber(controller: editingController, notifier: notifier),
+                      DefaultCodeChunkIndicator(width: 20, controller: chunkController, notifier: notifier),
                     ],
                   );
                 },
@@ -185,9 +189,9 @@ class _CfgEditPageState extends State<CfgEditPage> {
                     onPressed: _showHelp,
                     child: const Text("帮助"),
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

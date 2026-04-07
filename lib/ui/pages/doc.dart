@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
 class DocPage extends StatelessWidget {
@@ -22,39 +23,32 @@ class DocPage extends StatelessWidget {
       doc = docProvider.jsonDoc;
     } else if (mode == "formatting") {
       doc = docProvider.formattingDoc;
-    } else if (mode == "cfg_tips"){
+    } else if (mode == "cfg_tips") {
       doc = docProvider.tipDoc;
-    } else if (mode == "cfg"){
+    } else if (mode == "cfg") {
       doc = docProvider.cfgDoc;
-    } else if (mode == "basic"){
+    } else if (mode == "basic") {
       doc = docProvider.basicDoc;
-    } else if (mode == "faq"){
+    } else if (mode == "faq") {
       doc = docProvider.faqDoc;
-    } else if (mode == "get_started"){
+    } else if (mode == "get_started") {
       doc = docProvider.getStartedDoc;
-    }  else {
+    } else {
       doc = "不存在此文档";
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("帮助：$title"),
-        leading: IconButton(
-          onPressed: () {Navigator.pop(context);},
-          icon: const Icon(Icons.arrow_back_outlined),
-          style: styles.buttonStyle,
-        ),
-      ),
+      appBar: styled.buildAppBar(title: "帮助：$title", context: context),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: AlignmentGeometry.topCenter,
         child: Container(
           decoration: BoxDecoration(
             color: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
-            borderRadius: styles.borderRadius
+            borderRadius: styles.borderRadius,
           ),
           constraints: styles.pageWidthConstraint,
-          child: Markdown(data: doc)
+          child: Markdown(data: doc),
         ),
       ),
     );

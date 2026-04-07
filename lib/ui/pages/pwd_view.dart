@@ -80,15 +80,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_outlined),
-          style: styles.buttonStyle,
-        ),
-        title: Text("查看：${widget.identifier.isEmpty ? '未命名' : widget.identifier}"),
+      appBar: styled.buildAppBar(
+        title: "查看：${widget.identifier.isEmpty ? '未命名' : widget.identifier}",
+        context: context
       ),
       body: SingleChildScrollView(
         child: Padding(

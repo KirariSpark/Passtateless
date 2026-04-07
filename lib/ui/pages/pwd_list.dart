@@ -57,16 +57,7 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_outlined),
-          style: styles.buttonStyle,
-        ),
-        title: const Text("所有密码"),
-      ),
+      appBar: styled.buildAppBar(title: "所有密码", context: context),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: Alignment.topCenter,

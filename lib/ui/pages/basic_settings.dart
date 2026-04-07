@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/modules/core/enums.dart';
+import 'package:provider/provider.dart';
 
 // 高级设置页面
 class AdvancedSettingsPage extends StatelessWidget {
@@ -30,7 +32,7 @@ class BasicSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final appProvider = context.watch<AppProvider>();
+    final appProvider = context.watch<AppProvider>();
 
     return Container(
       padding: styles.uniInsetsSmall,
@@ -45,8 +47,8 @@ class BasicSettingsPage extends StatelessWidget {
                 title: "主密码",
                 leading: Icons.key,
                 trailing: Icon(Icons.arrow_forward),
-                context: context
-              )
+                context: context,
+              ),
             ),
             // 提醒我更改密码
             ConstrainedBox(
@@ -63,8 +65,11 @@ class BasicSettingsPage extends StatelessWidget {
                       children: <Widget>[
                         Text("定期提醒您更改主密码，可以增强你的档案的安全性，并降低泄漏风险"),
                         RadioGroup(
-                          groupValue: RemindDays.days180,
-                          onChanged: (value) {},
+                          groupValue: appProvider.remindMe,
+                          onChanged: (value) {
+                            appProvider.remindMe = value!;
+                            Navigator.pop(context);
+                          },
                           child: Column(
                             children: <Widget>[
                               RadioListTile(
@@ -109,12 +114,7 @@ class BasicSettingsPage extends StatelessWidget {
                 title: "高级设置",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (c) => const AdvancedSettingsPage(),
-                    ),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (c) => const AdvancedSettingsPage()));
                 },
               ),
             ),
@@ -127,7 +127,7 @@ class BasicSettingsPage extends StatelessWidget {
                 title: "关于",
                 trailing: Icon(Icons.arrow_forward),
               ),
-            )
+            ),
           ],
         ),
       ),

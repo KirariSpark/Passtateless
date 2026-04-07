@@ -52,17 +52,9 @@ class _PwdEditPageState extends State<PwdEditPage> {
     final currentItem = pwdList[widget._index];
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_outlined),
-          style: styles.buttonStyle,
-        ),
-        // 就是看这个档案有没有被命名，没有就显示未命名
-        title: Text("编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}"),
+      appBar: styled.buildAppBar(
+        title: "编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}",
+        context: context
       ),
       body: SingleChildScrollView(
         child: Padding(

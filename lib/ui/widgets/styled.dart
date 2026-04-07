@@ -58,3 +58,22 @@ TextField buildTextField({
     readOnly: readonly,
   );
 }
+
+AppBar buildAppBar({
+  required String title,
+  required BuildContext context,
+  List<Widget>? actions,
+  IconData exitIcon = Icons.arrow_back
+}) {
+  return AppBar(
+    leading: IconButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      icon: Icon(exitIcon),
+      style: styles.buttonStyle,
+    ),
+    title: Text(title),
+    actions: actions,
+  );
+}
