@@ -4,6 +4,7 @@ import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/pages/master_pwd.dart';
 import 'package:passtateless/ui/pages/about.dart';
 import 'package:provider/provider.dart';
 
@@ -42,13 +43,58 @@ class BasicSettingsPage extends StatelessWidget {
         child: Column(
           spacing: styles.layoutSpacing,
           children: [
+            // 查看主密码
             ConstrainedBox(
               constraints: styles.pageWidthConstraint,
               child: styled.buildListTile(
-                title: "主密码",
+                leading: Icons.visibility_outlined,
+                trailing: Icon(Icons.arrow_forward),
+                title: "查看主密码",
+                onTapped: () {
+                  ui.showAlertDialogQuick(
+                    title: "危险操作",
+                    content: Column(
+                      spacing: styles.layoutSpacing,
+                      children: [
+                        const Text("你正在执行危险操作，因此需要验证密码。\n请确保你周围没有其他人会窥视到你的密码。"),
+                        styled.buildTextField(
+                            label: "主密码",
+                            alpha: styles.alphaSemitransparent,
+                            passwordMode: true,
+                            context: context
+                        )
+                      ],
+                    ),
+                    action: () {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ui.showAlertQuick("密码", "pwd", "确定", context);
+                      }
+                    },
+                    actionText: "确认",
+                    action2: () {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    action2Text: "取消",
+                    context: context
+                  );
+                },
+                context: context
+              ),
+            ),
+            // 更改主密码
+            ConstrainedBox(
+              constraints: styles.pageWidthConstraint,
+              child: styled.buildListTile(
                 leading: Icons.key,
                 trailing: Icon(Icons.arrow_forward),
-                context: context,
+                title: "更改主密码",
+                onTapped: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => MasterPwdPage()));
+                },
+                context: context
               ),
             ),
             // 提醒我更改密码
