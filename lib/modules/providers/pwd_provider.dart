@@ -55,9 +55,6 @@ class PwdProvider extends ChangeNotifier {
       "identifier": "",
       "userName": "example",
       "account": "example.com",
-      "removeSp": false,
-      "removeDigits": false,
-      "removeAlpha": false,
       "starred": false
     });
     notifyListeners();

@@ -147,9 +147,11 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
   // 后处理流程
   if (removeDigits) {
     res = utils.removeDigits(res);
-  } else if (removeAlpha) {
+  }
+  if (removeAlpha) {
     res = utils.removeAlpha(res);
-  } else if (removeSp) {
+  }
+  if (removeSp) {
     res = utils.removeSpChar(res);
   }
   // 返回值

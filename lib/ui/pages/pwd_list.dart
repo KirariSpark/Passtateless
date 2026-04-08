@@ -41,10 +41,7 @@ class PwdListPage extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
                 identifier: pwdList[index]["identifier"],
                 userName: pwdList[index]["userName"],
-                account: pwdList[index]["account"],
-                removeDigits: pwdList[index]["removeDigits"],
-                removeAlpha: pwdList[index]["removeAlpha"],
-                removeSp: pwdList[index]["removeSp"],
+                account: pwdList[index]["account"]
               )));
             },
             alpha: styles.alphaSemitransparent,

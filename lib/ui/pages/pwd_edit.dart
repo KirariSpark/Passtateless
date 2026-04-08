@@ -115,58 +115,6 @@ class _PwdEditPageState extends State<PwdEditPage> {
                     )
                   ]
                 ),
-                // 开关区域
-                Wrap(
-                  spacing: styles.layoutSpacing,
-                  runSpacing: styles.layoutSpacing,
-                  children: <Widget>[
-                    // 移除数字
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: SwitchListTile(
-                        value: currentItem["removeDigits"],
-                        onChanged: (bool value){
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "removeDigits", value
-                          );
-                        },
-                        title: const Text("移除数字"),
-                        shape: styles.roundedBorder,
-                        tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
-                      ),
-                    ),
-                    // 移除字母
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: SwitchListTile(
-                        value: currentItem["removeAlpha"],
-                        onChanged: (bool value){
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "removeAlpha", value
-                          );
-                        },
-                        title: const Text("移除字母"),
-                        shape: styles.roundedBorder,
-                        tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
-                      ),
-                    ),
-                    // 移除特殊字符
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: SwitchListTile(
-                        value: currentItem["removeSp"],
-                        onChanged: (bool value){
-                          Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._index, "removeSp", value
-                          );
-                        },
-                        title: const Text("移除特殊字符"),
-                        shape: styles.roundedBorder,
-                        tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
-                      ),
-                    )
-                  ],
-                ),
                 // 危险区
                 ConstrainedBox(
                   constraints: styles.tileWidthConstraint,

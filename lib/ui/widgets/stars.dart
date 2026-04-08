@@ -57,9 +57,6 @@ class StarredPasswords extends StatelessWidget {
                 identifier: starredPasswords[index]["identifier"],
                 userName: starredPasswords[index]["userName"],
                 account: starredPasswords[index]["account"],
-                removeDigits: starredPasswords[index]["removeDigits"],
-                removeAlpha: starredPasswords[index]["removeAlpha"],
-                removeSp: starredPasswords[index]["removeSp"]
               )));
             },
             hasEditButton: false,

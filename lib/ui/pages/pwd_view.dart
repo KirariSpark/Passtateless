@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:passtateless/modules/core/enums.dart' as enums;
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/cfg_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/modules/core/enums.dart' as enums;
-import 'package:flutter/services.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:re_editor/re_editor.dart';
 
 class PwdViewPage extends StatefulWidget {
   final String identifier;
   final String userName;
   final String account;
-  final bool removeDigits;
-  final bool removeAlpha;
-  final bool removeSp;
 
-  const PwdViewPage({
-    super.key, required this.identifier, required this.userName, required this.account,
-    required this.removeDigits, required this.removeAlpha, required this.removeSp
-  });
+  const PwdViewPage({super.key, required this.identifier, required this.userName, required this.account});
 
   @override
   State<PwdViewPage> createState() => _PwdViewPageState();
@@ -29,6 +23,9 @@ class PwdViewPage extends StatefulWidget {
 class _PwdViewPageState extends State<PwdViewPage> {
   enums.Presets _preset = enums.Presets.simple;
   final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  bool removeDigits = false;
+  bool removeAlpha = false;
+  bool removeSp = false;
 
   /// 根据当前预设决定是否显示自定义规则
   Widget? _showConfigEdit() {
@@ -96,7 +93,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   child: Column(
                     spacing: styles.layoutSpacing,
                     children: <Widget>[
-                      // 只读部分
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -138,33 +134,45 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           ConstrainedBox(
                             constraints: styles.tileWidthConstraint,
                             child: SwitchListTile(
-                              value: widget.removeDigits,
+                              value: removeDigits,
+                              onChanged: (value){
+                                setState(() {
+                                  removeDigits = !removeDigits;
+                                });
+                              },
                               title: const Text("移除数字"),
                               shape: styles.roundedBorder,
-                              onChanged: (_) {},
-                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
                             ),
                           ),
                           // 移除字母
                           ConstrainedBox(
                             constraints: styles.tileWidthConstraint,
                             child: SwitchListTile(
-                              value: widget.removeAlpha,
-                              onChanged: (_){},
+                              value: removeAlpha,
+                              onChanged: (value){
+                                setState(() {
+                                  removeAlpha = !removeAlpha;
+                                });
+                              },
                               title: const Text("移除字母"),
                               shape: styles.roundedBorder,
-                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
                             ),
                           ),
                           // 移除特殊字符
                           ConstrainedBox(
                             constraints: styles.tileWidthConstraint,
                             child: SwitchListTile(
-                              value: widget.removeSp,
-                              onChanged: (_){},
+                              value: removeSp,
+                              onChanged: (value){
+                                setState(() {
+                                  removeSp = !removeSp;
+                                });
+                              },
                               title: const Text("移除特殊字符"),
                               shape: styles.roundedBorder,
-                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(200),
+                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
                             ),
                           )
                         ]
@@ -241,7 +249,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             ].contains(_preset)) {
                               var res = parser.parseBuiltins(
                                 _preset,
-                                "${widget.identifier}: ${widget.userName} @ ${widget.account}"
+                                "${widget.identifier}: ${widget.userName} @ ${widget.account}",
+                                removeAlpha: removeAlpha,
+                                removeDigits: removeDigits,
+                                removeSp: removeSp
                               );
                               if (res.$1 == ErrorCode.success) {
                                 Clipboard.setData(ClipboardData(text: res.$2));

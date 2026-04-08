@@ -331,9 +331,7 @@ class Generator {
         // 从特殊字符列表中随机选择一个
         int spIndex = random.nextInt() % specialChars.length;
         String randomSpChar = specialChars[spIndex];
-        password = password.substring(0, insertIndex) +
-            randomSpChar +
-            password.substring(insertIndex);
+        password = password.substring(0, insertIndex) + randomSpChar + password.substring(insertIndex);
       }
     }
   }

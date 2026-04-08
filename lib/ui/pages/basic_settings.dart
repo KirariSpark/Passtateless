@@ -58,10 +58,10 @@ class BasicSettingsPage extends StatelessWidget {
                       children: [
                         const Text("你正在执行危险操作，因此需要验证密码。\n请确保你周围没有其他人会窥视到你的密码。"),
                         styled.buildTextField(
-                            label: "主密码",
-                            alpha: styles.alphaSemitransparent,
-                            passwordMode: true,
-                            context: context
+                          label: "主密码",
+                          alpha: styles.alphaSemitransparent,
+                          passwordMode: true,
+                          context: context
                         )
                       ],
                     ),

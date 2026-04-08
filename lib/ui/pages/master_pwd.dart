@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class MasterPwdPage extends StatefulWidget {
