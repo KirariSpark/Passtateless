@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:provider/provider.dart';
+
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/pwd_provider.dart';
-import 'ui/pages/help.dart' as help_tab;
-import 'ui/pages/home.dart' as home_page;
 import 'ui/pages/basic_settings.dart';
+import 'ui/pages/help.dart';
+import 'ui/pages/home.dart';
 import 'ui/styles.dart' as styles;
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Passtateless());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Passtateless extends StatelessWidget {
+  const Passtateless({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,20 +40,20 @@ class MyApp extends StatelessWidget {
           fontFamily: 'SourceHans',
         ),
         themeMode: ThemeMode.system,
-        home: const MyHomePage(),
+        home: const MainApp(),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainApp> createState() => _MainAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainAppState extends State<MainApp> {
   Axis? _lastScrollDirection;
 
   @override
@@ -162,9 +163,9 @@ class _MyHomePageState extends State<MyHomePage> {
       physics: NeverScrollableScrollPhysics(),
       scrollDirection: scrollDirection,
       children: [
-        home_page.HomePage(),
+        HomePage(),
         BasicSettingsPage(),
-        help_tab.HelpPage(),
+        HelpPage(),
       ],
     );
   }
