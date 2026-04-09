@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart' as cryptography;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/modules/core/random.dart';
 
@@ -53,30 +54,16 @@ class Generator {
   }
 
   /// PBKDF2 (基于Hmac-SHA256)
-  void toPBKDF2(String salt, [int iterations = 100]) {
-    var hmac = Hmac(sha256, utf8.encode(original));
-    var saltBytes = utf8.encode(salt);
-
-    // 补充4字节的块索引（大端序，这里取第1块，刚好满足SHA256的32字节输出）
-    var saltWithBlockIndex = Uint8List(saltBytes.length + 4);
-    saltWithBlockIndex.setRange(0, saltBytes.length, saltBytes);
-    var byteData = ByteData.view(saltWithBlockIndex.buffer, saltBytes.length, 4);
-    byteData.setUint32(0, 1, Endian.big);
-
-    // 计算 U1
-    var u = hmac.convert(saltWithBlockIndex).bytes;
-    var result = Uint8List.fromList(u);
-
-    // 迭代计算 U2 到 Uc 并进行异或
-    for (int i = 1; i < iterations; i++) {
-      u = hmac.convert(u).bytes;
-      for (int j = 0; j < result.length; j++) {
-        result[j] ^= u[j];
-      }
+  Future<void> toPBKDF2(String salt, [int iterations = 100]) async {
+    final pbkdf2 = cryptography.Pbkdf2(macAlgorithm: cryptography.Hmac.sha256(), iterations: iterations, bits: 256);
+    final newSecretKey = await pbkdf2.deriveKeyFromPassword(password: password, nonce: utf8.encode(salt));
+    final secretKeyBytes = await newSecretKey.extractBytes();
+    List<int> finalBytes = [];
+    for (var item in secretKeyBytes) {
+      finalBytes.add((item % 93) + 33);
     }
-
-    // 转为16进制字符串
-    password = result.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    password = ascii.decode(finalBytes, allowInvalid: true);
+    print(password);
   }
 
   /// 移除特殊字符

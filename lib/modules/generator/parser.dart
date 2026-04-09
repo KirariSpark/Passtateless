@@ -20,13 +20,13 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
 }
 
 /// 运行输入的列表定义的生成操作
-(ErrorCode, String) parse(
+Future<(ErrorCode, String)> parse(
   List<Map<String, dynamic>> commands,
   String input,{
     bool removeDigits = false,
     bool removeAlpha = false,
     bool removeSp = false
-}) {
+}) async {
   Generator generator = Generator(input);
   String res = "";
   // 生成流程
@@ -46,7 +46,7 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
           generator.toSHA256();
           break;
         case 'toPBKDF2':
-          generator.toPBKDF2(
+          await generator.toPBKDF2(
             args[0] as String,
             args.length > 1 ? args[1] as int : 100,
           );
@@ -158,20 +158,20 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
   return (ErrorCode.success, res);
 }
 
-(ErrorCode, String) parseBuiltins(
+Future<(ErrorCode, String)> parseBuiltins(
   enums.Presets cfg,
   String input, {
     bool removeDigits = false,
     bool removeAlpha = false,
     bool removeSp = false
-}) {
+}) async {
   switch (cfg) {
     case enums.Presets.simple:
-      return parse(builtin.simple, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
+      return await parse(builtin.simple, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
     case enums.Presets.complex:
-      return parse(builtin.complex, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
+      return await parse(builtin.complex, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
     case enums.Presets.bank:
-      return parse(builtin.bank, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
+      return await parse(builtin.bank, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
     default:
       return (ErrorCode.invalidArgs, "");
   }

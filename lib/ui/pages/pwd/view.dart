@@ -241,13 +241,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: (){
+                          onPressed: () async {
                             if (<enums.Presets>[
-                              enums.Presets.simple,
-                              enums.Presets.complex,
-                              enums.Presets.bank
+                              enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
                             ].contains(_preset)) {
-                              var res = parser.parseBuiltins(
+                              var res = await parser.parseBuiltins(
                                 _preset,
                                 "${widget.identifier}: ${widget.userName} @ ${widget.account}",
                                 removeAlpha: removeAlpha,
@@ -256,9 +254,13 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               );
                               if (res.$1 == ErrorCode.success) {
                                 Clipboard.setData(ClipboardData(text: res.$2));
-                                ui.showSnackBarQuick("密码已复制", context);
+                                if (context.mounted) {
+                                  ui.showSnackBarQuick("密码已复制", context);
+                                }
                               } else {
-                                ui.showSnackBarQuick(res.$1.generic, context);
+                                if (context.mounted) {
+                                  ui.showSnackBarQuick(res.$1.generic, context);
+                                }
                               }
                             }
                           },

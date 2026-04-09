@@ -44,6 +44,8 @@ dependencies:
   re_highlight: ^0.0.3
   flutter_spinkit: ^5.2.2
   two_dimensional_scrollables: ^0.4.2
+  cryptography: ^2.9.0
+  cryptography_flutter: ^2.3.4
 
 dev_dependencies:
   flutter_test:
