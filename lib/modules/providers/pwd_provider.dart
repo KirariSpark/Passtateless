@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
 import 'package:passtateless/modules/core/enums.dart' as enums;
-import 'package:passtateless/modules/core/error_codes.dart';
 
 class PwdLocation {
   final String folder;
@@ -23,7 +22,24 @@ class PwdLocation {
 
 
 class PwdProvider extends ChangeNotifier {
-  Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
+  Map<String, List<Map<String, dynamic>>> _pwdMap = {
+    "": [
+      {
+        "identifier": "test",
+        "userName": "test",
+        "account": "test",
+        "starred": false
+      }
+    ],
+    "test": [
+      {
+        "identifier": "test",
+        "userName": "test",
+        "account": "test",
+        "starred": true
+      }
+    ]
+  };
   List<Map<String, dynamic>> _stars = [];
   List<PwdLocation> _starredLocation = [];
 
@@ -98,12 +114,12 @@ class PwdProvider extends ChangeNotifier {
 
   /// 新增一个文件夹
   ErrorCode addFolder(String name) {
-    if (_pwdMap.containsKey(name)) {
-      return ErrorCode.duplicateKey;
-    } else if (name == "") {
+    if (name == "") {
       return ErrorCode.emptyKey;
+    } else if (_pwdMap.containsKey(name)) {
+      return ErrorCode.duplicateKey;
     } else {
-      _pwdMap.addAll({name, []} as Map<String, List<Map<String, dynamic>>>);
+      _pwdMap.addAll({name: []});
       notifyListeners();
       return ErrorCode.success;
     }
