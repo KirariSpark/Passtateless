@@ -20,33 +20,75 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
   @override
   Widget build(BuildContext context) {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
-    List<Widget> foldersTiles = [];
-    for (var item in folders) {
-      foldersTiles.add(ConstrainedBox(
-        constraints: styles.tileWidthConstraint,
-        child: styled.buildListTile(
-          title: item.isEmpty ? "未分类" : item,
-          onTapped: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
-          },
-          trailing: Icon(Icons.arrow_forward),
-          alpha: styles.alphaSemitransparent,
-          context: context
-        ),
-      ));
-    }
+
     return Scaffold(
       appBar: styled.buildAppBar(title: "密码管理", context: context),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
           padding: styles.pagePadding,
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: styles.layoutSpacing,
-              runSpacing: styles.layoutSpacing,
-              children: foldersTiles
-            ),
+          constraints: styles.pageWidthConstraint,
+          child: ListView.separated(
+            itemCount: folders.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Dismissible(
+                key: ValueKey(folders[index]),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: styles.borderRadius,
+                    color: Colors.red,
+                  ),
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  child: const Icon(Icons.delete_forever, color: Colors.white),
+                ),
+                confirmDismiss: (direction) async {
+                  // 未分类 文件夹是内置文件夹，不能删除
+                  if (folders[index].isEmpty) {
+                    ui.showSnackBarQuick("你不能删除此文件夹", context);
+                    return false;
+                  } else {
+                    return await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("确认删除"),
+                        shape: styles.roundedBorder,
+                        content: Text("确定要删除文件夹 ${folders[index]} 吗？\n你会永远失去它（真的很久）"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            style: styles.buttonStyle,
+                            child: const Text("取消"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            style: styles.buttonStyle,
+                            child: const Text("删除", style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                onDismissed: (_) {
+                  Provider.of<PwdProvider>(context, listen: false).removeFolder(folders[index]);
+                  ui.showSnackBarQuick("文件夹已删除", context);
+                },
+                child: styled.buildListTile(
+                  title: folders[index].isEmpty ? "未分类" : folders[index],
+                  onTapped: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
+                  },
+                  trailing: Icon(Icons.arrow_forward),
+                  alpha: styles.alphaSemitransparent,
+                  context: context
+                ),
+              );
+            },
+            separatorBuilder: (_, _) {
+              return styles.spacingSizedBox;
+            },
           )
         ),
       ),
@@ -69,10 +111,8 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
               if (stat == ErrorCode.success) {
                 Navigator.pop(context);
                 ui.showSnackBarQuick("文件夹已建立", context);
-              } else if (stat == ErrorCode.emptyKey) {
-                ui.showSnackBarQuick("请输入名称", context);
               } else {
-                ui.showSnackBarQuick("输入的名称与已有的文件夹重复", context);
+                ui.showSnackBarQuick(stat.generic, context);
               }
             },
             action2Text: "确定",

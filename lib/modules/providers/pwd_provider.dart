@@ -115,14 +115,20 @@ class PwdProvider extends ChangeNotifier {
   /// 新增一个文件夹
   ErrorCode addFolder(String name) {
     if (name == "") {
-      return ErrorCode.emptyKey;
+      return ErrorCode.emptyFolderName;
     } else if (_pwdMap.containsKey(name)) {
-      return ErrorCode.duplicateKey;
+      return ErrorCode.duplicateFolderName;
     } else {
       _pwdMap.addAll({name: []});
       notifyListeners();
       return ErrorCode.success;
     }
+  }
+
+  ErrorCode removeFolder(String name) {
+    _pwdMap.remove(name);
+    notifyListeners();
+    return ErrorCode.success;
   }
 
   /// 读取加密的归档文件

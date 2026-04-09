@@ -9,8 +9,8 @@ enum ErrorCode {
   unknownCommand(7, "输入包含未知命令"),
   invalidArgs(8, "输入包含无效参数"),
   generateFailed(9, "无法生成满足要求的密码"),
-  duplicateKey(10, "输入键 {item} 与已有的键重复", "不能输入重复的键"),
-  emptyKey(11, "不能输入空键");
+  duplicateFolderName(10, "文件夹名 {item} 与已有的键重复", "不能输入重复的文件夹名称"),
+  emptyFolderName(11, "不能输入空名称");
 
   final int code;
   final String _messageTemplate;

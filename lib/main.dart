@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/pwd_provider.dart';
-import 'ui/pages/app.dart';
 import 'ui/pages/splash.dart';
 
 void main() {
