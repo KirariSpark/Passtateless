@@ -33,9 +33,9 @@ class PwdProvider extends ChangeNotifier {
     ],
     "test": [
       {
-        "identifier": "test",
-        "userName": "test",
-        "account": "test",
+        "identifier": "test2",
+        "userName": "test2",
+        "account": "test2",
         "starred": true
       }
     ]
@@ -61,6 +61,16 @@ class PwdProvider extends ChangeNotifier {
   }
 
   List<String> get pwdFolders => _pwdMap.keys.toList();
+
+  List<Map<String, dynamic>> getPwdList(String folder) => _pwdMap[folder] ?? [];
+
+  Map<String, dynamic> getItem(PwdLocation loc) {
+    if (_pwdMap.containsKey(loc.folder) && loc.index < _pwdMap[loc.folder]!.length) {
+      return _pwdMap[loc.folder]![loc.index];
+    } else {
+      return {};
+    }
+  }
 
   /// 更新指定项的数据
   (int stat, String info) setValue(PwdLocation loc, String key, dynamic value) {
@@ -98,12 +108,12 @@ class PwdProvider extends ChangeNotifier {
     }
   }
 
-  /// 在未分类记录条目结尾增加一条空记录
-  void addEmptyRecord() {
+  /// 在指定文件夹中增加一条空记录
+  void addEmptyRecordTo(String folder) {
     if (!_pwdMap.containsKey("")) {
       _pwdMap[""] = [];
     }
-    _pwdMap[""]!.add({
+    _pwdMap[folder]!.add({
       "identifier": "",
       "userName": "example",
       "account": "example.com",
@@ -125,6 +135,7 @@ class PwdProvider extends ChangeNotifier {
     }
   }
 
+  /// 移除一个文件夹
   ErrorCode removeFolder(String name) {
     _pwdMap.remove(name);
     notifyListeners();

@@ -8,7 +8,8 @@ import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:provider/provider.dart';
 
 class PwdListPage extends StatelessWidget {
-  const PwdListPage({super.key});
+  final String folder;
+  const PwdListPage({super.key, required this.folder});
 
   List<Widget> _buildList(List<Map<String, dynamic>> pwdList, BuildContext context){
     if (pwdList.isEmpty) {
@@ -17,7 +18,7 @@ class PwdListPage extends StatelessWidget {
           constraints: styles.tileWidthConstraint,
           child: styled.buildListTile(
             title: "没有密码",
-            subtitle: "点击页面底部的 + 以新增一条密码",
+            subtitle: "点击页面右下角的 + 以新增一条密码",
             leading: Icons.not_interested,
             alpha: styles.alphaSemitransparent,
             context: context
@@ -33,11 +34,13 @@ class PwdListPage extends StatelessWidget {
             pwdRecord: pwdList[index],
             onStarPressed: (){
               Provider.of<PwdProvider>(context, listen: false).switchStarState(
-                  PwdLocation(folder: "", index: index)
+                PwdLocation(folder: folder, index: index)
               );
             },
             onEditPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(location: PwdLocation(folder: "", index: index))));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(
+                location: PwdLocation(folder: folder, index: index)))
+              );
             },
             onTapped: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
@@ -83,11 +86,11 @@ class PwdListPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
+          Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PwdEditPage(location: PwdLocation(folder: "", index: pwdList.length - 1))
+              builder: (context) => PwdEditPage(location: PwdLocation(folder: folder, index: pwdList.length - 1))
             )
           );
         },
@@ -100,7 +103,7 @@ class PwdListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pwdList = context.watch<PwdProvider>().pwdList;
+    final pwdList = context.watch<PwdProvider>().getPwdList(folder);
     return _buildUi(pwdList, context);
   }
 }

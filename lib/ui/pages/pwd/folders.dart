@@ -78,7 +78,9 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                 child: styled.buildListTile(
                   title: folders[index].isEmpty ? "未分类" : folders[index],
                   onTapped: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
+                    Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))
+                    );
                   },
                   trailing: Icon(Icons.arrow_forward),
                   alpha: styles.alphaSemitransparent,

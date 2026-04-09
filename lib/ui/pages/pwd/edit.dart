@@ -6,8 +6,8 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
 class PwdEditPage extends StatefulWidget {
-  final PwdLocation _location;
-  const PwdEditPage({super.key, required PwdLocation location}) : _location = location;
+  final PwdLocation location;
+  const PwdEditPage({super.key, required this.location});
 
   @override
   State<PwdEditPage> createState() => _PwdEditPageState();
@@ -17,13 +17,12 @@ class _PwdEditPageState extends State<PwdEditPage> {
   late TextEditingController _identifierController;
   late TextEditingController _userNameController;
   late TextEditingController _accountController;
-
   bool _isDeleting = false;
 
   @override
   void initState() {
     super.initState();
-    final data = Provider.of<PwdProvider>(context, listen: false).pwdList[widget._location.index];
+    final data = Provider.of<PwdProvider>(context, listen: false).getItem(widget.location);
     _identifierController = TextEditingController(text: data["identifier"]);
     _userNameController = TextEditingController(text: data["userName"]);
     _accountController = TextEditingController(text: data["account"]);
@@ -46,8 +45,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
       );
     }
 
-    final pwdList = context.watch<PwdProvider>().pwdList;
-    final currentItem = pwdList[widget._location.index];
+    final currentItem = context.watch<PwdProvider>().getItem(widget.location);
 
     return Scaffold(
       appBar: styled.buildAppBar(
@@ -72,7 +70,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         controller: _identifierController,
                         onChanged: (value) {
                           Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._location, "identifier", value
+                            widget.location, "identifier", value
                           );
                         },
                         label: "档案名",
@@ -86,7 +84,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         controller: _userNameController,
                         onChanged: (value) {
                           Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._location, "userName", value
+                            widget.location, "userName", value
                           );
                         },
                         label: "用户名",
@@ -100,7 +98,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         controller: _accountController,
                         onChanged: (value) {
                           Provider.of<PwdProvider>(context, listen: false).setValue(
-                            widget._location, "account", value
+                            widget.location, "account", value
                           );
                         },
                         label: "账号",
@@ -108,35 +106,35 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       ),
                     )
                   ]
-              ),
-              ConstrainedBox(
-                constraints: styles.tileWidthConstraint,
-                child: TextButton(
-                  onPressed: (){
-                    ui.showConfirmDialogQuick(
-                      context,
-                      (){
-                        setState(() {
-                          _isDeleting = true;
-                        });
-                        Provider.of<PwdProvider>(context, listen: false).removeRecord(widget._location);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
-                      "确认删除"
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: styles.roundedBorder,
-                    backgroundColor: ColorScheme.of(context).errorContainer
-                  ),
-                  child: Text(
-                    "删除这条记录",
-                    style: TextStyle(
-                      color: ColorScheme.of(context).error,
-                      fontWeight: FontWeight.w800
+                ),
+                ConstrainedBox(
+                  constraints: styles.tileWidthConstraint,
+                  child: TextButton(
+                    onPressed: (){
+                      ui.showConfirmDialogQuick(
+                        context,
+                        (){
+                          setState(() {
+                            _isDeleting = true;
+                          });
+                          Provider.of<PwdProvider>(context, listen: false).removeRecord(widget.location);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        "确认删除"
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: styles.roundedBorder,
+                      backgroundColor: ColorScheme.of(context).errorContainer
                     ),
-                  )
+                    child: Text(
+                      "删除这条记录",
+                      style: TextStyle(
+                        color: ColorScheme.of(context).error,
+                        fontWeight: FontWeight.w800
+                      ),
+                    )
                   ),
                 ),
               ],
