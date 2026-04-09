@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
-import 'package:passtateless/ui/pages/pwd_edit.dart';
+import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
-import 'package:passtateless/ui/pages/pwd_view.dart';
+import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:provider/provider.dart';
 
 class PwdListPage extends StatelessWidget {

@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/pwd_provider.dart';
-import 'ui/pages/basic_settings.dart';
-import 'ui/pages/help.dart';
+import 'ui/pages/settings/basic.dart';
+import 'ui/pages/help/overview.dart';
 import 'ui/pages/home.dart';
 import 'ui/styles.dart' as styles;
 
@@ -165,7 +165,7 @@ class _MainAppState extends State<MainApp> {
       children: [
         HomePage(),
         BasicSettingsPage(),
-        HelpPage(),
+        HelpOverviewPage(),
       ],
     );
   }

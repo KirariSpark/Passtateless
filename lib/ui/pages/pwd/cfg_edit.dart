@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
-import 'package:passtateless/ui/pages/doc.dart';
+import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';
@@ -63,7 +63,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DocPage(title: "JSON 语法", mode: "json"),
+                      builder: (context) => DocViewPage(title: "JSON 语法", mode: "json"),
                     ),
                   );
                 },
@@ -77,7 +77,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DocPage(title: "生成配置", mode: "cfg"),
+                      builder: (context) => DocViewPage(title: "生成配置", mode: "cfg"),
                     ),
                   );
                 },
@@ -91,7 +91,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DocPage(title: "提示", mode: "cfg_tips"),
+                      builder: (context) => DocViewPage(title: "提示", mode: "cfg_tips"),
                     ),
                   );
                 },
@@ -105,7 +105,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DocPage(title: "格式化与可读性", mode: "formatting")
+                      builder: (context) => DocViewPage(title: "格式化与可读性", mode: "formatting")
                     )
                   );
                 },

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/pages/doc.dart';
+import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
-class HelpPage extends StatelessWidget {
-  const HelpPage({super.key});
+class HelpOverviewPage extends StatelessWidget {
+  const HelpOverviewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => DocPage(title: "基础信息", mode: "basic"))
+                        builder: (context) => DocViewPage(title: "基础信息", mode: "basic"))
                     );
                   },
                   context: context
@@ -35,7 +35,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => DocPage(title: "常见问题", mode: "faq"))
+                        builder: (context) => DocViewPage(title: "常见问题", mode: "faq"))
                     );
                   },
                   context: context
@@ -46,7 +46,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => DocPage(title: "开始使用", mode: "get_started"))
+                        builder: (context) => DocViewPage(title: "开始使用", mode: "get_started"))
                     );
                   },
                   context: context
@@ -57,7 +57,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => DocPage(title: "JSON 基础", mode: "json"))
+                        builder: (context) => DocViewPage(title: "JSON 基础", mode: "json"))
                     );
                   },
                   context: context
@@ -68,7 +68,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => DocPage(title: "格式化与可读性", mode: "formatting"))
+                      builder: (context) => DocViewPage(title: "格式化与可读性", mode: "formatting"))
                     );
                   },
                   context: context
@@ -79,7 +79,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => DocPage(title: "生成配置", mode: "cfg"))
+                      builder: (context) => DocViewPage(title: "生成配置", mode: "cfg"))
                     );
                   },
                   context: context
@@ -90,7 +90,7 @@ class HelpPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () {
                     Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => DocPage(title: "生成配置提示", mode: "cfg_tips"))
+                      builder: (context) => DocViewPage(title: "生成配置提示", mode: "cfg_tips"))
                     );
                   },
                   context: context

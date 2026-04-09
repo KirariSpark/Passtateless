@@ -5,9 +5,6 @@
   "identifier": "用于标识这一密码条目的名称，显示给用户看",
   "userName": "用户名，也可以是其他用于标识唯一的账号的信息",
   "account": "当前密码对应的账号",
-  "removeSp": true,
-  "removeDigits": true,
-  "removeAlpha": true,
   "starred": false
 }
 ```

@@ -4,7 +4,7 @@ import 'package:passtateless/modules/core/enums.dart' as enums;
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/ui/pages/cfg_edit.dart';
+import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';

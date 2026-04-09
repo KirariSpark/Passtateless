@@ -5,14 +5,14 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
-class DocPage extends StatelessWidget {
+class DocViewPage extends StatelessWidget {
   final String title;
   final String mode;
 
   /// 构造函数
   ///
   /// [mode] 决定了选择哪个文档来展示，支持的值和文档目录中文档的文件名相同
-  const DocPage({super.key, required this.title, required this.mode});
+  const DocViewPage({super.key, required this.title, required this.mode});
 
   @override
   Widget build(BuildContext context) {
