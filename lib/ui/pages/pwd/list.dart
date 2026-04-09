@@ -32,10 +32,12 @@ class PwdListPage extends StatelessWidget {
           PwdTile(
             pwdRecord: pwdList[index],
             onStarPressed: (){
-              Provider.of<PwdProvider>(context, listen: false).switchStarState(index);
+              Provider.of<PwdProvider>(context, listen: false).switchStarState(
+                  PwdLocation(folder: "", index: index)
+              );
             },
             onEditPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: index)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(location: PwdLocation(folder: "", index: index))));
             },
             onTapped: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
@@ -82,7 +84,12 @@ class PwdListPage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Provider.of<PwdProvider>(context, listen: false).addEmptyRecord();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(index: pwdList.length - 1)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PwdEditPage(location: PwdLocation(folder: "", index: pwdList.length - 1))
+            )
+          );
         },
         shape: styles.roundedBorder,
         child: const Icon(Icons.add),
