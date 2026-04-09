@@ -23,6 +23,7 @@ class PwdViewPage extends StatefulWidget {
 class _PwdViewPageState extends State<PwdViewPage> {
   enums.Presets _preset = enums.Presets.simple;
   final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  bool isGenerating = false;
   bool removeDigits = false;
   bool removeAlpha = false;
   bool removeSp = false;
@@ -82,197 +83,211 @@ class _PwdViewPageState extends State<PwdViewPage> {
         context: context
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: styles.uniInsetsSmall,
-          child: Center(
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                double maxWidth = ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 3);
-                return ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: maxWidth),
-                  child: Column(
-                    spacing: styles.layoutSpacing,
-                    children: <Widget>[
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          // 档案名
-                          ConstrainedBox(
-                            constraints: styles.tileWidthConstraint,
-                            child: styled.buildTextField(
-                              context: context,
-                              controller: TextEditingController(text: widget.identifier),
-                              label: "档案名",
-                              readonly: true,
-                              alpha: styles.alphaSemitransparent
-                            )
-                          ),
-                          // 用户名
-                          ConstrainedBox(
-                            constraints: styles.tileWidthConstraint,
-                            child: styled.buildTextField(
-                              context: context,
-                              controller: TextEditingController(text: widget.userName),
-                              label: "用户名",
-                              readonly: true,
-                              alpha: styles.alphaSemitransparent
-                            )
-                          ),
-                          // 账号
-                          ConstrainedBox(
-                            constraints: styles.tileWidthConstraint,
-                            child: styled.buildTextField(
-                              context: context,
-                              controller: TextEditingController(text: widget.account),
-                              label: "账号",
-                              readonly: true,
-                              alpha: styles.alphaSemitransparent
-                            ),
-                          ),
-                          // 移除数字
-                          ConstrainedBox(
-                            constraints: styles.tileWidthConstraint,
-                            child: SwitchListTile(
-                              value: removeDigits,
-                              onChanged: (value){
-                                setState(() {
-                                  removeDigits = !removeDigits;
-                                });
-                              },
-                              title: const Text("移除数字"),
-                              shape: styles.roundedBorder,
-                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
-                            ),
-                          ),
-                          // 移除字母
-                          ConstrainedBox(
-                            constraints: styles.tileWidthConstraint,
-                            child: SwitchListTile(
-                              value: removeAlpha,
-                              onChanged: (value){
-                                setState(() {
-                                  removeAlpha = !removeAlpha;
-                                });
-                              },
-                              title: const Text("移除字母"),
-                              shape: styles.roundedBorder,
-                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
-                            ),
-                          ),
-                          // 移除特殊字符
-                          ConstrainedBox(
-                            constraints: styles.tileWidthConstraint,
-                            child: SwitchListTile(
-                              value: removeSp,
-                              onChanged: (value){
-                                setState(() {
-                                  removeSp = !removeSp;
-                                });
-                              },
-                              title: const Text("移除特殊字符"),
-                              shape: styles.roundedBorder,
-                              tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
-                            ),
+        child: Container(
+          padding: styles.pagePaddingAll,
+          alignment: Alignment.center,
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              double maxWidth = ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 3);
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: Column(
+                  spacing: styles.layoutSpacing,
+                  children: <Widget>[
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        // 档案名
+                        ConstrainedBox(
+                          constraints: styles.tileWidthConstraint,
+                          child: styled.buildTextField(
+                            context: context,
+                            controller: TextEditingController(text: widget.identifier),
+                            label: "档案名",
+                            readonly: true,
+                            alpha: styles.alphaSemitransparent
                           )
-                        ]
-                      ),
-                      // 生成预设
-                      styled.buildListTile(
-                        context: context,
-                        title: "生成预设",
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _preset.displayName,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Icon(Icons.arrow_drop_down)
-                          ],
                         ),
-                        alpha: styles.alphaSemitransparent,
-                        onTapped: (){
-                          ui.showAlertQuickWidget(
-                            "选择预设",
-                            RadioGroup(
-                              groupValue: _preset,
-                              onChanged: (value){
-                                setState(() {_preset = value ?? enums.Presets.simple;});
-                                Navigator.pop(context);
-                              },
-                              child: Column(
-                                children: [
-                                  RadioListTile(
-                                    title: Text(enums.Presets.simple.displayName),
-                                    subtitle: Text("简易预设，适用于对安全性要求不高的场景"),
-                                    shape: styles.roundedBorder,
-                                    value: enums.Presets.simple,
-                                  ),
-                                  RadioListTile(
-                                    title: Text(enums.Presets.complex.displayName),
-                                    subtitle: Text("使用更复杂的生成流程和 PBKDF2 算法"),
-                                    shape: styles.roundedBorder,
-                                    value: enums.Presets.complex
-                                  ),
-                                  RadioListTile(
-                                    title: Text(enums.Presets.bank.displayName),
-                                    subtitle: Text("生成六位的纯数字密码"),
-                                    shape: styles.roundedBorder,
-                                    value: enums.Presets.bank
-                                  ),
-                                  RadioListTile(
-                                    title: Text(enums.Presets.custom.displayName),
-                                    subtitle: Text("完全自定义整个生成流程"),
-                                    shape: styles.roundedBorder,
-                                    value: enums.Presets.custom
-                                  )
-                                ],
-                              )
-                            ),
-                            "取消",
-                            context
-                          );
-                        },
+                        // 用户名
+                        ConstrainedBox(
+                          constraints: styles.tileWidthConstraint,
+                          child: styled.buildTextField(
+                            context: context,
+                            controller: TextEditingController(text: widget.userName),
+                            label: "用户名",
+                            readonly: true,
+                            alpha: styles.alphaSemitransparent
+                          )
+                        ),
+                        // 账号
+                        ConstrainedBox(
+                          constraints: styles.tileWidthConstraint,
+                          child: styled.buildTextField(
+                            context: context,
+                            controller: TextEditingController(text: widget.account),
+                            label: "账号",
+                            readonly: true,
+                            alpha: styles.alphaSemitransparent
+                          ),
+                        ),
+                        // 移除数字
+                        ConstrainedBox(
+                          constraints: styles.tileWidthConstraint,
+                          child: SwitchListTile(
+                            value: removeDigits,
+                            onChanged: (value){
+                              setState(() {
+                                removeDigits = !removeDigits;
+                              });
+                            },
+                            title: const Text("移除数字"),
+                            shape: styles.roundedBorder,
+                            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                          ),
+                        ),
+                        // 移除字母
+                        ConstrainedBox(
+                          constraints: styles.tileWidthConstraint,
+                          child: SwitchListTile(
+                            value: removeAlpha,
+                            onChanged: (value){
+                              setState(() {
+                                removeAlpha = !removeAlpha;
+                              });
+                            },
+                            title: const Text("移除字母"),
+                            shape: styles.roundedBorder,
+                            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                          ),
+                        ),
+                        // 移除特殊字符
+                        ConstrainedBox(
+                          constraints: styles.tileWidthConstraint,
+                          child: SwitchListTile(
+                            value: removeSp,
+                            onChanged: (value){
+                              setState(() {
+                                removeSp = !removeSp;
+                              });
+                            },
+                            title: const Text("移除特殊字符"),
+                            shape: styles.roundedBorder,
+                            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                          ),
+                        )
+                      ]
+                    ),
+                    // 生成预设
+                    styled.buildListTile(
+                      context: context,
+                      title: "生成预设",
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _preset.displayName,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          Icon(Icons.arrow_drop_down)
+                        ],
                       ),
-                      // 视情况选择是否显示配置编辑页面
-                      ?_showConfigEdit(),
-                      // 复制按钮
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (<enums.Presets>[
-                              enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
-                            ].contains(_preset)) {
-                              var res = await parser.parseBuiltins(
-                                _preset,
-                                "${widget.identifier}: ${widget.userName} @ ${widget.account}",
-                                removeAlpha: removeAlpha,
-                                removeDigits: removeDigits,
-                                removeSp: removeSp
-                              );
-                              if (res.$1 == ErrorCode.success) {
-                                Clipboard.setData(ClipboardData(text: res.$2));
-                                if (context.mounted) {
-                                  ui.showSnackBarQuick("密码已复制", context);
+                      alpha: styles.alphaSemitransparent,
+                      onTapped: (){
+                        ui.showAlertQuickWidget(
+                          "选择预设",
+                          RadioGroup(
+                            groupValue: _preset,
+                            onChanged: (value){
+                              setState(() {_preset = value ?? enums.Presets.simple;});
+                              Navigator.pop(context);
+                            },
+                            child: Column(
+                              children: [
+                                RadioListTile(
+                                  title: Text(enums.Presets.simple.displayName),
+                                  subtitle: Text("简易预设，适用于对安全性要求不高的场景"),
+                                  shape: styles.roundedBorder,
+                                  value: enums.Presets.simple,
+                                ),
+                                RadioListTile(
+                                  title: Text(enums.Presets.complex.displayName),
+                                  subtitle: Text("使用更复杂的生成流程和 PBKDF2 算法，可能较慢"),
+                                  shape: styles.roundedBorder,
+                                  value: enums.Presets.complex
+                                ),
+                                RadioListTile(
+                                  title: Text(enums.Presets.bank.displayName),
+                                  subtitle: Text("生成六位的纯数字密码"),
+                                  shape: styles.roundedBorder,
+                                  value: enums.Presets.bank
+                                ),
+                                RadioListTile(
+                                  title: Text(enums.Presets.custom.displayName),
+                                  subtitle: Text("完全自定义整个生成流程"),
+                                  shape: styles.roundedBorder,
+                                  value: enums.Presets.custom
+                                )
+                              ],
+                            )
+                          ),
+                          "取消",
+                          context
+                        );
+                      },
+                    ),
+                    // 视情况选择是否显示配置编辑页面
+                    ?_showConfigEdit(),
+                    // 按钮
+                    Row(
+                      spacing: styles.layoutSpacing,
+                      children: [
+                        // 查看密码
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: (){},
+                            style: styles.buttonStyle,
+                            child: Text("查看密码"),
+                          ),
+                        ),
+                        // 复制密码
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isGenerating ? null : () async {
+                              // 禁用按钮
+                              setState(() {isGenerating = true;});
+                              // 开始生成
+                              if (<enums.Presets>[
+                                enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
+                              ].contains(_preset)) {
+                                var res = await parser.parseBuiltins(
+                                  _preset, "${widget.identifier}: ${widget.userName} @ ${widget.account}",
+                                  removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
+                                );
+                                if (res.$1 == ErrorCode.success) {
+                                  Clipboard.setData(ClipboardData(text: res.$2));
+                                  if (context.mounted) {
+                                    ui.showSnackBarQuick("密码已复制", context);
+                                  }
+                                } else {
+                                  if (context.mounted) {
+                                    ui.showSnackBarQuick(res.$1.generic, context);
+                                  }
                                 }
-                              } else {
-                                if (context.mounted) {
-                                  ui.showSnackBarQuick(res.$1.generic, context);
-                                }
+                                // 启用按钮
+                                setState(() {isGenerating = false;});
                               }
-                            }
-                          },
-                          style: styles.buttonStyle,
-                          child: const Text("复制密码"),
-                        ),
-                      ),
-                    ],
-                  )
-                );
-              },
-            ),
+                            },
+                            style: styles.buttonStyle,
+                            child: const Text("复制密码"),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                )
+              );
+            },
           ),
         ),
       ),

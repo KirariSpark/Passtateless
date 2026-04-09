@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:cryptography/cryptography.dart' as cryptography;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
@@ -63,7 +62,6 @@ class Generator {
       finalBytes.add((item % 93) + 33);
     }
     password = ascii.decode(finalBytes, allowInvalid: true);
-    print(password);
   }
 
   /// 移除特殊字符

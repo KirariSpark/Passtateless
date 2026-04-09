@@ -21,8 +21,8 @@ class HomePageQuickOptions extends StatelessWidget {
         children: [
           // 密码管理
           styled.buildListTile(
-            title: "密码管理",
-            subtitle: "增加、删除或修改你的密码",
+            title: "全部密码",
+            subtitle: "查看和修改全部密码资料夹",
             leading: Icons.format_list_bulleted,
             trailing: Icon(Icons.arrow_forward),
             onTapped: onEditTapped,

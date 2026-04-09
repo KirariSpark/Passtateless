@@ -22,7 +22,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
 
     return Scaffold(
-      appBar: styled.buildAppBar(title: "密码管理", context: context),
+      appBar: styled.buildAppBar(title: "全部资料夹", context: context),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(

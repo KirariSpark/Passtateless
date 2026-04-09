@@ -48,7 +48,7 @@ Future<(ErrorCode, String)> parse(
         case 'toPBKDF2':
           await generator.toPBKDF2(
             args[0] as String,
-            args.length > 1 ? args[1] as int : 100,
+            args.length > 1 ? args[1] as int : 100000,
           );
           break;
         case 'removeSpChar':

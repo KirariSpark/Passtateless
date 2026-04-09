@@ -59,7 +59,7 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "所有密码", context: context),
+      appBar: styled.buildAppBar(title: "资料夹：${folder.isEmpty ? '未分类' : folder}", context: context),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: Alignment.topCenter,
