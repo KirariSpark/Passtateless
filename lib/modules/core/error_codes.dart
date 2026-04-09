@@ -8,7 +8,9 @@ enum ErrorCode {
   decryptionFailed(6, "无法解密文件 {item}", "无法解密文件"),
   unknownCommand(7, "输入包含未知命令"),
   invalidArgs(8, "输入包含无效参数"),
-  generateFailed(9, "无法生成满足要求的密码");
+  generateFailed(9, "无法生成满足要求的密码"),
+  duplicateKey(10, "输入键 {item} 与已有的键重复", "不能输入重复的键"),
+  emptyKey(11, "不能输入空键");
 
   final int code;
   final String _messageTemplate;

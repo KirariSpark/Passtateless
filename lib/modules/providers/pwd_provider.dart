@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
 import 'package:passtateless/modules/core/enums.dart' as enums;
+import 'package:passtateless/modules/core/error_codes.dart';
 
 class PwdLocation {
   final String folder;
@@ -22,17 +23,17 @@ class PwdLocation {
 
 
 class PwdProvider extends ChangeNotifier {
-  Map<String, List<Map<String, dynamic>>> _pwdList = {"": []};
+  Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
   List<Map<String, dynamic>> _stars = [];
   List<PwdLocation> _starredLocation = [];
 
   // TODO: 实现完整功能
-  List<Map<String, dynamic>> get pwdList => _pwdList[""] ?? [];
+  List<Map<String, dynamic>> get pwdList => _pwdMap[""] ?? [];
 
   List<Map<String, dynamic>> get starredPwds {
     _stars = [];
     _starredLocation = [];
-    _pwdList.forEach((folder, items) {
+    _pwdMap.forEach((folder, items) {
       for (var (index, item) in items.indexed) {
         if (item["starred"]) {
           _stars.add(item);
@@ -43,11 +44,13 @@ class PwdProvider extends ChangeNotifier {
     return _stars;
   }
 
+  List<String> get pwdFolders => _pwdMap.keys.toList();
+
   /// 更新指定项的数据
   (int stat, String info) setValue(PwdLocation loc, String key, dynamic value) {
     // 包含这个文件夹，且索引未越界
-    if (_pwdList.containsKey(loc.folder) && loc.index < _pwdList[loc.folder]!.length) {
-      _pwdList[loc.folder]![loc.index][key] = value;
+    if (_pwdMap.containsKey(loc.folder) && loc.index < _pwdMap[loc.folder]!.length) {
+      _pwdMap[loc.folder]![loc.index][key] = value;
       notifyListeners();
       return (0, "");
     }
@@ -56,8 +59,8 @@ class PwdProvider extends ChangeNotifier {
 
   /// 更新指定项的收藏状态
   void switchStarState(PwdLocation loc) {
-    if (_pwdList.containsKey(loc.folder) && loc.index < _pwdList[loc.folder]!.length) {
-      _pwdList[loc.folder]![loc.index]["starred"] = !_pwdList[loc.folder]![loc.index]["starred"];
+    if (_pwdMap.containsKey(loc.folder) && loc.index < _pwdMap[loc.folder]!.length) {
+      _pwdMap[loc.folder]![loc.index]["starred"] = !_pwdMap[loc.folder]![loc.index]["starred"];
       notifyListeners();
     }
   }
@@ -67,24 +70,24 @@ class PwdProvider extends ChangeNotifier {
     PwdLocation loc = _starredLocation[index];
     _stars.removeAt(index);
     _starredLocation.removeAt(index);
-    _pwdList[loc.folder]![loc.index]["starred"] = !_pwdList[loc.folder]![loc.index]["starred"];
+    _pwdMap[loc.folder]![loc.index]["starred"] = !_pwdMap[loc.folder]![loc.index]["starred"];
     notifyListeners();
   }
 
   /// 从所有密码中移除指定项
   void removeRecord(PwdLocation loc) {
-    if (_pwdList.containsKey(loc.folder) && loc.index < _pwdList[loc.folder]!.length) {
-      _pwdList[loc.folder]!.removeAt(loc.index);
+    if (_pwdMap.containsKey(loc.folder) && loc.index < _pwdMap[loc.folder]!.length) {
+      _pwdMap[loc.folder]!.removeAt(loc.index);
       notifyListeners();
     }
   }
 
   /// 在未分类记录条目结尾增加一条空记录
   void addEmptyRecord() {
-    if (!_pwdList.containsKey("")) {
-      _pwdList[""] = [];
+    if (!_pwdMap.containsKey("")) {
+      _pwdMap[""] = [];
     }
-    _pwdList[""]!.add({
+    _pwdMap[""]!.add({
       "identifier": "",
       "userName": "example",
       "account": "example.com",
@@ -93,19 +96,32 @@ class PwdProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 新增一个文件夹
+  ErrorCode addFolder(String name) {
+    if (_pwdMap.containsKey(name)) {
+      return ErrorCode.duplicateKey;
+    } else if (name == "") {
+      return ErrorCode.emptyKey;
+    } else {
+      _pwdMap.addAll({name, []} as Map<String, List<Map<String, dynamic>>>);
+      notifyListeners();
+      return ErrorCode.success;
+    }
+  }
+
   /// 读取加密的归档文件
   Future<ErrorCode> readArchive(String masterPwd) async {
     final (errorCode, res) = await readEncryptedJsonFile(enums.Paths.pwdRecord.path, masterPwd);
     if (errorCode == ErrorCode.success) {
       if (res is Map) {
-        _pwdList = {};
+        _pwdMap = {};
         res.forEach((key, value) {
           if (value is List) {
-            _pwdList[key.toString()] = value.cast<Map<String, dynamic>>();
+            _pwdMap[key.toString()] = value.cast<Map<String, dynamic>>();
           }
         });
-        if (!_pwdList.containsKey("")) {
-          _pwdList[""] = [];
+        if (!_pwdMap.containsKey("")) {
+          _pwdMap[""] = [];
         }
         notifyListeners();
         return ErrorCode.success;
@@ -118,7 +134,7 @@ class PwdProvider extends ChangeNotifier {
 
   /// 保存当前数据到加密的归档文件
   Future<ErrorCode> saveArchive(String masterPwd) async {
-    final (errorCode, _) = await writeEncryptedJsonFile(enums.Paths.pwdRecord.path, _pwdList, masterPwd);
+    final (errorCode, _) = await writeEncryptedJsonFile(enums.Paths.pwdRecord.path, _pwdMap, masterPwd);
     return errorCode;
   }
 }

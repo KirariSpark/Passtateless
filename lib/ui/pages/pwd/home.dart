@@ -5,6 +5,7 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/list.dart';
+import 'package:passtateless/ui/pages/pwd/folders.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -29,7 +30,7 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: styles.layoutSpacing),
                   HomePageQuickOptions(
                     onEditTapped: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdListPage()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdFolderPage()));
                     },
                     onEvalTapped: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEvalPage()));

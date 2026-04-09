@@ -92,9 +92,9 @@ class PwdListPage extends StatelessWidget {
           );
         },
         shape: styles.roundedBorder,
+        elevation: 3,
         child: const Icon(Icons.add),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 

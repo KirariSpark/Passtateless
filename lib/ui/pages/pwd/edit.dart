@@ -51,8 +51,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
 
     return Scaffold(
       appBar: styled.buildAppBar(
-          title: "编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}",
-          context: context
+        title: "编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}",
+        context: context
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -62,81 +62,81 @@ class _PwdEditPageState extends State<PwdEditPage> {
               spacing: 8,
               children: <Widget>[
                 Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      ConstrainedBox(
-                          constraints: styles.tileWidthConstraint,
-                          child: styled.buildTextField(
-                              context: context,
-                              controller: _identifierController,
-                              onChanged: (value) {
-                                Provider.of<PwdProvider>(context, listen: false).setValue(
-                                    widget._location, "identifier", value
-                                );
-                              },
-                              label: "档案名",
-                              alpha: styles.alphaSemitransparent
-                          )
-                      ),
-                      ConstrainedBox(
-                          constraints: styles.tileWidthConstraint,
-                          child: styled.buildTextField(
-                              context: context,
-                              controller: _userNameController,
-                              onChanged: (value) {
-                                Provider.of<PwdProvider>(context, listen: false).setValue(
-                                    widget._location, "userName", value
-                                );
-                              },
-                              label: "用户名",
-                              alpha: styles.alphaSemitransparent
-                          )
-                      ),
-                      ConstrainedBox(
-                        constraints: styles.tileWidthConstraint,
-                        child: styled.buildTextField(
-                            context: context,
-                            controller: _accountController,
-                            onChanged: (value) {
-                              Provider.of<PwdProvider>(context, listen: false).setValue(
-                                  widget._location, "account", value
-                              );
-                            },
-                            label: "账号",
-                            alpha: styles.alphaSemitransparent
-                        ),
+                  spacing: styles.layoutSpacing,
+                  runSpacing: styles.layoutSpacing,
+                  children: [
+                    ConstrainedBox(
+                      constraints: styles.tileWidthConstraint,
+                      child: styled.buildTextField(
+                        context: context,
+                        controller: _identifierController,
+                        onChanged: (value) {
+                          Provider.of<PwdProvider>(context, listen: false).setValue(
+                            widget._location, "identifier", value
+                          );
+                        },
+                        label: "档案名",
+                        alpha: styles.alphaSemitransparent
                       )
-                    ]
-                ),
-                ConstrainedBox(
-                  constraints: styles.tileWidthConstraint,
-                  child: TextButton(
-                      onPressed: (){
-                        ui.showConfirmDialogQuick(
-                            context,
-                                (){
-                              setState(() {
-                                _isDeleting = true;
-                              });
-                              Provider.of<PwdProvider>(context, listen: false).removeRecord(widget._location);
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                            "确认删除"
-                        );
+                    ),
+                    ConstrainedBox(
+                      constraints: styles.tileWidthConstraint,
+                      child: styled.buildTextField(
+                        context: context,
+                        controller: _userNameController,
+                        onChanged: (value) {
+                          Provider.of<PwdProvider>(context, listen: false).setValue(
+                            widget._location, "userName", value
+                          );
+                        },
+                        label: "用户名",
+                        alpha: styles.alphaSemitransparent
+                      )
+                    ),
+                    ConstrainedBox(
+                      constraints: styles.tileWidthConstraint,
+                      child: styled.buildTextField(
+                        context: context,
+                        controller: _accountController,
+                        onChanged: (value) {
+                          Provider.of<PwdProvider>(context, listen: false).setValue(
+                            widget._location, "account", value
+                          );
+                        },
+                        label: "账号",
+                        alpha: styles.alphaSemitransparent
+                      ),
+                    )
+                  ]
+              ),
+              ConstrainedBox(
+                constraints: styles.tileWidthConstraint,
+                child: TextButton(
+                  onPressed: (){
+                    ui.showConfirmDialogQuick(
+                      context,
+                      (){
+                        setState(() {
+                          _isDeleting = true;
+                        });
+                        Provider.of<PwdProvider>(context, listen: false).removeRecord(widget._location);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
                       },
-                      style: ElevatedButton.styleFrom(
-                          shape: styles.roundedBorder,
-                          backgroundColor: ColorScheme.of(context).errorContainer
-                      ),
-                      child: Text(
-                        "删除这条记录",
-                        style: TextStyle(
-                            color: ColorScheme.of(context).error,
-                            fontWeight: FontWeight.w800
-                        ),
-                      )
+                      "确认删除"
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: styles.roundedBorder,
+                    backgroundColor: ColorScheme.of(context).errorContainer
+                  ),
+                  child: Text(
+                    "删除这条记录",
+                    style: TextStyle(
+                      color: ColorScheme.of(context).error,
+                      fontWeight: FontWeight.w800
+                    ),
+                  )
                   ),
                 ),
               ],

@@ -20,6 +20,8 @@ BoxConstraints tileHeightConstraint = const BoxConstraints(maxHeight: 300);
 
 EdgeInsets uniInsetsSmall = const EdgeInsets.all(8);
 
+EdgeInsets pagePadding = const EdgeInsets.symmetric(horizontal: 16);
+
 const double layoutSpacing = 8;
 
 const SizedBox spacingSizedBox = SizedBox(width: 8, height: 8);
