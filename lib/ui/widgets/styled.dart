@@ -23,7 +23,7 @@ ListTile buildListTile({
 }) {
   return ListTile(
     onTap: onTapped,
-    leading: leading == null ? null : Icon(leading),
+    leading: leading == null ? null : Icon(leading, color: ColorScheme.of(context).primary,),
     title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.bodyLarge)),
     subtitle: subtitle == null ? null : Text(subtitle),
     trailing: trailing,

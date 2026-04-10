@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/master.dart';
+import 'package:passtateless/ui/pages/settings/customize.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -51,9 +51,10 @@ class BasicSettingsPage extends StatelessWidget {
               child: styled.buildListTile(
                 leading: Icons.color_lens_outlined,
                 title: "个性化",
+                titleTag: "customize",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
-                  ui.showSnackBarQuick("Coming S∞n", context);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => CustomizeSettingsPage()));
                 },
                 context: context,
               ),

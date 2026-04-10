@@ -37,7 +37,7 @@ InputDecoration uniInputDecoration(String label) {
     );
 }
 
-const int alphaTransparent = 64;
+const int alphaAlmostTransparent = 96;
 
 const int alphaOpaque = 224;
 

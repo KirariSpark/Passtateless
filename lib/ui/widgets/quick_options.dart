@@ -31,6 +31,7 @@ class HomePageQuickOptions extends StatelessWidget {
           // 密码评估
           styled.buildListTile(
             title: "密码强度",
+            titleTag: "pwdEval",
             subtitle: "评估密码强度，并获取相关建议",
             leading: Icons.checklist,
               trailing: Icon(Icons.arrow_forward),

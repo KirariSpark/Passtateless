@@ -10,7 +10,7 @@ class HelpOverviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: styles.uniInsetsSmall,
+        padding: styles.pagePaddingAll,
         alignment: AlignmentGeometry.topCenter,
         constraints: styles.pageWidthConstraint,
         child: SingleChildScrollView(

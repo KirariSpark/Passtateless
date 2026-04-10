@@ -57,7 +57,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
             children: <Widget>[
               styled.buildListTile(
                 title: "JSON 语法基础",
-                alpha: styles.alphaTransparent,
+                alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -71,7 +71,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               ),
               styled.buildListTile(
                 title: "生成配置",
-                alpha: styles.alphaTransparent,
+                alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -85,7 +85,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               ),
               styled.buildListTile(
                 title: "生成规则提示",
-                alpha: styles.alphaTransparent,
+                alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -99,7 +99,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               ),
               styled.buildListTile(
                 title: "格式化与可读性",
-                alpha: styles.alphaTransparent,
+                alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
                   Navigator.pop(context);
                   Navigator.push(

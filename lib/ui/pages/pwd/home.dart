@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
     return SingleChildScrollView(
       child: Container(
         alignment: Alignment.center,
-        padding: styles.uniInsetsSmall,
+        padding: styles.pagePaddingAll,
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return Column(
