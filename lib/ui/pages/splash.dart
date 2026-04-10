@@ -95,7 +95,6 @@ class _SplashPageState extends State<SplashPage> {
                         if (stat != ErrorCode.success) {
                           ui.showSnackBarQuick(stat.generic, context);
                         } else {
-                          ui.showSnackBarQuick("已解密你的档案", context);
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp()));
                         }
                       }

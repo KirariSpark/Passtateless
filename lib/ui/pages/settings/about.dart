@@ -14,6 +14,7 @@ class AboutPage extends StatelessWidget {
           padding: styles.uniInsetsSmall,
           constraints: styles.pageWidthConstraint,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
                 "assets/icon.png",
@@ -31,11 +32,6 @@ class AboutPage extends StatelessWidget {
                 onPressed: (){},
                 style: styles.buttonStyle,
                 child: Text("开源许可证")
-              ),
-              TextButton(
-                onPressed: (){},
-                style: styles.buttonStyle,
-                child: Text("开源仓库")
               )
             ],
           ),
