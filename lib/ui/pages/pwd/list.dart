@@ -62,27 +62,7 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("查看：${folder.isEmpty ? '未分类' : folder}"),
-        leading: IconButton(
-          onPressed: () async {
-            ui.showSnackBarQuick("正在保存", context);
-            var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-              Provider.of<AppProvider>(context, listen: false).masterPwd
-            );
-            if (context.mounted) {
-              if (stat == ErrorCode.success) {
-                ui.showSnackBarQuick("你的档案已保存", context);
-              } else {
-                ui.showSnackBarQuick(stat.generic, context);
-              }
-              Navigator.pop(context);
-            }
-          },
-          style: styles.buttonStyle,
-          icon: Icon(Icons.arrow_back)
-        ),
-      ),
+      appBar: styled.buildAppBar(title: "查看：${folder.isEmpty ? '未分类' : folder}", context: context),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: Alignment.topCenter,
@@ -107,19 +87,76 @@ class PwdListPage extends StatelessWidget {
           ),
         )
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PwdEditPage(location: PwdLocation(folder: folder, index: pwdList.length - 1))
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: (){
+      //     Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => PwdEditPage(location: PwdLocation(folder: folder, index: pwdList.length - 1))
+      //       )
+      //     );
+      //   },
+      //   shape: styles.roundedBorder,
+      //   elevation: 3,
+      //   child: const Icon(Icons.add),
+      // ),
+      floatingActionButton: PopupMenuButton(
+        popUpAnimationStyle: AnimationStyle(
+            curve: Curves.easeInOut,
+            duration: Duration(milliseconds: 300),
+            reverseCurve: Curves.easeInOut,
+            reverseDuration: Duration(milliseconds: 300)
+        ),
+        tooltip: "更多功能",
+        iconSize: 30,
+        icon: Icon(Icons.menu),
+        itemBuilder: (_) {
+          return [
+            // 保存更改
+            PopupMenuItem(
+              child: Row(
+                spacing: styles.layoutSpacing,
+                children: [
+                  Icon(Icons.save_outlined),
+                  Text("保存更改")
+                ],
+              ),
+              onTap: () async {
+                ui.showSnackBarQuick("正在保存", context);
+                var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+                    Provider.of<AppProvider>(context, listen: false).masterPwd
+                );
+                if (context.mounted) {
+                  if (stat == ErrorCode.success) {
+                    ui.showSnackBarQuick("你的档案已保存", context);
+                  } else {
+                    ui.showSnackBarQuick(stat.generic, context);
+                  }
+                }
+              },
+            ),
+            // 新建记录
+            PopupMenuItem(
+              child: Row(
+                spacing: styles.layoutSpacing,
+                children: [
+                  Icon(Icons.add),
+                  Text("新建记录")
+                ],
+              ),
+              onTap: (){
+                Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PwdEditPage(location: PwdLocation(folder: folder, index: pwdList.length - 1))
+                  )
+                );
+              },
             )
-          );
-        },
-        shape: styles.roundedBorder,
-        elevation: 3,
-        child: const Icon(Icons.add),
+          ];
+        }
       ),
     );
   }

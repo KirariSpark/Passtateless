@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/pages/pwd/list.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -101,36 +102,75 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           )
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          ui.showAlertDialogQuick(
-            title: "新建文件夹",
-            content: styled.buildTextField(
-              label: "文件夹名",
-              controller: folderName,
-              alpha: styles.alphaSemitransparent,
-              context: context
+      floatingActionButton: PopupMenuButton(
+        popUpAnimationStyle: AnimationStyle(
+          curve: Curves.easeInOut,
+          duration: Duration(milliseconds: 300),
+          reverseCurve: Curves.easeInOut,
+          reverseDuration: Duration(milliseconds: 300)
+        ),
+        tooltip: "更多功能",
+        iconSize: 30,
+        icon: Icon(Icons.menu),
+        itemBuilder: (_) {
+          return [
+            // 保存更改
+            PopupMenuItem(
+              child: Row(
+                spacing: styles.layoutSpacing,
+                children: [
+                  Icon(Icons.save_outlined),
+                  Text("保存更改")
+                ],
+              ),
+              onTap: () async {
+                ui.showSnackBarQuick("正在保存", context);
+                var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+                    Provider.of<AppProvider>(context, listen: false).masterPwd
+                );
+                if (context.mounted) {
+                  if (stat == ErrorCode.success) {
+                    ui.showSnackBarQuick("你的档案已保存", context);
+                  } else {
+                    ui.showSnackBarQuick(stat.generic, context);
+                  }
+                }
+              },
             ),
-            action: (){
-              Navigator.pop(context);
-            },
-            actionText: "取消",
-            action2: () {
-              var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
-              if (stat == ErrorCode.success) {
-                Navigator.pop(context);
-                ui.showSnackBarQuick("文件夹已建立", context);
-              } else {
-                ui.showSnackBarQuick(stat.generic, context);
+            // 新建资料夹
+            PopupMenuItem(
+              child: Row(
+                spacing: styles.layoutSpacing,
+                children: [
+                  Icon(Icons.create_new_folder_outlined),
+                  Text("新建资料夹")
+                ],
+              ),
+              onTap: (){
+                ui.showAlertDialogQuick(
+                  title: "新建文件夹",
+                  content: styled.buildTextField(
+                    label: "文件夹名", controller: folderName,
+                    alpha: styles.alphaSemitransparent, context: context
+                  ),
+                  action: () => Navigator.pop(context),
+                  actionText: "取消",
+                  action2: () {
+                    var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
+                    if (stat == ErrorCode.success) {
+                      Navigator.pop(context);
+                      ui.showSnackBarQuick("文件夹已建立", context);
+                    } else {
+                      ui.showSnackBarQuick(stat.generic, context);
+                    }
+                  },
+                  action2Text: "确定",
+                  context: context
+                );
               }
-            },
-            action2Text: "确定",
-            context: context
-          );
+            )
+          ];
         },
-        shape: styles.roundedBorder,
-        elevation: 3,
-        child: Icon(Icons.create_new_folder_outlined),
       ),
     );
   }
