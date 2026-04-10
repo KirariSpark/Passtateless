@@ -12,14 +12,7 @@ class AdvancedSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('高级设置'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-          style: styles.buttonStyle,
-        ),
-      ),
+      appBar: styled.buildAppBar(title: "高级设置", titleTag: "advanced", context: context),
       body: Center(child: Placeholder()),
     );
   }
@@ -44,6 +37,7 @@ class BasicSettingsPage extends StatelessWidget {
               child: styled.buildListTile(
                 leading: Icons.key,
                 title: "主密码",
+                titleTag: "masterPwd",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => MasterPwdSettingsPage()));
@@ -71,6 +65,7 @@ class BasicSettingsPage extends StatelessWidget {
                 context: context,
                 leading: Icons.developer_mode,
                 title: "高级设置",
+                titleTag: "advanced",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (c) => const AdvancedSettingsPage()));
@@ -84,6 +79,7 @@ class BasicSettingsPage extends StatelessWidget {
                 context: context,
                 leading: Icons.info_outlined,
                 title: "关于",
+                titleTag: "about",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));

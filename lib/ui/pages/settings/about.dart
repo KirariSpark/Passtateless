@@ -8,7 +8,7 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "关于", context: context),
+      appBar: styled.buildAppBar(title: "关于", titleTag: "about", context: context),
       body: Center(
         child: Container(
           padding: styles.uniInsetsSmall,

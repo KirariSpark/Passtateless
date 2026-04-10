@@ -14,7 +14,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appProvider = context.watch<AppProvider>();
     return Scaffold(
-      appBar: styled.buildAppBar(title: "主密码设置", context: context),
+      appBar: styled.buildAppBar(title: "主密码", titleTag: "masterPwd", context: context),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(

@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 
 /// 构建预定义了风格的ListTile
 ///
-/// [title] ListTile的标题
-/// [context] BuildContext context
-/// [leading] 位于头部的图标
-/// [trailing] 位于尾部的Widget
-/// [titleTag] 用于 Hero 动画的 tag
-/// [subtitle] ListTile的副标题
-/// [onTapped] 当ListTile被点击时，调用的函数
-/// [alpha] ListTile背景的透明度（0-255）
+/// [title] ListTile的标题<br>
+/// [context] BuildContext context<br>
+/// [leading] 位于头部的图标<br>
+/// [subtitle] ListTile的副标题<br>
+/// [trailing] 位于尾部的Widget<br>
+/// [titleTag] 用于 Hero 动画的 tag<br>
+/// [onTapped] 当ListTile被点击时，调用的函数<br>
+/// [alpha] ListTile背景的透明度（0-255）<br>
 ListTile buildListTile({
   required String title,
   required BuildContext context,
@@ -33,6 +33,16 @@ ListTile buildListTile({
 }
 
 /// 构建预定义了风格的TextField
+///
+/// [context] BuildContext context<br>
+/// [controller] TextField 的控制器<br>
+/// [onChanged] 当 TextField 发生变化时要做的事<br>
+/// [label] TextField 的标签<br>
+/// [alpha] 背景的透明度<br>
+/// [passwordMode] 密码模式（显示内容为·）<br>
+/// [multiline] 是否是多行文本框<br>
+/// [readonly] 是否是只读文本框<br>
+/// [maxLines] 多行文本框的最大行数<br>
 TextField buildTextField({
   required BuildContext context,
   TextEditingController? controller,
@@ -42,7 +52,7 @@ TextField buildTextField({
   bool passwordMode = false,
   bool multiline = false,
   bool readonly = false,
-  int? maxLines = 1
+  int maxLines = 1
 }) {
   return TextField(
     controller: controller,
@@ -61,18 +71,31 @@ TextField buildTextField({
   );
 }
 
+/// 构建预定义了风格的AppBar
+///
+/// [title] 标题<br>
+/// [context] BuildContext context<br>
+/// [titleTag] 标题的 tag，用于 hero 动画<br>
+/// [actions] 放在 AppBar 右侧的一组 Widget<br>
+/// [exitIcon] 自定义退出按钮<br>
 AppBar buildAppBar({
   required String title,
   required BuildContext context,
+  String? titleTag,
   List<Widget>? actions,
   IconData exitIcon = Icons.arrow_back
 }) {
-  return buildAppBarWidget(title: Text(title), context: context, exitIcon: exitIcon, actions: actions);
+  return buildAppBarWidget(
+    title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+    context: context, exitIcon: exitIcon, actions: actions
+  );
 }
 
+/// 参考 buildAppBar
 AppBar buildAppBarWidget({
   required Widget title,
   required BuildContext context,
+  String? titleTag,
   List<Widget>? actions,
   IconData exitIcon = Icons.arrow_back
 }) {
