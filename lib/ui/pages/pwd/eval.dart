@@ -25,7 +25,7 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: styles.uniInsetsSmall,
+          padding: styles.pagePadding,
           constraints: styles.pageWidthConstraint,
           child: SingleChildScrollView(
             child: Column(

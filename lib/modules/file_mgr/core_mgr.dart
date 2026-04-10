@@ -1,6 +1,6 @@
+import 'package:aes256/aes256.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
-import 'package:encrypt/encrypt.dart';
 import 'dart:io';
 
 /// 获取缓存目录路径
@@ -29,7 +29,8 @@ Future<(ErrorCode, String res)> readTextFile(String relativePath) async {
     final filePath = '${baseDir.path}/$relativePath';
     final file = File(filePath);
     if (await file.exists()) {
-      return (ErrorCode.success, await file.readAsString());
+      var res = await file.readAsString();
+      return (ErrorCode.success, res);
     } else {
       return (ErrorCode.fileNotExist, "");
     }
@@ -81,19 +82,15 @@ Future<(ErrorCode, String errors)> deleteFile(String relativePath) async {
 /// 读取加密文本文件内容
 ///
 /// [relativePath]要读取的文件相对于缓存路径的相对路径
-/// [key]用于解密的密钥（需为32位字符以符合AES256标准）
+/// [key]用于解密的密钥
 Future<(ErrorCode, String res)> readEncryptedTextFile(String relativePath, String key) async {
   try {
     // 先读取密文
     final (errorCode, content) = await readTextFile(relativePath);
-    if (errorCode != ErrorCode.success) {
-      return (errorCode, "");
-    }
+    if (errorCode != ErrorCode.success) {return (errorCode, "");}
 
     // 使用AES256解密
-    final encrypter = Encrypter(AES(Key.fromUtf8(key), mode: AESMode.cbc));
-    final iv = IV.fromLength(16);
-    final decrypted = encrypter.decrypt(Encrypted.fromBase64(content), iv: iv);
+    final decrypted = await Aes256.decrypt(encrypted: content, passphrase: key);
 
     return (ErrorCode.success, decrypted);
   } catch (e) {
@@ -106,16 +103,14 @@ Future<(ErrorCode, String res)> readEncryptedTextFile(String relativePath, Strin
 ///
 /// [relativePath]要写入的文件相对于缓存路径的相对路径
 /// [content]要写入的明文内容
-/// [key]用于加密的密钥（需为32位字符以符合AES256标准）
 Future<(ErrorCode, String errors)> writeEncryptedTextFile(String relativePath, String content, String key) async {
   try {
     // 使用AES256加密
-    final encrypter = Encrypter(AES(Key.fromUtf8(key), mode: AESMode.cbc));
-    final iv = IV.fromLength(16);
-    final encrypted = encrypter.encrypt(content, iv: iv);
+    final encrypted = await Aes256.encrypt(text: content, passphrase: key);
 
     // 将加密后的Base64字符串写入文件
-    return await writeTextFile(relativePath, encrypted.base64);
+    final res = await writeTextFile(relativePath, encrypted);
+    return res;
   } catch (e) {
     return (ErrorCode.unknown, e.toString());
   }
@@ -124,7 +119,7 @@ Future<(ErrorCode, String errors)> writeEncryptedTextFile(String relativePath, S
 /// 删除加密文件
 ///
 /// [relativePath]要删除的文件相对于缓存路径的相对路径
-/// [key]用于解密验证的密钥（需为32位字符以符合AES256标准）
+/// [key]用于解密验证的密钥
 Future<(ErrorCode, String errors)> deleteEncryptedTextFile(String relativePath, String key) async {
   // 尝试读取并解密文件，验证是否能够成功解密
   final (readErrorCode, _) = await readEncryptedTextFile(relativePath, key);

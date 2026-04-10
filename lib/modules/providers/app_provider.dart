@@ -23,6 +23,14 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 主密码
+  String _masterPwd = "";
+  String get masterPwd => _masterPwd;
+  set masterPwd(String value) {
+    _masterPwd = value;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _pageController.dispose();

@@ -22,24 +22,7 @@ class PwdLocation {
 
 
 class PwdProvider extends ChangeNotifier {
-  Map<String, List<Map<String, dynamic>>> _pwdMap = {
-    "": [
-      {
-        "identifier": "test",
-        "userName": "test",
-        "account": "test",
-        "starred": false
-      }
-    ],
-    "test": [
-      {
-        "identifier": "test2",
-        "userName": "test2",
-        "account": "test2",
-        "starred": true
-      }
-    ]
-  };
+  Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
   List<Map<String, dynamic>> _stars = [];
   List<PwdLocation> _starredLocation = [];
 
@@ -144,8 +127,8 @@ class PwdProvider extends ChangeNotifier {
 
   /// 读取加密的归档文件
   Future<ErrorCode> readArchive(String masterPwd) async {
-    final (errorCode, res) = await readEncryptedJsonFile(enums.Paths.pwdRecord.path, masterPwd);
-    if (errorCode == ErrorCode.success) {
+    final (stat, res) = await readEncryptedJsonFile(enums.Paths.pwdRecord.path, masterPwd);
+    if (stat == ErrorCode.success) {
       if (res is Map) {
         _pwdMap = {};
         res.forEach((key, value) {
@@ -159,10 +142,14 @@ class PwdProvider extends ChangeNotifier {
         notifyListeners();
         return ErrorCode.success;
       } else {
-        return ErrorCode.jsonFormatError;
+        return stat;
       }
+    } else if (stat == ErrorCode.fileNotExist) {
+      await saveArchive(masterPwd);
+      return await readArchive(masterPwd);
+    } else {
+      return stat;
     }
-    return errorCode;
   }
 
   /// 保存当前数据到加密的归档文件

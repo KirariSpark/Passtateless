@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:provider/provider.dart';
 
 class PwdListPage extends StatelessWidget {
@@ -59,7 +62,27 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "资料夹：${folder.isEmpty ? '未分类' : folder}", context: context),
+      appBar: styled.buildAppBar(
+        title: "资料夹：${folder.isEmpty ? '未分类' : folder}", context: context,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+                  Provider.of<AppProvider>(context, listen: false).masterPwd
+              );
+              if (context.mounted) {
+                if (stat == ErrorCode.success) {
+                  ui.showSnackBarQuick("你的档案已保存", context);
+                } else {
+                  ui.showSnackBarQuick(stat.generic, context);
+                }
+              }
+            },
+            style: styles.buttonStyle,
+            icon: Icon(Icons.save_outlined)
+          )
+        ]
+      ),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: Alignment.topCenter,

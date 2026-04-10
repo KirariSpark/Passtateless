@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/pages/app.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/ui/pages/app.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -12,12 +17,13 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  final TextEditingController pwdController = TextEditingController();
+  final TextEditingController _pwdController = TextEditingController();
   bool isDecrypting = false;
   Widget btnChild = Text("确定");
 
   @override
   Widget build(BuildContext context) {
+    final pwdProvider = context.watch<PwdProvider>();
     if (isDecrypting) {
       btnChild = Row(
         spacing: styles.layoutSpacing,
@@ -43,10 +49,7 @@ class _SplashPageState extends State<SplashPage> {
               mainAxisSize: MainAxisSize.min,
               spacing: styles.layoutSpacing,
               children: [
-                Image.asset(
-                  "assets/icon.png",
-                  width: 100,
-                ),
+                Image.asset("assets/icon.png", width: 100),
                 styles.spacingSizedBox,
                 Text(
                   "Passtateless 已被锁定",
@@ -62,21 +65,37 @@ class _SplashPageState extends State<SplashPage> {
                 styled.buildTextField(
                   context: context,
                   passwordMode: true,
-                  controller: pwdController,
+                  controller: _pwdController,
                   alpha: styles.alphaSemitransparent
                 ),
                 TextButton(
                   onPressed: () async {
+                    // 检查是否为空
+                    if (_pwdController.text.isEmpty) {
+                      ui.showSnackBarQuick("不能输入空密码", context);
+                      return;
+                    }
                     if (!isDecrypting) {
+                      // 设置解密状态
                       setState(() {
                         isDecrypting = true;
                       });
-                      await Future.delayed(Duration(seconds: 3));
+                      // 设置主密码
+                      Provider.of<AppProvider>(context, listen: false).masterPwd = _pwdController.text;
+                      await Future.delayed(Duration(milliseconds: 100));
+                      // 解密档案
+                      var stat = await pwdProvider.readArchive(_pwdController.text);
+                      // 解密结果处理
                       if (context.mounted) {
                         setState(() {
                           isDecrypting = false;
                         });
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp()));
+                        if (stat != ErrorCode.success) {
+                          ui.showSnackBarQuick(stat.generic, context);
+                        } else {
+                          ui.showSnackBarQuick("已解密你的档案", context);
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp()));
+                        }
                       }
                     }
                   },

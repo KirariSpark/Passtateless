@@ -58,10 +58,8 @@ Future<(ErrorCode, String errors)> writeJsonFile(String relativePath, dynamic co
 /// [key]用于解密的密钥（支持任意长度，内部自动哈希为符合要求的32字节）
 /// 返回 错误码和结果（解析后的 List 或 Map）
 Future<(ErrorCode, dynamic res)> readEncryptedJsonFile(String relativePath, String key) async {
-  final hashedKey = _hashKeyForAES256(key);
-
   // 封装底层 core 的加密文本读取
-  final (errorCode, textContent) = await core.readEncryptedTextFile(relativePath, hashedKey);
+  final (errorCode, textContent) = await core.readEncryptedTextFile(relativePath, key);
 
   if (errorCode != ErrorCode.success) {
     return (errorCode, null);
@@ -88,10 +86,9 @@ Future<(ErrorCode, String errors)> writeEncryptedJsonFile(String relativePath, d
   try {
     if (content is List || content is Map) {
       final jsonString = jsonEncode(content);
-      final hashedKey = _hashKeyForAES256(key);
 
       // 封装底层 core 的加密文本写入
-      return await core.writeEncryptedTextFile(relativePath, jsonString, hashedKey);
+      return await core.writeEncryptedTextFile(relativePath, jsonString, key);
     } else {
       return (ErrorCode.jsonFormatError, "");
     }
