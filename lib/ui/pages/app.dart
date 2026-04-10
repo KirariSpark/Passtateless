@@ -52,7 +52,7 @@ class _MainAppState extends State<MainApp> {
         if (currentWidth < desktopWidth) {
           // 移动端：底部导航
           return Scaffold(
-            body: _buildBodyContent(currentAxis, appProvider),
+            body: SafeArea(child: _buildBodyContent(currentAxis, appProvider)),
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: appProvider.currentIndex,
               onTap: onNavigate,
@@ -80,35 +80,37 @@ class _MainAppState extends State<MainApp> {
         } else {
           // 桌面/平板端：侧边栏
           return Scaffold(
-            body: Row(
-              children: [
-                NavigationRail(
-                  scrollable: true,
-                  indicatorShape: styles.roundedBorder,
-                  selectedIndex: appProvider.currentIndex,
-                  onDestinationSelected: onNavigate,
-                  labelType: NavigationRailLabelType.all,
-                  elevation: 3,
-                  destinations: const [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home_outlined),
-                      selectedIcon: Icon(Icons.home),
-                      label: Text("主页"),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.settings_outlined),
-                      selectedIcon: Icon(Icons.settings),
-                      label: Text("设置"),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.help_outline),
-                      selectedIcon: Icon(Icons.help),
-                      label: Text("帮助"),
-                    ),
-                  ],
-                ),
-                Expanded(child: _buildBodyContent(currentAxis, appProvider)),
-              ],
+            body: SafeArea(
+              child: Row(
+                children: [
+                  NavigationRail(
+                    scrollable: true,
+                    indicatorShape: styles.roundedBorder,
+                    selectedIndex: appProvider.currentIndex,
+                    onDestinationSelected: onNavigate,
+                    labelType: NavigationRailLabelType.all,
+                    elevation: 3,
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(Icons.home_outlined),
+                        selectedIcon: Icon(Icons.home),
+                        label: Text("主页"),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.settings_outlined),
+                        selectedIcon: Icon(Icons.settings),
+                        label: Text("设置"),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.help_outline),
+                        selectedIcon: Icon(Icons.help),
+                        label: Text("帮助"),
+                      ),
+                    ],
+                  ),
+                  Expanded(child: _buildBodyContent(currentAxis, appProvider)),
+                ],
+              ),
             ),
           );
         }
