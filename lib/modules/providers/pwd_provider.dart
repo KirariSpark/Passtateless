@@ -26,9 +26,6 @@ class PwdProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _stars = [];
   List<PwdLocation> _starredLocation = [];
 
-  // TODO: 实现完整功能
-  List<Map<String, dynamic>> get pwdList => _pwdMap[""] ?? [];
-
   List<Map<String, dynamic>> get starredPwds {
     _stars = [];
     _starredLocation = [];
@@ -53,6 +50,24 @@ class PwdProvider extends ChangeNotifier {
     } else {
       return {};
     }
+  }
+
+  /// 对 _pwdMap 的键进行排序，确保空字符串 "" 永远在最后
+  void _sortPwdMapKeys() {
+    final sortedKeys = _pwdMap.keys.toList()
+      ..sort((a, b) {
+        if (a.isEmpty && b.isEmpty) return 0;
+        if (a.isEmpty) return 1;  // a 是空字符串，排到后面
+        if (b.isEmpty) return -1; // b 是空字符串，排到后面
+        return a.compareTo(b);    // 其他情况按字母顺序排序
+      });
+
+    // 按照排序后的键重新构建 Map，以保持新的顺序
+    final sortedMap = <String, List<Map<String, dynamic>>>{};
+    for (var key in sortedKeys) {
+      sortedMap[key] = _pwdMap[key]!;
+    }
+    _pwdMap = sortedMap;
   }
 
   /// 更新指定项的数据
@@ -113,7 +128,8 @@ class PwdProvider extends ChangeNotifier {
       return ErrorCode.duplicateFolderName;
     } else {
       _pwdMap.addAll({name: []});
-      notifyListeners();
+      _sortPwdMapKeys(); // 先排序
+      notifyListeners(); // 再通知
       return ErrorCode.success;
     }
   }
@@ -123,6 +139,21 @@ class PwdProvider extends ChangeNotifier {
     _pwdMap.remove(name);
     notifyListeners();
     return ErrorCode.success;
+  }
+
+  /// 重命名文件夹
+  ErrorCode renameFolder(String before, String after) {
+    if (after == "") {
+      return ErrorCode.emptyFolderName;
+    } else if (_pwdMap.containsKey(after)) {
+      return ErrorCode.duplicateFolderName;
+    } else {
+      _pwdMap[after] = _pwdMap[before]!;
+      _pwdMap.remove(before);
+      _sortPwdMapKeys(); // 先排序
+      notifyListeners(); // 再通知
+      return ErrorCode.success;
+    }
   }
 
   /// 读取加密的归档文件

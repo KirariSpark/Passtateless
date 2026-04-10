@@ -96,7 +96,14 @@ class PwdListPage extends StatelessWidget {
         ),
         tooltip: "更多功能",
         iconSize: 30,
-        icon: Icon(Icons.menu),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: ColorScheme.of(context).primaryContainer,
+            borderRadius: styles.borderRadius
+          ),
+          child: Icon(Icons.menu)
+        ),
         itemBuilder: (_) {
           return [
             // 保存更改
