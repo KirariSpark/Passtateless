@@ -87,20 +87,6 @@ class PwdListPage extends StatelessWidget {
           ),
         )
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: (){
-      //     Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => PwdEditPage(location: PwdLocation(folder: folder, index: pwdList.length - 1))
-      //       )
-      //     );
-      //   },
-      //   shape: styles.roundedBorder,
-      //   elevation: 3,
-      //   child: const Icon(Icons.add),
-      // ),
       floatingActionButton: PopupMenuButton(
         popUpAnimationStyle: AnimationStyle(
             curve: Curves.easeInOut,
