@@ -68,7 +68,7 @@ class BasicSettingsPage extends StatelessWidget {
                     action: () {
                       if (context.mounted) {
                         Navigator.pop(context);
-                        ui.showAlertQuick("密码", "pwd", "确定", context);
+                        ui.showInfoDialogQuick(title: "密码", content: "pwd", buttonText: "确定", context: context);
                       }
                     },
                     actionText: "确认",

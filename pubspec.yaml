@@ -98,6 +98,10 @@ flutter:
           weight: 100
         - asset: assets/fonts/SourceHanSansCN-Normal.otf
           weight: 400
+    - family: SourceCodePro
+      fonts:
+        - asset: assets/fonts/SourceCodePro-Regular.otf
+          weight: 400
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

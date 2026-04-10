@@ -7,6 +7,7 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
 import 'package:re_editor/re_editor.dart';
 
 class PwdViewPage extends StatefulWidget {
@@ -74,6 +75,35 @@ class _PwdViewPageState extends State<PwdViewPage> {
     }
   }
 
+  /// 生成密码并显示提示
+  Future<String> genPwd(BuildContext context, bool copy) async {
+    setState(() {isGenerating = true;});
+    await Future.delayed(Duration(seconds: 1));
+    if (<enums.Presets>[
+      enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
+    ].contains(_preset)) {
+      var res = await parser.parseBuiltins(
+          _preset, "${widget.identifier}: ${widget.userName} @ ${widget.account}",
+          removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
+      );
+      if (res.$1 == ErrorCode.success) {
+        if (copy) {
+          Clipboard.setData(ClipboardData(text: res.$2));
+        }
+        if (context.mounted && copy) {
+          ui.showSnackBarQuick("密码已复制", context);
+        }
+        return res.$2;
+      } else {
+        if (context.mounted) {
+          ui.showSnackBarQuick(res.$1.generic, context);
+        }
+        return res.$1.generic;
+      }
+    } else {
+      return "Coming S∞n";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +224,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       ),
                       alpha: styles.alphaSemitransparent,
                       onTapped: (){
-                        ui.showAlertQuickWidget(
-                          "选择预设",
-                          RadioGroup(
+                        ui.showAlertDialogQuick(
+                          title: "选择预设",
+                          content: RadioGroup(
                             groupValue: _preset,
                             onChanged: (value){
                               setState(() {_preset = value ?? enums.Presets.simple;});
@@ -218,21 +248,22 @@ class _PwdViewPageState extends State<PwdViewPage> {
                                 ),
                                 RadioListTile(
                                   title: Text(enums.Presets.bank.displayName),
-                                  subtitle: Text("生成六位的纯数字密码"),
+                                  subtitle: Text("基于 PBKDF2 算法生成六位的纯数字密码，可能较慢"),
                                   shape: styles.roundedBorder,
                                   value: enums.Presets.bank
                                 ),
                                 RadioListTile(
                                   title: Text(enums.Presets.custom.displayName),
-                                  subtitle: Text("完全自定义整个生成流程"),
+                                  subtitle: Text("使用 JSON 完全自定义整个生成流程"),
                                   shape: styles.roundedBorder,
                                   value: enums.Presets.custom
                                 )
                               ],
                             )
                           ),
-                          "取消",
-                          context
+                          actionText: "取消",
+                          action: (){Navigator.pop(context);},
+                          context: context
                         );
                       },
                     ),
@@ -245,7 +276,22 @@ class _PwdViewPageState extends State<PwdViewPage> {
                         // 查看密码
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: (){},
+                            onPressed: isGenerating ? null : () async {
+                              ui.showConfirmDialogQuick(
+                                context: context,
+                                function: () async {
+                                  Navigator.pop(context);
+                                  var temp = await genPwd(context, false);
+                                  if (context.mounted) {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => FullscreenPwd(temp)));
+                                  }
+                                  // 启用按钮
+                                  setState(() {isGenerating = false;});
+                                },
+                                title: "危险操作",
+                                info: "此操作将会显示你的密码，以便于你的记忆。\n请确保周围没有人能够窥视到你的屏幕。"
+                              );
+                            },
                             style: styles.buttonStyle,
                             child: Text("查看密码"),
                           ),
@@ -254,29 +300,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: isGenerating ? null : () async {
-                              // 禁用按钮
-                              setState(() {isGenerating = true;});
                               // 开始生成
-                              if (<enums.Presets>[
-                                enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
-                              ].contains(_preset)) {
-                                var res = await parser.parseBuiltins(
-                                  _preset, "${widget.identifier}: ${widget.userName} @ ${widget.account}",
-                                  removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
-                                );
-                                if (res.$1 == ErrorCode.success) {
-                                  Clipboard.setData(ClipboardData(text: res.$2));
-                                  if (context.mounted) {
-                                    ui.showSnackBarQuick("密码已复制", context);
-                                  }
-                                } else {
-                                  if (context.mounted) {
-                                    ui.showSnackBarQuick(res.$1.generic, context);
-                                  }
-                                }
-                                // 启用按钮
-                                setState(() {isGenerating = false;});
-                              }
+                              await genPwd(context, true);
+                              // 启用按钮
+                              setState(() {isGenerating = false;});
                             },
                             style: styles.buttonStyle,
                             child: const Text("复制密码"),

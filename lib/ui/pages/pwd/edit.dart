@@ -112,8 +112,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                   child: TextButton(
                     onPressed: (){
                       ui.showConfirmDialogQuick(
-                        context,
-                        (){
+                        context: context,
+                        function: (){
                           setState(() {
                             _isDeleting = true;
                           });
@@ -121,7 +121,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           Navigator.pop(context);
                           Navigator.pop(context);
                         },
-                        "确认删除"
+                        title: "确认删除",
+                        info: "你无法撤销此操作"
                       );
                     },
                     style: ElevatedButton.styleFrom(

@@ -74,87 +74,23 @@ void showAlertDialogQuick({
 }
 
 /// 便捷地显示只有一行字和一个按钮的AlertDialog
-void showAlertQuick(
-  String title,
-  String content,
-  String buttonText,
-  BuildContext context,
-) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: styles.roundedBorder,
-      title: Text(title),
-      content: Text(content),
-      actions: [
-        TextButton(
-          style: styles.buttonStyle,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(buttonText),
-        ),
-      ],
-    ),
-  );
-}
-
-/// 便捷地显示只有一个按钮的AlertDialog，它的内容是一个Widget而非字符串
-void showAlertQuickWidget(
-  String title,
-  Widget content,
-  String buttonText,
-  BuildContext context,
-) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: styles.roundedBorder,
-      scrollable: true,
-      title: Text(title),
-      content: content,
-      actions: [
-        TextButton(
-          style: styles.buttonStyle,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(buttonText),
-        ),
-      ],
-    ),
+void showInfoDialogQuick({
+  required String title, required String content,
+  required String buttonText, required BuildContext context
+}) {
+  showAlertDialogQuick(
+    title: title, content: Text(content),
+    action: (){Navigator.pop(context);}, actionText: buttonText, context: context
   );
 }
 
 /// 便捷地显示不可撤销操作确认AlertDialog
-void showConfirmDialogQuick(
-  BuildContext context,
-  VoidCallback? function,
-  String title,
-) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: styles.roundedBorder,
-      title: Text(title),
-      content: const Text("此操作不可撤销"),
-      actions: [
-        // 取消
-        TextButton(
-          style: styles.buttonStyle,
-          onPressed: () => Navigator.pop(context),
-          child: const Text("取消"),
-        ),
-        // 确定
-        TextButton(
-          style: styles.buttonStyle,
-          onPressed: function,
-          child: Text(
-            "确定",
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-        ),
-      ],
-    ),
+void showConfirmDialogQuick({
+  required BuildContext context, required void Function() function,
+  required String title, required String info
+}) {
+  showAlertDialogQuick(
+    title: title, content: Text(info), action: (){Navigator.pop(context);}, actionText: "取消", context: context,
+    action2: function, action2Text: "确定"
   );
 }

@@ -47,9 +47,9 @@ class _CfgEditPageState extends State<CfgEditPage> {
   }
 
   void _showHelp() {
-    ui.showAlertQuickWidget(
-      "选择帮助",
-      ConstrainedBox(
+    ui.showAlertDialogQuick(
+      title: "选择帮助",
+      content: ConstrainedBox(
         constraints: styles.tileWidthConstraint,
         child: SingleChildScrollView(
           child: Column(
@@ -115,8 +115,9 @@ class _CfgEditPageState extends State<CfgEditPage> {
           ),
         ),
       ),
-      "取消",
-      context,
+      actionText: "取消",
+      action: () {Navigator.pop(context);},
+      context: context,
     );
   }
 
