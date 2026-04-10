@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 /// [context] BuildContext context
 /// [leading] 位于头部的图标
 /// [trailing] 位于尾部的Widget
+/// [titleTag] 用于 Hero 动画的 tag
 /// [subtitle] ListTile的副标题
 /// [onTapped] 当ListTile被点击时，调用的函数
 /// [alpha] ListTile背景的透明度（0-255）
@@ -16,13 +17,14 @@ ListTile buildListTile({
   IconData? leading,
   String? subtitle,
   Widget? trailing,
+  String? titleTag,
   void Function()? onTapped,
   int? alpha
 }) {
   return ListTile(
     onTap: onTapped,
     leading: leading == null ? null : Icon(leading),
-    title: Text(title),
+    title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.bodyLarge)),
     subtitle: subtitle == null ? null : Text(subtitle),
     trailing: trailing,
     shape: styles.roundedBorder,
@@ -65,6 +67,15 @@ AppBar buildAppBar({
   List<Widget>? actions,
   IconData exitIcon = Icons.arrow_back
 }) {
+  return buildAppBarWidget(title: Text(title), context: context, exitIcon: exitIcon, actions: actions);
+}
+
+AppBar buildAppBarWidget({
+  required Widget title,
+  required BuildContext context,
+  List<Widget>? actions,
+  IconData exitIcon = Icons.arrow_back
+}) {
   return AppBar(
     leading: IconButton(
       onPressed: () {
@@ -73,7 +84,7 @@ AppBar buildAppBar({
       icon: Icon(exitIcon),
       style: styles.buttonStyle,
     ),
-    title: Text(title),
+    title: title,
     actions: actions,
   );
 }

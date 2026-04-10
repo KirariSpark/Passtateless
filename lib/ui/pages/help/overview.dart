@@ -19,6 +19,7 @@ class HelpOverviewPage extends StatelessWidget {
             children: <Widget>[
               styled.buildListTile(
                 title: "基础信息",
+                titleTag: "basic",
                 subtitle: "关于无状态密码管理器和 Passtateless，你需要知道的一切",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
@@ -30,6 +31,7 @@ class HelpOverviewPage extends StatelessWidget {
               ),
               styled.buildListTile(
                 title: "常见问题",
+                titleTag: "faq",
                 subtitle: "你可能会遇到的问题",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
@@ -41,6 +43,7 @@ class HelpOverviewPage extends StatelessWidget {
               ),
               styled.buildListTile(
                 title: "开始使用",
+                titleTag: "get_started",
                 subtitle: "第一次使用？查看此文档以快速上手",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
@@ -52,6 +55,7 @@ class HelpOverviewPage extends StatelessWidget {
               ),
               styled.buildListTile(
                 title: "JSON 基础",
+                titleTag: "json",
                 subtitle: "了解基础的 JSON 语法，用于编写自定义生成设置",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
@@ -63,6 +67,7 @@ class HelpOverviewPage extends StatelessWidget {
               ),
               styled.buildListTile(
                 title: "格式化与可读性",
+                titleTag: "formatting",
                 subtitle: "了解配置编辑器的特性，包括自动格式化、语法高亮等",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
@@ -74,6 +79,7 @@ class HelpOverviewPage extends StatelessWidget {
               ),
               styled.buildListTile(
                 title: "生成配置",
+                titleTag: "cfg",
                 subtitle: "了解如何自定义生成配置，可用功能及其参数",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
@@ -85,6 +91,7 @@ class HelpOverviewPage extends StatelessWidget {
               ),
               styled.buildListTile(
                 title: "生成配置提示",
+                titleTag: "cfg_tips",
                 subtitle: "在配置生成算法时，你应该注意的一些事情",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {

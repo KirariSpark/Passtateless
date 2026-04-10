@@ -38,7 +38,14 @@ class DocViewPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: styled.buildAppBar(title: "帮助：$title", context: context),
+      appBar: styled.buildAppBarWidget(
+        title: Row(
+          children: [
+            Text("帮助："),
+            Hero(tag: mode, child: Text(title, style: Theme.of(context).textTheme.titleLarge))
+          ],
+        ), context: context
+      ),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: AlignmentGeometry.topCenter,
