@@ -78,7 +78,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
   /// 生成密码并显示提示
   Future<String> genPwd(BuildContext context, bool copy) async {
     setState(() {isGenerating = true;});
-    await Future.delayed(Duration(seconds: 1));
     if (<enums.Presets>[
       enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
     ].contains(_preset)) {

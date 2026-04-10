@@ -62,26 +62,26 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(
-        title: "资料夹：${folder.isEmpty ? '未分类' : folder}", context: context,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                  Provider.of<AppProvider>(context, listen: false).masterPwd
-              );
-              if (context.mounted) {
-                if (stat == ErrorCode.success) {
-                  ui.showSnackBarQuick("你的档案已保存", context);
-                } else {
-                  ui.showSnackBarQuick(stat.generic, context);
-                }
+      appBar: AppBar(
+        title: Text("查看：${folder.isEmpty ? '未分类' : folder}"),
+        leading: IconButton(
+          onPressed: () async {
+            ui.showSnackBarQuick("正在保存", context);
+            var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+              Provider.of<AppProvider>(context, listen: false).masterPwd
+            );
+            if (context.mounted) {
+              if (stat == ErrorCode.success) {
+                ui.showSnackBarQuick("你的档案已保存", context);
+              } else {
+                ui.showSnackBarQuick(stat.generic, context);
               }
-            },
-            style: styles.buttonStyle,
-            icon: Icon(Icons.save_outlined)
-          )
-        ]
+              Navigator.pop(context);
+            }
+          },
+          style: styles.buttonStyle,
+          icon: Icon(Icons.arrow_back)
+        ),
       ),
       body: Container(
         padding: styles.uniInsetsSmall,

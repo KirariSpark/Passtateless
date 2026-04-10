@@ -82,7 +82,14 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                       context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))
                     );
                   },
-                  trailing: Icon(Icons.arrow_forward),
+                  trailing: IconButton(
+                    tooltip: "重命名",
+                    onPressed: () {
+
+                    },
+                    style: styles.buttonStyle,
+                    icon: Icon(Icons.drive_file_rename_outline_outlined)
+                  ),
                   alpha: styles.alphaSemitransparent,
                   context: context
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/modules/core/enums.dart';
 
 class AppProvider extends ChangeNotifier {
@@ -27,7 +28,7 @@ class AppProvider extends ChangeNotifier {
   String _masterPwd = "";
   String get masterPwd => _masterPwd;
   set masterPwd(String value) {
-    _masterPwd = value;
+    _masterPwd = utils.toSHA256(value);
     notifyListeners();
   }
 

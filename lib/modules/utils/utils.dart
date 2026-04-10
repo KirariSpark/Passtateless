@@ -1,5 +1,5 @@
+import 'package:crypto/crypto.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
-import 'package:passtateless/modules/core/enums.dart';
 import 'dart:convert';
 
 
@@ -69,4 +69,11 @@ bool checkPwd(String pwd) {
     }
   }
   return hasDigit && hasUpper && hasLower && hasSpecial;
+}
+
+/// 获取输入文本的SHA256
+String toSHA256(String text) {
+  var bytes = utf8.encode(text);
+  var digest = sha256.convert(bytes);
+  return digest.toString();
 }

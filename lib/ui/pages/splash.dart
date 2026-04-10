@@ -81,10 +81,12 @@ class _SplashPageState extends State<SplashPage> {
                         isDecrypting = true;
                       });
                       // 设置主密码
+                      // setter会进行一次哈希处理，因此不能与controller同步
                       Provider.of<AppProvider>(context, listen: false).masterPwd = _pwdController.text;
-                      await Future.delayed(Duration(milliseconds: 100));
                       // 解密档案
-                      var stat = await pwdProvider.readArchive(_pwdController.text);
+                      var stat = await pwdProvider.readArchive(
+                        Provider.of<AppProvider>(context, listen: false).masterPwd
+                      );
                       // 解密结果处理
                       if (context.mounted) {
                         setState(() {

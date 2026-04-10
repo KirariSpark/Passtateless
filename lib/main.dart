@@ -34,7 +34,7 @@ class Passtateless extends StatelessWidget {
           fontFamily: 'SourceHans',
         ),
         themeMode: ThemeMode.system,
-        home: const SplashPage(),
+        home: const SafeArea(child: SplashPage()),
       ),
     );
   }
