@@ -21,7 +21,6 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
   @override
   Widget build(BuildContext context) {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
-
     return Scaffold(
       appBar: styled.buildAppBar(title: "全部资料夹", context: context),
       body: Container(
@@ -32,6 +31,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           child: ListView.separated(
             itemCount: folders.length,
             itemBuilder: (BuildContext context, int index) {
+              final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
               return Dismissible(
                 key: ValueKey(folders[index]),
                 direction: DismissDirection.endToStart,
@@ -77,7 +77,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   ui.showSnackBarQuick("文件夹已删除", context);
                 },
                 child: styled.buildListTile(
-                  title: folders[index].isEmpty ? "未分类" : folders[index],
+                  title: displayTitle,
                   onTapped: (){
                     Navigator.push(
                       context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))
@@ -86,7 +86,29 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   trailing: IconButton(
                     tooltip: "重命名",
                     onPressed: () {
-
+                      if (folders[index] == "") {
+                        ui.showSnackBarQuick("你不能重命名此文件夹", context);
+                        return;
+                      }
+                      ui.showAlertDialogQuick(
+                        title: "重命名：$displayTitle", content: styled.buildTextField(
+                          context: context, controller: folderName, label: "新名称", alpha: styles.alphaSemitransparent
+                        ),
+                        action: () => Navigator.pop(context),
+                        actionText: "取消",
+                        action2: () {
+                          var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
+                            folders[index], folderName.text
+                          );
+                          if (res == ErrorCode.success) {
+                            Navigator.pop(context);
+                          } else {
+                            ui.showSnackBarQuick(res.generic, context);
+                          }
+                        },
+                        action2Text: "确定",
+                        context: context
+                      );
                     },
                     style: styles.buttonStyle,
                     icon: Icon(Icons.drive_file_rename_outline_outlined)
