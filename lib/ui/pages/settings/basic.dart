@@ -26,15 +26,19 @@ class BasicSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: styles.pagePaddingAll,
-      constraints: styles.pageWidthConstraint,
       child: SingleChildScrollView(
         child: Column(
-          spacing: styles.layoutSpacing,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // 主密码
-            ConstrainedBox(
-              constraints: styles.pageWidthConstraint,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: styles.radius),
+                color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+              ),
+              constraints: styles.tileWidthConstraint,
               child: styled.buildListTile(
+                isFirst: true,
                 leading: Icons.key,
                 title: "主密码",
                 titleTag: "masterPwd",
@@ -42,12 +46,14 @@ class BasicSettingsPage extends StatelessWidget {
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => MasterPwdSettingsPage()));
                 },
+                alpha: 0,
                 context: context,
               ),
             ),
             // 个性化
-            ConstrainedBox(
-              constraints: styles.pageWidthConstraint,
+            Container(
+              color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+              constraints: styles.tileWidthConstraint,
               child: styled.buildListTile(
                 leading: Icons.color_lens_outlined,
                 title: "个性化",
@@ -56,12 +62,14 @@ class BasicSettingsPage extends StatelessWidget {
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => CustomizeSettingsPage()));
                 },
+                alpha: 0,
                 context: context,
               ),
             ),
             // 高级设置
-            ConstrainedBox(
-              constraints: styles.pageWidthConstraint,
+            Container(
+              color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+              constraints: styles.tileWidthConstraint,
               child: styled.buildListTile(
                 context: context,
                 leading: Icons.developer_mode,
@@ -71,11 +79,16 @@ class BasicSettingsPage extends StatelessWidget {
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (c) => const AdvancedSettingsPage()));
                 },
+                alpha: 0
               ),
             ),
             // 关于
-            ConstrainedBox(
-              constraints: styles.pageWidthConstraint,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(bottom: styles.radius),
+                color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+              ),
+              constraints: styles.tileWidthConstraint,
               child: styled.buildListTile(
                 context: context,
                 leading: Icons.info_outlined,
@@ -84,7 +97,9 @@ class BasicSettingsPage extends StatelessWidget {
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));
-                }
+                },
+                alpha: 0,
+                isLast: true
               ),
             ),
           ],
