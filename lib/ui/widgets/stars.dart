@@ -16,7 +16,7 @@ class StarredPasswords extends StatelessWidget {
     return Container(
       constraints: hasConstraint ? styles.tileHeightConstraint : null,
       decoration: BoxDecoration(
-        color: ColorScheme.of(context).secondaryContainer.withAlpha(styles.alphaSemitransparent),
+        color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
         borderRadius: styles.borderRadius
       ),
       padding: styles.uniInsetsSmall,
@@ -59,8 +59,7 @@ class StarredPasswords extends StatelessWidget {
                 account: starredPasswords[index]["account"],
               )));
             },
-            hasEditButton: false,
-            alpha: styles.alphaSemitransparent,
+            hasEditButton: false
           )
         );
       }

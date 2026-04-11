@@ -38,54 +38,60 @@ class EvalRes extends StatelessWidget {
           return evalRes!.feedback.suggestions!.join("");
         }
       }
-      return Column(
-        spacing: styles.layoutSpacing,
-        children: <Widget>[
-          // 评分
-          styled.buildListTile(
-            title: "评分",
-            subtitle: (evalRes!.score! + 1).toString(),
-            context: context,
-            trailing: Text(
-              scoreTextMap[evalRes!.score]!,
-              style: Theme.of(context).textTheme.bodyMedium,
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: styles.borderRadius,
+          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+        ),
+        child: Column(
+          children: <Widget>[
+            // 评分
+            styled.buildListTile(
+              title: "评分",
+              subtitle: (evalRes!.score! + 1).toString(),
+              context: context,
+              trailing: Text(
+                scoreTextMap[evalRes!.score]!,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              isFirst: true,
             ),
-            alpha: styles.alphaSemitransparent
-          ),
-          // guesses
-          styled.buildListTile(
-            title: "预估猜测次数",
-            subtitle: evalRes!.guesses.toString(),
-            context: context,
-            alpha: styles.alphaSemitransparent
-          ),
-          // 警告
-          styled.buildListTile(
-            title: "警告",
-            subtitle: evalRes!.feedback.warning == "" ? "没有警告" : evalRes!.feedback.warning ?? "",
-            context: context,
-            alpha: styles.alphaSemitransparent
-          ),
-          // 建议
-          styled.buildListTile(
-            title: "建议",
-            context: context,
-            subtitle: getSuggestionStr(),
-            alpha: styles.alphaSemitransparent
-          ),
-        ],
+            // guesses
+            styled.buildListTile(
+              title: "预估猜测次数",
+              subtitle: evalRes!.guesses.toString(),
+              context: context,
+            ),
+            // 警告
+            styled.buildListTile(
+              title: "警告",
+              subtitle: evalRes!.feedback.warning == "" ? "没有警告" : evalRes!.feedback.warning ?? "",
+              context: context,
+            ),
+            // 建议
+            styled.buildListTile(
+              title: "建议",
+              context: context,
+              subtitle: getSuggestionStr(),
+              isLast: true,
+            ),
+          ],
+        ),
       );
     } else {
-      return Column(
-        spacing: styles.layoutSpacing,
-        children: <Widget>[
-          styled.buildListTile(
-            title: "请输入评估对象",
-            subtitle: "输入要评估的密码，以获取评分、警告和建议",
-            context: context,
-            alpha: styles.alphaSemitransparent
-          )
-        ],
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: styles.borderRadius,
+          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+        ),
+        child: styled.buildListTile(
+          title: "请输入评估对象",
+          subtitle: "输入要评估的密码，以获取评分、警告和建议",
+          context: context,
+          isLast: true,
+          isFirst: true,
+          alpha: styles.alphaSemitransparent
+        )
       );
     }
   }

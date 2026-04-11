@@ -51,8 +51,7 @@ class PwdListPage extends StatelessWidget {
                 userName: pwdList[index]["userName"],
                 account: pwdList[index]["account"]
               )));
-            },
-            alpha: styles.alphaSemitransparent,
+            }
           ),
         );
       }

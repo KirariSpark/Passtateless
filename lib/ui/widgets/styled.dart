@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
 

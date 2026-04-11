@@ -22,105 +22,113 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
   Widget build(BuildContext context) {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
     return Scaffold(
-      appBar: styled.buildAppBar(title: "全部资料夹", context: context),
+      appBar: styled.buildAppBar(title: "资料夹", titleTag: "folders", context: context),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
           padding: styles.pagePadding,
-          constraints: styles.pageWidthConstraint,
-          child: ListView.separated(
-            itemCount: folders.length,
-            itemBuilder: (BuildContext context, int index) {
-              final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
-              return Dismissible(
-                key: ValueKey(folders[index]),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: styles.borderRadius,
-                    color: Colors.red,
+          constraints: styles.tileWidthConstraint,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: styles.borderRadius,
+              color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: folders.length,
+              itemBuilder: (BuildContext context, int index) {
+                final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
+                final bool isFirst = index == 0;
+                final bool isLast = index == folders.length - 1;
+                return Dismissible(
+                  key: ValueKey(folders[index]),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: styles.borderRadius,
+                      color: Colors.red,
+                    ),
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    child: const Icon(Icons.delete_forever, color: Colors.white),
                   ),
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 20),
-                  child: const Icon(Icons.delete_forever, color: Colors.white),
-                ),
-                confirmDismiss: (direction) async {
-                  // 未分类 文件夹是内置文件夹，不能删除
-                  if (folders[index].isEmpty) {
-                    ui.showSnackBarQuick("你不能删除此文件夹", context);
-                    return false;
-                  } else {
-                    return await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("确认删除"),
-                        shape: styles.roundedBorder,
-                        content: Text("确定要删除文件夹 ${folders[index]} 吗？\n你会永远失去它（真的很久）"),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            style: styles.buttonStyle,
-                            child: const Text("取消"),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            style: styles.buttonStyle,
-                            child: const Text("删除", style: TextStyle(color: Colors.red)),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                },
-                onDismissed: (_) {
-                  Provider.of<PwdProvider>(context, listen: false).removeFolder(folders[index]);
-                  ui.showSnackBarQuick("文件夹已删除", context);
-                },
-                child: styled.buildListTile(
-                  title: displayTitle,
-                  onTapped: (){
-                    Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))
-                    );
-                  },
-                  trailing: IconButton(
-                    tooltip: "重命名",
-                    onPressed: () {
-                      if (folders[index] == "") {
-                        ui.showSnackBarQuick("你不能重命名此文件夹", context);
-                        return;
-                      }
-                      ui.showAlertDialogQuick(
-                        title: "重命名：$displayTitle", content: styled.buildTextField(
-                          context: context, controller: folderName, label: "新名称", alpha: styles.alphaSemitransparent
+                  confirmDismiss: (direction) async {
+                    // 未分类 文件夹是内置文件夹，不能删除
+                    if (folders[index].isEmpty) {
+                      ui.showSnackBarQuick("你不能删除此文件夹", context);
+                      return false;
+                    } else {
+                      return await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("确认删除"),
+                          shape: styles.roundedBorder,
+                          content: Text("确定要删除文件夹 ${folders[index]} 吗？\n你会永远失去它（真的很久）"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              style: styles.buttonStyle,
+                              child: const Text("取消"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: styles.buttonStyle,
+                              child: const Text("删除", style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
                         ),
-                        action: () => Navigator.pop(context),
-                        actionText: "取消",
-                        action2: () {
-                          var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
-                            folders[index], folderName.text
-                          );
-                          if (res == ErrorCode.success) {
-                            Navigator.pop(context);
-                          } else {
-                            ui.showSnackBarQuick(res.generic, context);
-                          }
-                        },
-                        action2Text: "确定",
-                        context: context
+                      );
+                    }
+                  },
+                  onDismissed: (_) {
+                    Provider.of<PwdProvider>(context, listen: false).removeFolder(folders[index]);
+                    ui.showSnackBarQuick("文件夹已删除", context);
+                  },
+                  child: styled.buildListTile(
+                    title: displayTitle,
+                    onTapped: (){
+                      Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))
                       );
                     },
-                    style: styles.buttonStyle,
-                    icon: Icon(Icons.drive_file_rename_outline_outlined)
+                    trailing: IconButton(
+                      tooltip: "重命名",
+                      onPressed: () {
+                        if (folders[index] == "") {
+                          ui.showSnackBarQuick("你不能重命名此文件夹", context);
+                          return;
+                        }
+                        ui.showAlertDialogQuick(
+                          title: "重命名：$displayTitle", content: styled.buildTextField(
+                            context: context, controller: folderName, label: "新名称", alpha: styles.alphaSemitransparent
+                          ),
+                          action: () => Navigator.pop(context),
+                          actionText: "取消",
+                          action2: () {
+                            var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
+                              folders[index], folderName.text
+                            );
+                            if (res == ErrorCode.success) {
+                              Navigator.pop(context);
+                            } else {
+                              ui.showSnackBarQuick(res.generic, context);
+                            }
+                          },
+                          action2Text: "确定",
+                          context: context
+                        );
+                      },
+                      style: styles.buttonStyle,
+                      icon: Icon(Icons.drive_file_rename_outline_outlined)
+                    ),
+                    isFirst: isFirst,
+                    isLast: isLast,
+                    context: context
                   ),
-                  alpha: styles.alphaSemitransparent,
-                  context: context
-                ),
-              );
-            },
-            separatorBuilder: (_, _) {
-              return styles.spacingSizedBox;
-            },
+                );
+              }
+            ),
           )
         ),
       ),

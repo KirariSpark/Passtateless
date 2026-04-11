@@ -7,7 +7,6 @@ class PwdTile extends StatelessWidget {
   final void Function()? _onEditPressed;
   final void Function()? _onTapped;
   final bool _hasEditButton;
-  final int _alpha;
 
   /// 用于显示密码的改版ListTile
   const PwdTile({
@@ -17,14 +16,12 @@ class PwdTile extends StatelessWidget {
     void Function()? onEditPressed,
     void Function()? onTapped,
     bool hasEditButton = true,
-    int alpha = 255
   }) :
     _onStarPressed = onStarPressed,
     _pwdRecord = pwdRecord,
     _onEditPressed = onEditPressed,
     _onTapped = onTapped,
-    _hasEditButton = hasEditButton,
-    _alpha = alpha;
+    _hasEditButton = hasEditButton;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +46,7 @@ class PwdTile extends StatelessWidget {
         child: ListTile(
           onTap: _onTapped,
           shape: styles.roundedBorder,
-          tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(_alpha),
+          tileColor: ColorScheme.of(context).secondaryContainer.withAlpha(styles.alphaSemitransparent),
           title: Text(_pwdRecord["identifier"] == "" ? "未命名" : _pwdRecord["identifier"]),
           subtitle: Text(subtitleText),
           trailing: Row(
