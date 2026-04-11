@@ -22,7 +22,6 @@ class StarredPasswords extends StatelessWidget {
       padding: styles.uniInsetsSmall,
       child: SingleChildScrollView(
         child: Column(
-          spacing: styles.layoutSpacing,
           children: _buildList(context, starredPasswords),
         ),
       ),
@@ -32,19 +31,18 @@ class StarredPasswords extends StatelessWidget {
   List<Widget> _buildList(BuildContext context, List<Map<String, dynamic>> starredPasswords) {
     if (starredPasswords.isEmpty) {
       return <Widget>[
-        Material(
+        ListTile(
           shape: styles.roundedBorder,
-          child: ListTile(
-            shape: styles.roundedBorder,
-            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
-            onTap: (){},
-            title: const Text("没有收藏"),
-            subtitle: const Text("前往管理页面添加收藏项，以在此处快速访问"),
-          ),
+          tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaSemitransparent),
+          title: const Text("没有收藏"),
+          subtitle: const Text("前往管理页面添加收藏项，以在此处快速访问"),
         )
       ];
     } else {
-      List<Widget> temp = [];
+      List<Widget> temp = [
+        Text("收藏夹", style: Theme.of(context).textTheme.titleLarge),
+        styles.spacingSizedBox
+      ];
       for (var(index, _) in starredPasswords.indexed) {
         temp.add(
           PwdTile(
@@ -59,7 +57,9 @@ class StarredPasswords extends StatelessWidget {
                 account: starredPasswords[index]["account"],
               )));
             },
-            hasEditButton: false
+            hasEditButton: false,
+            isFirst: index == 0,
+            isLast: index == starredPasswords.length - 1,
           )
         );
       }
