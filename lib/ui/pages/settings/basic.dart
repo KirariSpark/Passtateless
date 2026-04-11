@@ -127,7 +127,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
           return AnimatedSwitcher(
             switchOutCurve: Curves.easeOutCubic,
             switchInCurve: Curves.easeOutCubic,
-            duration: Duration(milliseconds: 300),
+            duration: Duration(milliseconds: 200),
             child: _buildPage(_selectedTag!, isWide)
           );
         }
@@ -163,11 +163,8 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         );
       }
 
-      Widget tile;
-      tile = AnimatedSwitcher(
-        duration: Duration(milliseconds: 300),
-        switchOutCurve: Curves.easeOutCubic,
-        switchInCurve: Curves.easeOutCubic,
+      Widget tile = AnimatedSwitcher(
+        duration: Duration(milliseconds: 100),
         child: Container(
           key: isSelected ? ValueKey("selected") : ValueKey("notSelected"),
           decoration: decoration,
@@ -198,9 +195,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         final bool isWide = constraints.maxWidth > styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing;
 
         return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 100),
           child: isWide ? _buildWideLayout(context, isWide) : _buildNarrowLayout(context)
         );
       },

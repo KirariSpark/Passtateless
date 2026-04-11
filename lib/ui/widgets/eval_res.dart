@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:zxcvbn/zxcvbn.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/styles.dart' as styles;
 

@@ -39,8 +39,8 @@ enum AvailableColors {
   indigo(Colors.indigo, "靛蓝"),
   blueGrey(Colors.blueGrey, "蓝灰"),
   teal(Colors.teal, "暗青"),
-  greed(Colors.green, "绿色"),
-  amber(Colors.amber, "琥珀"),
+  greed(Colors.lightGreen, "绿色"),
+  amber(Colors.lime, "柠檬"),
   orange(Colors.orange, "橙色"),
   red(Colors.red, "红色");
 

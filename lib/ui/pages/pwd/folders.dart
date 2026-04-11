@@ -9,7 +9,8 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
 class PwdFolderPage extends StatefulWidget {
-  const PwdFolderPage({super.key});
+  final bool useHero;
+  const PwdFolderPage({super.key, required this.useHero});
 
   @override
   State<PwdFolderPage> createState() => _PwdFolderPageState();
@@ -22,7 +23,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
   Widget build(BuildContext context) {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
     return Scaffold(
-      appBar: styled.buildAppBar(title: "资料夹", titleTag: "folders", context: context),
+      appBar: styled.buildAppBar(title: "资料夹", context: context, titleTag: widget.useHero ? "folders" : null),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(

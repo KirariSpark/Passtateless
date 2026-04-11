@@ -6,7 +6,8 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:zxcvbn/zxcvbn.dart';
 
 class PwdEvalPage extends StatefulWidget {
-  const PwdEvalPage({super.key});
+  final bool useHero;
+  const PwdEvalPage({super.key, required this.useHero});
 
   @override
   State<PwdEvalPage> createState() => _PwdEvalPageState();
@@ -21,7 +22,7 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "密码强度", titleTag: "pwdEval", context: context),
+      appBar: styled.buildAppBar(title: "密码强度", context: context, titleTag: widget.useHero ? "pwdEval" : null),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
