@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
-RoundedRectangleBorder roundedBorder = const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(5))
-);
+double _radius = 5;
 
 ButtonStyle buttonStyle = ElevatedButton.styleFrom(
     shape: roundedBorder
 );
 
-BorderRadius borderRadius = BorderRadius.circular(5);
+Radius radius = Radius.circular(_radius);
 
-BoxConstraints uniBoxConstraints = const BoxConstraints(maxWidth: 1010);
+RoundedRectangleBorder roundedBorder = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(_radius))
+);
+
+BorderRadius borderRadius = BorderRadius.circular(_radius);
+
 
 BoxConstraints pageWidthConstraint = const BoxConstraints(maxWidth: 800);
 

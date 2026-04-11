@@ -1,48 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/quick_options.dart';
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/stars.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  Widget _buildListTiles(BuildContext context) {
+    return Container(
+      constraints: styles.tileWidthConstraint,
+      decoration: BoxDecoration(
+      borderRadius: styles.borderRadius,
+        color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 密码管理
+          styled.buildListTile(
+            title: "全部密码",
+            subtitle: "查看和修改全部密码资料夹",
+            leading: Icons.format_list_bulleted,
+            trailing: Icon(Icons.arrow_forward),
+            onTapped: () => Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PwdFolderPage())
+            ),
+            alpha: 0,
+            isFirst: true,
+            context: context
+          ),
+          // 密码评估
+          styled.buildListTile(
+            title: "密码强度",
+            titleTag: "pwdEval",
+            subtitle: "评估密码强度，并获取相关建议",
+            leading: Icons.checklist,
+            trailing: Icon(Icons.arrow_forward),
+            onTapped: () => Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PwdEvalPage())
+            ),
+            alpha: 0,
+            isLast: true,
+            context: context
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        alignment: Alignment.center,
-        padding: styles.pagePaddingAll,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return Column(
+    return Container(
+      alignment: Alignment.topCenter,
+      padding: styles.pagePaddingAll,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          // 当前宽度超出双栏占用的宽度
+          if (constraints.maxWidth > (styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing)) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
               spacing: styles.layoutSpacing,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 2, usePadding: true)
-                  ),
-                  child: StarredPasswords()
-                ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 2, usePadding: true)
-                  ),
-                  child: HomePageQuickOptions(
-                    onEditTapped: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdFolderPage()));
-                    },
-                    onEvalTapped: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEvalPage()));
-                    },
-                  ),
-                )
+                ConstrainedBox(constraints: styles.tileWidthConstraint, child: StarredPasswords(hasConstraint: false)),
+                _buildListTiles(context)
               ],
             );
-          },
-        ),
+          } else {
+            return SingleChildScrollView(
+              child: Column(
+                spacing: styles.layoutSpacing,
+                children: [
+                  ConstrainedBox(constraints: styles.tileWidthConstraint, child: StarredPasswords(hasConstraint: true)),
+                  _buildListTiles(context)
+                ],
+              ),
+            );
+          }
+        },
       ),
     );
   }

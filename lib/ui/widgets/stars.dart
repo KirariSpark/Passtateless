@@ -6,23 +6,23 @@ import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:provider/provider.dart';
 
 class StarredPasswords extends StatelessWidget {
-  const StarredPasswords({super.key});
+  final bool hasConstraint;
+  const StarredPasswords({super.key, required this.hasConstraint});
 
   @override
   Widget build(BuildContext context) {
     final starredPasswords = context.watch<PwdProvider>().starredPwds;
 
     return Container(
-      constraints: styles.tileHeightConstraint,
+      constraints: hasConstraint ? styles.tileHeightConstraint : null,
       decoration: BoxDecoration(
-        color: ColorScheme.of(context).secondaryContainer.withAlpha(175),
+        color: ColorScheme.of(context).secondaryContainer.withAlpha(styles.alphaSemitransparent),
         borderRadius: styles.borderRadius
       ),
       padding: styles.uniInsetsSmall,
       child: SingleChildScrollView(
-        child: Wrap(
+        child: Column(
           spacing: styles.layoutSpacing,
-          runSpacing: styles.layoutSpacing,
           children: _buildList(context, starredPasswords),
         ),
       ),

@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 /// [titleTag] 用于 Hero 动画的 tag<br>
 /// [onTapped] 当ListTile被点击时，调用的函数<br>
 /// [alpha] ListTile背景的透明度（0-255）<br>
+/// [isFirst] 决定上方是否有圆角<br>
+/// [isLast] 决定下方是否有圆角
 ListTile buildListTile({
   required String title,
   required BuildContext context,
@@ -19,7 +21,9 @@ ListTile buildListTile({
   Widget? trailing,
   String? titleTag,
   void Function()? onTapped,
-  int? alpha
+  int? alpha,
+  bool isFirst = false,
+  bool isLast = false,
 }) {
   return ListTile(
     onTap: onTapped,
@@ -27,7 +31,10 @@ ListTile buildListTile({
     title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.bodyLarge)),
     subtitle: subtitle == null ? null : Text(subtitle),
     trailing: trailing,
-    shape: styles.roundedBorder,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.vertical(
+      top: isFirst ? styles.radius : Radius.zero,
+      bottom: isLast ? styles.radius : Radius.zero
+    )),
     tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 255)
   );
 }
