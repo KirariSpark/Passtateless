@@ -19,6 +19,8 @@ BoxConstraints pageWidthConstraint = const BoxConstraints(maxWidth: 800);
 
 BoxConstraints tileWidthConstraint = const BoxConstraints(maxWidth: 400);
 
+BoxConstraints tileWidthConstraintSmall = const BoxConstraints(maxWidth: 300);
+
 BoxConstraints tileHeightConstraint = const BoxConstraints(maxHeight: 300);
 
 EdgeInsets uniInsetsSmall = const EdgeInsets.all(8);

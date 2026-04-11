@@ -3,12 +3,13 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
+  final bool useHero;
+  const AboutPage({super.key, required this.useHero});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "关于", titleTag: "about", context: context),
+      appBar: styled.buildAppBar(title: "关于", context: context, titleTag: useHero ? "about" : null),
       body: Center(
         child: Container(
           padding: styles.uniInsetsSmall,

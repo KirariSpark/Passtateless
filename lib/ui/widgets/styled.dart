@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
 
@@ -27,7 +29,7 @@ ListTile buildListTile({
 }) {
   return ListTile(
     onTap: onTapped,
-    leading: leading == null ? null : Icon(leading, color: ColorScheme.of(context).primary,),
+    leading: leading == null ? null : Icon(leading),
     title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.bodyLarge)),
     subtitle: subtitle == null ? null : Text(subtitle),
     trailing: trailing,
@@ -35,6 +37,7 @@ ListTile buildListTile({
       top: isFirst ? styles.radius : Radius.zero,
       bottom: isLast ? styles.radius : Radius.zero
     )),
+    iconColor: ColorScheme.of(context).primary,
     tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 0)
   );
 }
@@ -94,7 +97,7 @@ AppBar buildAppBar({
 }) {
   return buildAppBarWidget(
     title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
-    context: context, exitIcon: exitIcon, actions: actions
+    context: context, exitIcon: exitIcon, actions: actions,
   );
 }
 
@@ -106,14 +109,21 @@ AppBar buildAppBarWidget({
   List<Widget>? actions,
   IconData exitIcon = Icons.arrow_back
 }) {
+  final parentRoute = ModalRoute.of(context);
+  bool hasLeading = false;
+  if (parentRoute?.impliesAppBarDismissal ?? false) {
+    hasLeading = true;
+  } else {
+    hasLeading = false;
+  }
   return AppBar(
-    leading: IconButton(
+    leading: hasLeading ? IconButton(
       onPressed: () {
         Navigator.pop(context);
       },
       icon: Icon(exitIcon),
       style: styles.buttonStyle,
-    ),
+    ) : null,
     title: title,
     actions: actions,
   );

@@ -8,13 +8,14 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/styles.dart' as styles;
 
 class MasterPwdSettingsPage extends StatelessWidget {
-  const MasterPwdSettingsPage({super.key});
+  final bool useHero;
+  const MasterPwdSettingsPage({super.key, required this.useHero});
 
   @override
   Widget build(BuildContext context) {
     final appProvider = context.watch<AppProvider>();
     return Scaffold(
-      appBar: styled.buildAppBar(title: "主密码", titleTag: "masterPwd", context: context),
+      appBar: styled.buildAppBar(title: "主密码", context: context, titleTag: useHero ? "masterPwd" : null),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(

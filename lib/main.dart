@@ -3,9 +3,11 @@ import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:provider/provider.dart';
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/pwd_provider.dart';
+import 'package:flutter/rendering.dart';
 import 'ui/pages/splash.dart';
 
 void main() {
+  debugPaintSizeEnabled = false;
   runApp(const Passtateless());
 }
 

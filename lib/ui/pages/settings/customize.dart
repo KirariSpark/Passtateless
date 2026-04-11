@@ -6,14 +6,15 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/styles.dart' as styles;
 
 class CustomizeSettingsPage extends StatelessWidget {
-  const CustomizeSettingsPage({super.key});
+  final bool useHero;
+  const CustomizeSettingsPage({super.key, required this.useHero});
 
   @override
   Widget build(BuildContext context) {
     final appProvider = context.watch<AppProvider>();
 
     return Scaffold(
-      appBar: styled.buildAppBar(title: "个性化", titleTag: "customize", context: context),
+      appBar: styled.buildAppBar(title: "个性化", context: context, titleTag: useHero ? "customize" : null),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
