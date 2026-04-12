@@ -1,5 +1,5 @@
 enum ErrorCode {
-  success(0, "操作 {item} 成功完成", "操作成功完成"),
+  success(0, "操作 {item} 成功完成", "成功"),
   unknown(1, "未知错误：{item}", "未知错误"),
   emptyString(2, "输入包含空字符串"),
   jsonFormatError(3, "JSON 格式错误"),
@@ -10,7 +10,10 @@ enum ErrorCode {
   invalidArgs(8, "输入包含无效参数"),
   generateFailed(9, "无法生成满足要求的密码"),
   duplicateFolderName(10, "文件夹名 {item} 与已有的键重复", "不能输入重复的文件夹名称"),
-  emptyFolderName(11, "不能输入空名称");
+  emptyFolderName(11, "不能输入空名称"),
+  wrongConfirmPwd(12, "新密码与确认密码不符"),
+  wrongPwd(13, "密码错误"),
+  emptyPwd(14, "密码为空");
 
   final int code;
   final String _messageTemplate;

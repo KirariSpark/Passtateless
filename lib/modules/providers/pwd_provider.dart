@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
 import 'package:passtateless/modules/core/enums.dart' as enums;
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 
 const _uuid = Uuid();
 
@@ -90,15 +91,6 @@ class PwdProvider extends ChangeNotifier {
       _pwdMap[loc.folder]![loc.index]["starred"] = !_pwdMap[loc.folder]![loc.index]["starred"];
       notifyListeners();
     }
-  }
-
-  /// 从收藏列表更新指定项的收藏状态 - 它会同步更新完整列表
-  void switchStarStateFromStarred(int index) {
-    PwdLocation loc = _starredLocation[index];
-    _stars.removeAt(index);
-    _starredLocation.removeAt(index);
-    _pwdMap[loc.folder]![loc.index]["starred"] = !_pwdMap[loc.folder]![loc.index]["starred"];
-    notifyListeners();
   }
 
   /// 从所有密码中移除指定项
@@ -225,5 +217,31 @@ class PwdProvider extends ChangeNotifier {
   Future<ErrorCode> saveArchive(String masterPwd) async {
     final (errorCode, _) = await writeEncryptedJsonFile(enums.Paths.pwdRecord.path, _pwdMap, masterPwd);
     return errorCode;
+  }
+
+  /// 更改主密码
+  Future<ErrorCode> changeMasterPwd({
+    required String currentMaster,
+    required String inputOld,
+    required String inputNew,
+    required String inputConfirm
+  }) async {
+    String oldHash = utils.toSHA256(inputOld);
+    if (currentMaster == oldHash) {
+      // 旧密码验证通过，验证新密码与确认密码是否相同
+      if (inputNew == inputConfirm) {
+        // 再验证它们是否为空
+        if ((inputNew.isNotEmpty) && (inputConfirm.isNotEmpty)) {
+          // 新密码和确认密码验证通过，执行重新加密保存
+          return await saveArchive(utils.toSHA256(inputNew));
+        } else {
+          return ErrorCode.emptyPwd;
+        }
+      } else {
+        return ErrorCode.wrongConfirmPwd;
+      }
+    } else {
+      return ErrorCode.wrongPwd;
+    }
   }
 }

@@ -65,8 +65,7 @@ class _SplashPageState extends State<SplashPage> {
                 styled.buildTextField(
                   context: context,
                   passwordMode: true,
-                  controller: _pwdController,
-                  alpha: styles.alphaSemitransparent
+                  controller: _pwdController
                 ),
                 TextButton(
                   onPressed: () async {
