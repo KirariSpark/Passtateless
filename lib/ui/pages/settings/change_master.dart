@@ -15,6 +15,7 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: ValueKey("change_master"),
       appBar: styled.buildAppBar(
         title: "更改主密码",
         exitIcon: Icons.close,
@@ -35,8 +36,8 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: styles.uniInsetsSmall,
-          constraints: styles.pageWidthConstraint,
+          padding: styles.pagePaddingAll,
+          constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
               spacing: styles.layoutSpacing,

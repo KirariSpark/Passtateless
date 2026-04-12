@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/pages/settings/master_pwd.dart';
+import 'package:passtateless/ui/pages/settings/change_master.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:provider/provider.dart';
@@ -23,12 +23,13 @@ class MasterPwdSettingsPage extends StatelessWidget {
           constraints: styles.pageWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
-              spacing: styles.layoutSpacing,
               children: [
                 // 更改主密码
                 ConstrainedBox(
-                  constraints: styles.pageWidthConstraint,
+                  constraints: styles.tileWidthConstraint,
                   child: styled.buildListTile(
+                    alpha: styles.alphaAlmostTransparent,
+                    isFirst: true,
                     leading: Icons.edit_outlined,
                     trailing: Icon(Icons.arrow_forward),
                     title: "更改主密码",
@@ -40,8 +41,10 @@ class MasterPwdSettingsPage extends StatelessWidget {
                 ),
                 // 提醒我更改密码
                 ConstrainedBox(
-                  constraints: styles.pageWidthConstraint,
+                  constraints: styles.tileWidthConstraint,
                   child: styled.buildListTile(
+                    alpha: styles.alphaAlmostTransparent,
+                    isLast: true,
                     leading: Icons.lock_clock_outlined,
                     title: "提醒我更改主密码",
                     trailing: Icon(Icons.arrow_forward),
