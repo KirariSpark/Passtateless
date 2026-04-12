@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
 import 'package:passtateless/modules/core/enums.dart' as enums;
+
+const _uuid = Uuid();
 
 class PwdLocation {
   final String folder;
@@ -112,12 +115,39 @@ class PwdProvider extends ChangeNotifier {
       _pwdMap[""] = [];
     }
     _pwdMap[folder]!.add({
+      "id": _uuid.v4(),
       "identifier": "",
       "userName": "example",
       "account": "example.com",
       "starred": false
     });
     notifyListeners();
+  }
+
+  /// 通过 id 修改收藏状态
+  void switchStarStateById(String id) {
+    final loc = _findLocationById(id);
+    if (loc != null) {
+      _pwdMap[loc.folder]![loc.index]["starred"] = !_pwdMap[loc.folder]![loc.index]["starred"];
+      notifyListeners();
+    }
+  }
+
+  /// 通过 id 查找该记录在 _pwdMap 中的真实位置
+  PwdLocation? _findLocationById(String id) {
+    for (var folder in _pwdMap.keys) {
+      for (var (index, item) in _pwdMap[folder]!.indexed) {
+        if (item["id"] == id) return PwdLocation(folder: folder, index: index);
+      }
+    }
+    return null;
+  }
+
+  /// 通过 id 查找记录
+  Map<String, dynamic> getItemById(String id) {
+    final loc = _findLocationById(id);
+    if (loc != null) return _pwdMap[loc.folder]![loc.index];
+    return {};
   }
 
   /// 新增一个文件夹
@@ -162,9 +192,17 @@ class PwdProvider extends ChangeNotifier {
     if (stat == ErrorCode.success) {
       if (res is Map) {
         _pwdMap = {};
+        // 为没有 id 的老数据补上 id
         res.forEach((key, value) {
           if (value is List) {
-            _pwdMap[key.toString()] = value.cast<Map<String, dynamic>>();
+            final processedList = value.map<Map<String, dynamic>>((item) {
+              final map = Map<String, dynamic>.from(item as Map);
+              if (!map.containsKey("id") || map["id"] == null || map["id"].toString().isEmpty) {
+                map["id"] = _uuid.v4(); // 兼容老版本数据
+              }
+              return map;
+            }).toList();
+            _pwdMap[key.toString()] = processedList;
           }
         });
         if (!_pwdMap.containsKey("")) {
