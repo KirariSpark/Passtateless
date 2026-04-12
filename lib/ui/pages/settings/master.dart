@@ -54,12 +54,12 @@ class MasterPwdSettingsPage extends StatelessWidget {
                         content: Column(
                           spacing: styles.layoutSpacing,
                           children: <Widget>[
-                            Text("定期提醒您更改主密码，可以增强你的档案的安全性，并降低泄漏风险"),
+                            Text("定期提醒您更改主密码\n此行为可以增强你的档案的安全性\n也能降低数据泄漏的风险"),
                             RadioGroup(
                               groupValue: appProvider.remindMe,
                               onChanged: (value) {
                                 appProvider.remindMe = value!;
-                                Navigator.pop(context);
+                                Navigator.of(context, rootNavigator: true).pop(context);
                               },
                               child: Column(
                                 children: <Widget>[
@@ -91,7 +91,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                         context: context,
                         action: () {
                           if (context.mounted) {
-                            Navigator.pop(context);
+                            Navigator.of(context, rootNavigator: true).pop(context);
                           }
                         },
                         actionText: '取消',
