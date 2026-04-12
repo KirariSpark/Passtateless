@@ -112,20 +112,10 @@ class _HomePageState extends State<HomePage> {
   Widget _buildLeftContent(BuildContext context, bool isWide) {
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
-      // 移除 SingleChildScrollView，改用 Column 直接布局
       child: Column(
         spacing: styles.layoutSpacing,
         children: [
-          // 使用 Expanded 让收藏夹部分占满剩余空间
-          Expanded(
-            child: StarredPasswords(
-              hasConstraint: false, // 取消固定高度约束，由 Expanded 控制
-              isWide: isWide,
-              onItemTapped: (id) => _onStarredItemTapped(id, isWide),
-              selectedId: _selectedPwdId,
-            ),
-          ),
-          // 下方入口部分（固定在底部可见）
+          // 入口部分
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -152,6 +142,15 @@ class _HomePageState extends State<HomePage> {
                 context: context,
               ),
             ],
+          ),
+          // 收藏夹
+          Expanded(
+            child: StarredPasswords(
+              hasConstraint: false, // 取消固定高度约束，由 Expanded 控制
+              isWide: isWide,
+              onItemTapped: (id) => _onStarredItemTapped(id, isWide),
+              selectedId: _selectedPwdId,
+            ),
           ),
         ],
       ),
