@@ -73,8 +73,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                             widget.location, "identifier", value
                           );
                         },
-                        label: "档案名",
-                        alpha: styles.alphaSemitransparent
+                        label: "档案名"
                       )
                     ),
                     ConstrainedBox(
@@ -87,8 +86,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                             widget.location, "userName", value
                           );
                         },
-                        label: "用户名",
-                        alpha: styles.alphaSemitransparent
+                        label: "用户名"
                       )
                     ),
                     ConstrainedBox(
@@ -101,8 +99,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                             widget.location, "account", value
                           );
                         },
-                        label: "账号",
-                        alpha: styles.alphaSemitransparent
+                        label: "账号"
                       ),
                     )
                   ]

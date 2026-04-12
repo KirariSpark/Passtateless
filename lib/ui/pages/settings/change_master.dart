@@ -46,19 +46,16 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
                   context: context,
                   label: "旧密码",
                   passwordMode: pwdMode,
-                  alpha: styles.alphaSemitransparent
                 ),
                 styled.buildTextField(
                   context: context,
                   label: "新密码",
                   passwordMode: pwdMode,
-                  alpha: styles.alphaSemitransparent
                 ),
                 styled.buildTextField(
                   context: context,
                   label: "确认密码",
                   passwordMode: pwdMode,
-                  alpha: styles.alphaSemitransparent
                 )
               ],
             ),

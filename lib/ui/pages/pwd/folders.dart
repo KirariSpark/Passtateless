@@ -102,7 +102,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                         }
                         ui.showAlertDialogQuick(
                           title: "重命名：$displayTitle", content: styled.buildTextField(
-                            context: context, controller: folderName, label: "新名称", alpha: styles.alphaSemitransparent
+                            context: context, controller: folderName, label: "新名称"
                           ),
                           action: () => Navigator.pop(context),
                           actionText: "取消",
@@ -181,7 +181,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   title: "新建文件夹",
                   content: styled.buildTextField(
                     label: "文件夹名", controller: folderName,
-                    alpha: styles.alphaSemitransparent, context: context
+                    context: context
                   ),
                   action: () => Navigator.pop(context),
                   actionText: "取消",

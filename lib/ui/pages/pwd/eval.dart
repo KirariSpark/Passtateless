@@ -40,7 +40,6 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
                       child: styled.buildTextField(
                         context: context,
                         label: "评估对象",
-                        alpha: styles.alphaSemitransparent,
                         controller: _pwdController,
                         passwordMode: !_visible
                       )

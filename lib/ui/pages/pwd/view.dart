@@ -134,8 +134,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             context: context,
                             controller: TextEditingController(text: widget.identifier),
                             label: "档案名",
-                            readonly: true,
-                            alpha: styles.alphaSemitransparent
+                            readonly: true
                           )
                         ),
                         // 用户名
@@ -145,8 +144,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             context: context,
                             controller: TextEditingController(text: widget.userName),
                             label: "用户名",
-                            readonly: true,
-                            alpha: styles.alphaSemitransparent
+                            readonly: true
                           )
                         ),
                         // 账号
@@ -156,8 +154,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             context: context,
                             controller: TextEditingController(text: widget.account),
                             label: "账号",
-                            readonly: true,
-                            alpha: styles.alphaSemitransparent
+                            readonly: true
                           ),
                         ),
                         // 移除数字

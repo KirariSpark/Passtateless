@@ -56,7 +56,7 @@ TextField buildTextField({
   TextEditingController? controller,
   void Function(String)? onChanged,
   String? label,
-  int alpha = 255,
+  int alpha = 0,
   bool passwordMode = false,
   bool multiline = false,
   bool readonly = false,
@@ -67,7 +67,7 @@ TextField buildTextField({
     onChanged: onChanged,
     decoration: InputDecoration(
       filled: true,
-      fillColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha),
+      fillColor: ColorScheme.of(context).primaryContainer.withAlpha(alpha),
       label: label == null ? null : Text(label),
       border: const OutlineInputBorder()
     ),
