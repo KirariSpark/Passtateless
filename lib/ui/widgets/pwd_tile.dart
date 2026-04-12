@@ -3,14 +3,32 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/styles.dart' as styles;
 
 class PwdTile extends StatelessWidget {
+  /// 单个密码记录条目
   final Map<String, dynamic> pwdRecord;
+
+  /// 收藏键点击时，应该做的事
   final void Function()? _onStarPressed;
+
+  /// 编辑键点击时，应该做的事
   final void Function()? _onEditPressed;
+
+  /// 组件本身被点击时，应该做的事
   final void Function()? _onTapped;
+
+  /// 是否有编辑按钮（通常用于收藏夹页面）
   final bool hasEditButton;
+
+  /// 是否是第一项
   final bool isFirst;
+
+  /// 是否是第二项
   final bool isLast;
+
+  /// 是否是被激活的项，存在 isAlpha 时此项失效
   final bool isActive;
+
+  /// 背景的透明度
+  final int? alpha;
 
   /// 用于显示密码的改版ListTile
   const PwdTile({
@@ -22,11 +40,11 @@ class PwdTile extends StatelessWidget {
     this.hasEditButton = true,
     this.isFirst = false,
     this.isLast = false,
-    this.isActive = false
-  }) :
-    _onStarPressed = onStarPressed,
-    _onEditPressed = onEditPressed,
-    _onTapped = onTapped;
+    this.isActive = false,
+    this.alpha,
+  }) : _onStarPressed = onStarPressed,
+       _onEditPressed = onEditPressed,
+       _onTapped = onTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +52,27 @@ class PwdTile extends StatelessWidget {
     bool hasUserName = pwdRecord["userName"].toString().isNotEmpty;
     bool hasAccount = pwdRecord["account"].toString().isNotEmpty;
 
-    if (hasAccount && !hasUserName) { // 设置了账号但未设置用户名
+    // 决定副标题内容
+    if (hasAccount && !hasUserName) {
+      // 设置了账号但未设置用户名
       subtitleText = pwdRecord["account"];
-    } else if (hasUserName && !hasAccount) { // 设置了用户名但未设置账号
+    } else if (hasUserName && !hasAccount) {
+      // 设置了用户名但未设置账号
       subtitleText = pwdRecord["userName"];
-    } else if (!hasUserName && !hasAccount) { // 都没有设置
+    } else if (!hasUserName && !hasAccount) {
+      // 都没有设置
       subtitleText = "无效记录，添加用户名或账号";
-    } else { // 都设置了
+    } else {
+      // 都设置了
       subtitleText = "${pwdRecord["userName"]} @ ${pwdRecord["account"]}";
+    }
+
+    // 决定透明度
+    final int realAlpha;
+    if (alpha != null) {
+      realAlpha = alpha!;
+    } else {
+      realAlpha = isActive ? styles.alphaOpaque : 0;
     }
 
     return ConstrainedBox(
@@ -55,23 +86,25 @@ class PwdTile extends StatelessWidget {
             IconButton(
               style: styles.buttonStyle,
               onPressed: _onStarPressed,
-              icon: pwdRecord["starred"] ? Icon(
-                Icons.star, color: ColorScheme.of(context).primary
-              ) : Icon(Icons.star_border)
+              icon: pwdRecord["starred"]
+                  ? Icon(Icons.star, color: ColorScheme.of(context).primary)
+                  : Icon(Icons.star_border),
             ),
-            ?hasEditButton ? IconButton(
-              style: styles.buttonStyle,
-              onPressed: _onEditPressed,
-              icon: Icon(Icons.edit_outlined)
-            ) : null
+            ?hasEditButton
+                ? IconButton(
+                    style: styles.buttonStyle,
+                    onPressed: _onEditPressed,
+                    icon: Icon(Icons.edit_outlined),
+                  )
+                : null,
           ],
         ),
         onTapped: _onTapped,
         isFirst: isFirst,
         isLast: isLast,
-        alpha: isActive ? styles.alphaOpaque : 0,
-        context: context
-      )
+        alpha: realAlpha,
+        context: context,
+      ),
     );
   }
 }

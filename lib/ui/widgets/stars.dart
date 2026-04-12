@@ -5,6 +5,7 @@ import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:provider/provider.dart';
 
 class StarredPasswords extends StatelessWidget {
+  /// 当前是否有高度约束
   final bool hasConstraint;
   /// 用于告知当前是否为宽屏
   final bool isWide;
@@ -33,6 +34,7 @@ class StarredPasswords extends StatelessWidget {
       padding: styles.uniInsetsSmall,
       child: SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: _buildList(context, starredPasswords, selectedId),
         ),
       ),

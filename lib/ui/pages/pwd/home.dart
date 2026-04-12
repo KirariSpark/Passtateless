@@ -108,48 +108,52 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, bool isWide) {
+  // 构建左侧部分
+  Widget _buildLeftContent(BuildContext context, bool isWide) {
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
-      child: SingleChildScrollView(
-        child: Column(
-          spacing: styles.layoutSpacing,
-          children: [
-            StarredPasswords(
-              hasConstraint: true,
+      // 移除 SingleChildScrollView，改用 Column 直接布局
+      child: Column(
+        spacing: styles.layoutSpacing,
+        children: [
+          // 使用 Expanded 让收藏夹部分占满剩余空间
+          Expanded(
+            child: StarredPasswords(
+              hasConstraint: false, // 取消固定高度约束，由 Expanded 控制
               isWide: isWide,
               onItemTapped: (id) => _onStarredItemTapped(id, isWide),
               selectedId: _selectedPwdId,
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildTile(
-                  tag: "folders",
-                  title: "资料夹",
-                  titleTag: isWide ? null : "folders",
-                  subtitle: "查看和修改全部密码资料夹",
-                  leading: Icons.format_list_bulleted,
-                  isFirst: true,
-                  isLast: false,
-                  isWide: isWide,
-                  context: context,
-                ),
-                _buildTile(
-                  tag: "pwdEval",
-                  title: "密码强度",
-                  titleTag: isWide ? null : "pwdEval",
-                  subtitle: "评估密码强度，并获取相关建议",
-                  leading: Icons.checklist,
-                  isFirst: false,
-                  isLast: true,
-                  isWide: isWide,
-                  context: context,
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+          // 下方入口部分（固定在底部可见）
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildTile(
+                tag: "folders",
+                title: "资料夹",
+                titleTag: isWide ? null : "folders",
+                subtitle: "查看和修改全部密码资料夹",
+                leading: Icons.format_list_bulleted,
+                isFirst: true,
+                isLast: false,
+                isWide: isWide,
+                context: context,
+              ),
+              _buildTile(
+                tag: "pwdEval",
+                title: "密码强度",
+                titleTag: isWide ? null : "pwdEval",
+                subtitle: "评估密码强度，并获取相关建议",
+                leading: Icons.checklist,
+                isFirst: false,
+                isLast: true,
+                isWide: isWide,
+                context: context,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -214,7 +218,7 @@ class _HomePageState extends State<HomePage> {
         spacing: styles.layoutSpacing,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMainContent(context, true),
+          _buildLeftContent(context, true),
           Expanded(
             child: Container(
               constraints: styles.tileWidthConstraint,
@@ -231,7 +235,7 @@ class _HomePageState extends State<HomePage> {
       padding: styles.pagePaddingAll,
       alignment: Alignment.topCenter,
       key: const ValueKey('narrow-home'),
-      child: _buildMainContent(context, false),
+      child: _buildLeftContent(context, false),
     );
   }
 
