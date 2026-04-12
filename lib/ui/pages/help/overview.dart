@@ -172,9 +172,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
         final bool isWide = constraints.maxWidth > styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 100),
-          child: isWide
-              ? _buildWideLayout(context, isWide)
-              : _buildNarrowLayout(context),
+          child: isWide ? _buildWideLayout(context, isWide) : _buildNarrowLayout(context),
         );
       },
     );

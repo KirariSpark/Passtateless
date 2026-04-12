@@ -2,21 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/master.dart';
 import 'package:passtateless/ui/pages/settings/customize.dart';
+import 'package:passtateless/ui/pages/settings/advanced.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-
-// 高级设置页面
-class AdvancedSettingsPage extends StatelessWidget {
-  const AdvancedSettingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("高级设置")),
-      body: Center(child: Placeholder()),
-    );
-  }
-}
 
 // 基础设置页面
 class BasicSettingsPage extends StatefulWidget {
@@ -105,24 +93,12 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
 
   // 构建第二栏(右侧)内容
   Widget _buildRightContent(BuildContext context, bool isWide) {
-    Widget buildHint(String text) {
-      return Container(
-        decoration: BoxDecoration(
-          borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
-        ),
-        child: Center(
-          child: Text(text),
-        ),
-      );
-    }
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 200) { // 过窄时什么都不显示
-          return buildHint("");
+          return styled.buildPlaceHolder(text: "", context: context);
         } else if (_selectedTag == null) {
-          return buildHint("未选择设置项");
+          return styled.buildPlaceHolder(text: "未选择设置项", context: context);
         } else {
           return AnimatedSwitcher(
             switchOutCurve: Curves.easeOutCubic,
@@ -138,38 +114,19 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   // 构建设置项列表
   List<Widget> _buildSettingTiles(BuildContext context, bool isWide) {
     final List<Widget> tiles = [];
-    final colorScheme = ColorScheme.of(context);
 
     for (int i = 0; i < _settingItems.length; i++) {
       final item = _settingItems[i];
       final isSelected = _selectedTag == item.tag;
       final alpha = isSelected && isWide ? styles.alphaOpaque : styles.alphaAlmostTransparent;
 
-      // 构建 decoration
-      BoxDecoration? decoration;
-      if (item.isFirst) {
-        decoration = BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: styles.radius),
-          color: colorScheme.primaryContainer.withAlpha(alpha),
-        );
-      } else if (item.isLast) {
-        decoration = BoxDecoration(
-          borderRadius: BorderRadius.vertical(bottom: styles.radius),
-          color: colorScheme.primaryContainer.withAlpha(alpha),
-        );
-      } else {
-        decoration = BoxDecoration(
-          color: colorScheme.primaryContainer.withAlpha(alpha),
-        );
-      }
-
       Widget tile = AnimatedSwitcher(
         duration: Duration(milliseconds: 100),
-        child: Container(
+        child: ConstrainedBox(
           key: isSelected ? ValueKey("selected") : ValueKey("notSelected"),
-          decoration: decoration,
           constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
           child: styled.buildListTile(
+            alpha: alpha,
             isFirst: item.isFirst,
             isLast: item.isLast,
             leading: item.icon,
