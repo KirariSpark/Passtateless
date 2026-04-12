@@ -5,6 +5,8 @@ import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/stars.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,8 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _selectedTag;
-  Map<String, dynamic>? _selectedPwdRecord;
-  int? _selectedPwdIndex;
+  String? _selectedPwdId;
 
   Widget _buildPage(String tag, bool isWide) {
     switch (tag) {
@@ -34,8 +35,7 @@ class _HomePageState extends State<HomePage> {
     if (isWide) {
       setState(() {
         _selectedTag = tag;
-        _selectedPwdRecord = null; // 切换普通页面时，清空密码详情状态
-        _selectedPwdIndex = null;
+        _selectedPwdId = null; // 切换普通页面时，清空密码详情状态
       });
     } else {
       Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)));
@@ -43,69 +43,57 @@ class _HomePageState extends State<HomePage> {
   }
 
   // 收藏夹项目的点击
-  void _onStarredItemTapped(Map<String, dynamic> pwdRecord, bool isWide, int index) {
+  void _onStarredItemTapped(String id, bool isWide) {
     if (isWide) {
       setState(() {
         _selectedTag = null; // 切换密码详情时，清空普通页面状态
-        _selectedPwdRecord = pwdRecord;
-        _selectedPwdIndex = index;
+        _selectedPwdId = id;
       });
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PwdViewPage(
-            identifier: pwdRecord["identifier"] ?? "",
-            userName: pwdRecord["userName"] ?? "",
-            account: pwdRecord["account"] ?? "",
+      // 窄屏时通过 Provider 获取完整记录用于路由传参
+      final record = Provider.of<PwdProvider>(context, listen: false).getItemById(id);
+      if (record.isNotEmpty) {
+        Navigator.push(context, MaterialPageRoute(
+            builder: (context) => PwdViewPage(
+              identifier: record["identifier"] ?? "",
+              userName: record["userName"] ?? "",
+              account: record["account"] ?? "",
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
 
   // 构建单个瓦片
   Widget _buildTile({
-    required String tag, required String title, required String? titleTag, required String subtitle,
-    required IconData leading, required bool isFirst, required bool isLast, required bool isWide,
+    required String tag,
+    required String title,
+    required String? titleTag,
+    required String subtitle,
+    required IconData leading,
+    required bool isFirst,
+    required bool isLast,
+    required bool isWide,
     required BuildContext context,
   }) {
     final isSelected = _selectedTag == tag && isWide;
-    final alpha = isSelected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
-    final colorScheme = ColorScheme.of(context);
-
-    // 根据位置单独配置圆角，避免接缝处出现圆角
-    BoxDecoration decoration;
-    if (isFirst && isLast) {
-      decoration = BoxDecoration(
-        borderRadius: styles.borderRadius,
-        color: colorScheme.primaryContainer.withAlpha(alpha),
-      );
-    } else if (isFirst) {
-      decoration = BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: styles.radius),
-        color: colorScheme.primaryContainer.withAlpha(alpha),
-      );
-    } else if (isLast) {
-      decoration = BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: styles.radius),
-        color: colorScheme.primaryContainer.withAlpha(alpha),
-      );
-    } else {
-      decoration = BoxDecoration(
-        color: colorScheme.primaryContainer.withAlpha(alpha),
-      );
-    }
+    final alpha = isSelected
+        ? styles.alphaOpaque
+        : styles.alphaAlmostTransparent;
 
     // 下方入口部分
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 100),
       switchOutCurve: Curves.easeOutCubic,
       switchInCurve: Curves.easeOutCubic,
-      child: Container(
-        key: isSelected ? const ValueKey("selected") : const ValueKey("notSelected"),
-        decoration: decoration,
+      child: ConstrainedBox(
+        constraints: styles.tileWidthConstraint,
+        key: isSelected
+            ? const ValueKey("selected")
+            : const ValueKey("notSelected"),
         child: styled.buildListTile(
+          alpha: alpha,
           title: title,
           titleTag: titleTag,
           subtitle: subtitle,
@@ -127,7 +115,12 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           spacing: styles.layoutSpacing,
           children: [
-            StarredPasswords(hasConstraint: true, isWide: isWide, onItemTapped: _onStarredItemTapped, selectedIndex: _selectedPwdIndex),
+            StarredPasswords(
+              hasConstraint: true,
+              isWide: isWide,
+              onItemTapped: (id) => _onStarredItemTapped(id, isWide),
+              selectedId: _selectedPwdId,
+            ),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -154,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                   context: context,
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -167,11 +160,11 @@ class _HomePageState extends State<HomePage> {
       return Container(
         decoration: BoxDecoration(
           borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+          color: ColorScheme.of(
+            context,
+          ).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
         ),
-        child: Center(
-          child: Text(text),
-        ),
+        child: Center(child: Text(text)),
       );
     }
 
@@ -179,20 +172,26 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 200) {
           return buildHint("");
-        } else if (_selectedPwdRecord != null) {
-          // 如果有选中的密码记录，则渲染密码详情页
-          return AnimatedSwitcher(
-            switchOutCurve: Curves.easeOutCubic,
-            switchInCurve: Curves.easeOutCubic,
-            duration: Duration(milliseconds: 200),
-            child: PwdViewPage(
-              // 使用 hash 生成 Key，因为 identifier 可以相同
-              key: ValueKey(_selectedPwdRecord.hashCode),
-              identifier: _selectedPwdRecord!["identifier"] ?? "",
-              userName: _selectedPwdRecord!["userName"] ?? "",
-              account: _selectedPwdRecord!["account"] ?? "",
-            ),
-          );
+        } else if (_selectedPwdId != null) {
+          // 通过 ID 从 Provider 获取密码记录
+          final pwdRecord = context.watch<PwdProvider>().getItemById(_selectedPwdId!);
+
+          if (pwdRecord.isNotEmpty) {
+            // 如果有选中的密码记录，则渲染密码详情页
+            return AnimatedSwitcher(
+              switchOutCurve: Curves.easeOutCubic,
+              switchInCurve: Curves.easeOutCubic,
+              duration: Duration(milliseconds: 200),
+              child: PwdViewPage(
+                key: ValueKey(_selectedPwdId),
+                identifier: pwdRecord["identifier"] ?? "",
+                userName: pwdRecord["userName"] ?? "",
+                account: pwdRecord["account"] ?? "",
+              ),
+            );
+          } else {
+            return buildHint("未找到记录");
+          }
         } else if (_selectedTag == null) {
           return buildHint("未选择项目");
         } else {
@@ -209,7 +208,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildWideLayout(BuildContext context) {
     return Container(
-      key: const ValueKey('wide-layout'),
+      key: const ValueKey('wide-home'),
       padding: styles.pagePaddingAll,
       child: Row(
         spacing: styles.layoutSpacing,
@@ -231,7 +230,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: styles.pagePaddingAll,
       alignment: Alignment.topCenter,
-      key: const ValueKey('narrow-layout'),
+      key: const ValueKey('narrow-home'),
       child: _buildMainContent(context, false),
     );
   }
