@@ -89,7 +89,7 @@ class EvalRes extends StatelessWidget {
           context: context,
           isLast: true,
           isFirst: true,
-          alpha: styles.alphaSemitransparent
+          alpha: styles.alphaAlmostTransparent
         )
       );
     }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passtateless/modules/core/enums.dart' as enums;
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -22,7 +22,7 @@ class PwdViewPage extends StatefulWidget {
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
-  enums.Presets _preset = enums.Presets.simple;
+  Presets _preset = Presets.simple;
   final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
   bool isGenerating = false;
   bool removeDigits = false;
@@ -31,7 +31,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
 
   /// 根据当前预设决定是否显示自定义规则
   Widget? _showConfigEdit() {
-    if (_preset == enums.Presets.custom) {
+    if (_preset == Presets.custom) {
       return styled.buildListTile(
         context: context,
         title: "配置生成规则",
@@ -45,7 +45,8 @@ class _PwdViewPageState extends State<PwdViewPage> {
             const Icon(Icons.arrow_forward_ios, size: 16)
           ],
         ),
-        alpha: styles.alphaSemitransparent,
+        alpha: styles.alphaAlmostTransparent,
+        isLast: true,
         onTapped: () async {
           // 跳转并等待返回结果
           final result = await Navigator.push(
@@ -78,8 +79,8 @@ class _PwdViewPageState extends State<PwdViewPage> {
   /// 生成密码并显示提示
   Future<String> genPwd(BuildContext context, bool copy) async {
     setState(() {isGenerating = true;});
-    if (<enums.Presets>[
-      enums.Presets.simple, enums.Presets.complex, enums.Presets.bank
+    if (<Presets>[
+      Presets.simple, Presets.complex, Presets.bank
     ].contains(_preset)) {
       var res = await parser.parseBuiltins(
           _preset, "${widget.identifier}: ${widget.userName} @ ${widget.account}",
@@ -121,7 +122,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
               return ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: maxWidth),
                 child: Column(
-                  spacing: styles.layoutSpacing,
                   children: <Widget>[
                     Wrap(
                       spacing: 8,
@@ -172,7 +172,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             title: const Text("移除数字"),
                             shape: styles.roundedBorder,
-                            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                            tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
                           ),
                         ),
                         // 移除字母
@@ -187,7 +187,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             title: const Text("移除字母"),
                             shape: styles.roundedBorder,
-                            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                            tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
                           ),
                         ),
                         // 移除特殊字符
@@ -202,11 +202,12 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             title: const Text("移除特殊字符"),
                             shape: styles.roundedBorder,
-                            tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                            tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
                           ),
                         )
                       ]
                     ),
+                    styles.spacingSizedBox,
                     // 生成预设
                     styled.buildListTile(
                       context: context,
@@ -221,41 +222,43 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           Icon(Icons.arrow_drop_down)
                         ],
                       ),
-                      alpha: styles.alphaSemitransparent,
+                      alpha: styles.alphaAlmostTransparent,
+                      isFirst: true,
+                      isLast: _preset == Presets.custom ? false : true,
                       onTapped: (){
                         ui.showAlertDialogQuick(
                           title: "选择预设",
                           content: RadioGroup(
                             groupValue: _preset,
                             onChanged: (value){
-                              setState(() {_preset = value ?? enums.Presets.simple;});
+                              setState(() {_preset = value ?? Presets.simple;});
                               Navigator.pop(context);
                             },
                             child: Column(
                               children: [
                                 RadioListTile(
-                                  title: Text(enums.Presets.simple.displayName),
+                                  title: Text(Presets.simple.displayName),
                                   subtitle: Text("简易预设，适用于对安全性要求不高的场景"),
                                   shape: styles.roundedBorder,
-                                  value: enums.Presets.simple,
+                                  value: Presets.simple,
                                 ),
                                 RadioListTile(
-                                  title: Text(enums.Presets.complex.displayName),
+                                  title: Text(Presets.complex.displayName),
                                   subtitle: Text("使用更复杂的生成流程和 PBKDF2 算法，可能较慢"),
                                   shape: styles.roundedBorder,
-                                  value: enums.Presets.complex
+                                  value: Presets.complex
                                 ),
                                 RadioListTile(
-                                  title: Text(enums.Presets.bank.displayName),
+                                  title: Text(Presets.bank.displayName),
                                   subtitle: Text("基于 PBKDF2 算法生成六位的纯数字密码，可能较慢"),
                                   shape: styles.roundedBorder,
-                                  value: enums.Presets.bank
+                                  value: Presets.bank
                                 ),
                                 RadioListTile(
-                                  title: Text(enums.Presets.custom.displayName),
+                                  title: Text(Presets.custom.displayName),
                                   subtitle: Text("使用 JSON 完全自定义整个生成流程"),
                                   shape: styles.roundedBorder,
-                                  value: enums.Presets.custom
+                                  value: Presets.custom
                                 )
                               ],
                             )
@@ -268,6 +271,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                     ),
                     // 视情况选择是否显示配置编辑页面
                     ?_showConfigEdit(),
+                    styles.spacingSizedBox,
                     // 按钮
                     Row(
                       spacing: styles.layoutSpacing,
