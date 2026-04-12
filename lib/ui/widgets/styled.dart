@@ -79,6 +79,26 @@ TextField buildTextField({
   );
 }
 
+/// 构建一个占位符，比自带的好看（）
+/// 
+/// [text] 占位符内要显示的内容
+/// [context] 上下文
+Container buildPlaceHolder({
+  required String text, 
+  required BuildContext context
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: styles.borderRadius,
+      color: ColorScheme.of(
+        context,
+      ).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+    ),
+    alignment: Alignment.center,
+    child: Text(text),
+  );
+}
+
 /// 构建预定义了风格的AppBar
 ///
 /// [title] 标题<br>
@@ -109,6 +129,7 @@ AppBar buildAppBarWidget({
 }) {
   final parentRoute = ModalRoute.of(context);
   bool hasLeading = false;
+  // 决定是否展示返回键（参考官方AppBar实现）
   if (parentRoute?.impliesAppBarDismissal ?? false) {
     hasLeading = true;
   } else {

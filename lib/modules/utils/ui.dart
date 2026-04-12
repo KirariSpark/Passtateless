@@ -1,11 +1,11 @@
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
 
-/// 计算宽度约束
-/// [availableWidth]: 父容器提供的最大可用宽度
-/// [useSpacing]: 是否在计算中加入间隔
-/// [maxColumns]: 允许的最大列数限制，默认为100（即相当于不限制）
-/// [usePadding]: 是否在计算时引入内边距
+/// 计算宽度约束<br>
+/// [availableWidth]: 父容器提供的最大可用宽度<br>
+/// [useSpacing]: 是否在计算中加入间隔<br>
+/// [maxColumns]: 允许的最大列数限制，默认为100（即相当于不限制）<br>
+/// [usePadding]: 是否在计算时引入内边距<br>
 double calcWidthConstraint(
   double availableWidth,
   bool useSpacing, {
@@ -80,7 +80,8 @@ void showInfoDialogQuick({
 }) {
   showAlertDialogQuick(
     title: title, content: Text(content),
-    action: (){Navigator.pop(context);}, actionText: buttonText, context: context
+    action: (){Navigator.pop(context);}, 
+    actionText: buttonText, context: context
   );
 }
 
@@ -90,7 +91,7 @@ void showConfirmDialogQuick({
   required String title, required String info
 }) {
   showAlertDialogQuick(
-    title: title, content: Text(info), action: (){Navigator.pop(context);}, actionText: "取消", context: context,
-    action2: function, action2Text: "确定"
+    title: title, content: Text(info), action: (){Navigator.pop(context);}, 
+    actionText: "取消", context: context, action2: function, action2Text: "确定"
   );
 }

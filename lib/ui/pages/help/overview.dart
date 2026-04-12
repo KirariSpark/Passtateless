@@ -55,11 +55,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
 
   Widget _buildPage(String tag, bool isWide) {
     final item = _docItems.firstWhere((item) => item.tag == tag);
-    return DocViewPage(
-      title: item.title,
-      mode: item.tag,
-      key: ValueKey(tag),
-    );
+    return DocViewPage(title: item.title, mode: item.tag, key: ValueKey(tag));
   }
 
   void _onItemTapped(_DocItem item, bool isWide) {
@@ -117,22 +113,12 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
   }
 
   Widget _buildRightContent(BuildContext context, bool isWide) {
-    Widget buildHint(String text) {
-      return Container(
-        decoration: BoxDecoration(
-          borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
-        ),
-        child: Center(child: Text(text)),
-      );
-    }
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 250) {
-          return buildHint("");
+          return styled.buildPlaceHolder(text: "", context: context);
         } else if (_selectedTag == null) {
-          return buildHint("未选择文档项");
+          return styled.buildPlaceHolder(text: "未选择文档项", context: context);
         } else {
           return AnimatedSwitcher(
             switchOutCurve: Curves.easeOutCubic,
@@ -147,39 +133,20 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
 
   List<Widget> _buildDocTiles(BuildContext context, bool isWide) {
     final List<Widget> tiles = [];
-    final colorScheme = ColorScheme.of(context);
 
     for (int i = 0; i < _docItems.length; i++) {
       final item = _docItems[i];
       final isSelected = _selectedTag == item.tag;
       final alpha = isSelected && isWide
-          ? styles.alphaOpaque
-          : styles.alphaAlmostTransparent;
-
-      BoxDecoration? decoration;
-      if (item.isFirst) {
-        decoration = BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: styles.radius),
-          color: colorScheme.primaryContainer.withAlpha(alpha),
-        );
-      } else if (item.isLast) {
-        decoration = BoxDecoration(
-          borderRadius: BorderRadius.vertical(bottom: styles.radius),
-          color: colorScheme.primaryContainer.withAlpha(alpha),
-        );
-      } else {
-        decoration = BoxDecoration(
-          color: colorScheme.primaryContainer.withAlpha(alpha),
-        );
-      }
+        ? styles.alphaOpaque : styles.alphaAlmostTransparent;
 
       Widget tile = AnimatedSwitcher(
         duration: Duration(milliseconds: 100),
-        child: Container(
+        child: ConstrainedBox(
           key: isSelected ? ValueKey("selected") : ValueKey("notSelected"),
-          decoration: decoration,
           constraints: isWide ? styles.tileWidthConstraint : styles.tileWidthConstraintWider,
           child: styled.buildListTile(
+            alpha: alpha,
             isFirst: item.isFirst,
             isLast: item.isLast,
             title: item.title,
@@ -202,8 +169,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bool isWide = constraints.maxWidth >
-            styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing;
+        final bool isWide = constraints.maxWidth > styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 100),
           child: isWide

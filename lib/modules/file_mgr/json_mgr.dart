@@ -1,16 +1,6 @@
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart' as core;
-
-/// 使用 SHA-256 哈希处理密钥，自动生成符合 AES256 要求的 32 字节密钥
-String _hashKeyForAES256(String key) {
-  // 将输入的任意长度 key 转换为 SHA-256 哈希值（64位十六进制字符串）
-  final hexHash = sha256.convert(utf8.encode(key)).toString();
-  // 截取前 32 个字符。因为全是 0-9/a-f 的 ASCII 字符，
-  // 被底层 Key.fromUtf8 解析后长度恰好为 32 字节，完美符合 AES256 标准
-  return hexHash.substring(0, 32);
-}
 
 /// 读取JSON文件内容
 ///
