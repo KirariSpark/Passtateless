@@ -35,12 +35,12 @@ enum RemindDays {
 }
 
 enum AvailableColors {
-  deepPurple(Colors.deepPurple, "深紫"),
+  deepPurple(Colors.purple, "紫色"),
   indigo(Colors.indigo, "靛蓝"),
-  blueGrey(Colors.blueGrey, "蓝灰"),
+  blueGrey(Colors.blue, "蓝色"),
   teal(Colors.teal, "暗青"),
-  greed(Colors.lightGreen, "绿色"),
-  amber(Colors.lime, "柠檬"),
+  greed(Colors.lightGreen, "浅绿"),
+  amber(Colors.yellow, "黄色"),
   orange(Colors.orange, "橙色"),
   red(Colors.red, "红色");
 

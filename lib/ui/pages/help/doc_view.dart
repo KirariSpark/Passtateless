@@ -51,7 +51,7 @@ class DocViewPage extends StatelessWidget {
         alignment: AlignmentGeometry.topCenter,
         child: Container(
           decoration: BoxDecoration(
-            color: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+            color: ColorScheme.of(context).secondaryContainer.withAlpha(styles.alphaAlmostTransparent),
             borderRadius: styles.borderRadius,
           ),
           constraints: styles.pageWidthConstraint,

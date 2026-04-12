@@ -136,6 +136,7 @@ AppBar buildAppBarWidget({
     hasLeading = false;
   }
   return AppBar(
+    shape: styles.roundedBorder,
     leading: hasLeading ? IconButton(
       onPressed: () {
         Navigator.pop(context);
