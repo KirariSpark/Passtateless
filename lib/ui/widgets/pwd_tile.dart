@@ -10,6 +10,7 @@ class PwdTile extends StatelessWidget {
   final bool hasEditButton;
   final bool isFirst;
   final bool isLast;
+  final bool isActive;
 
   /// 用于显示密码的改版ListTile
   const PwdTile({
@@ -20,7 +21,8 @@ class PwdTile extends StatelessWidget {
     void Function()? onTapped,
     this.hasEditButton = true,
     this.isFirst = false,
-    this.isLast = false
+    this.isLast = false,
+    this.isActive = false
   }) :
     _onStarPressed = onStarPressed,
     _onEditPressed = onEditPressed,
@@ -67,6 +69,7 @@ class PwdTile extends StatelessWidget {
         onTapped: _onTapped,
         isFirst: isFirst,
         isLast: isLast,
+        alpha: isActive ? styles.alphaOpaque : 0,
         context: context
       )
     );

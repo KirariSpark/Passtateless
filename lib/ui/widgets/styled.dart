@@ -36,7 +36,7 @@ ListTile buildListTile({
       bottom: isLast ? styles.radius : Radius.zero
     )),
     iconColor: ColorScheme.of(context).primary,
-    tileColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(alpha ?? 0)
+    tileColor: ColorScheme.of(context).primaryContainer.withAlpha(alpha ?? 0)
   );
 }
 

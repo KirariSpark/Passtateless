@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
+import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/stars.dart';
@@ -14,11 +15,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _selectedTag;
+  Map<String, dynamic>? _selectedPwdRecord;
+  int? _selectedPwdIndex;
 
   Widget _buildPage(String tag, bool isWide) {
     switch (tag) {
       case "folders":
-        return PwdFolderPage(key: ValueKey(tag), useHero: !isWide); // 宽屏下不应使用Hero
+        return PwdFolderPage(key: ValueKey(tag), useHero: !isWide);
       case "pwdEval":
         return PwdEvalPage(key: ValueKey(tag), useHero: !isWide);
       default:
@@ -26,26 +29,45 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // 普通项目的点击
   void _onItemTapped(String tag, bool isWide) {
     if (isWide) {
       setState(() {
         _selectedTag = tag;
+        _selectedPwdRecord = null; // 切换普通页面时，清空密码详情状态
+        _selectedPwdIndex = null;
       });
     } else {
       Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)));
     }
   }
 
+  // 收藏夹项目的点击
+  void _onStarredItemTapped(Map<String, dynamic> pwdRecord, bool isWide, int index) {
+    if (isWide) {
+      setState(() {
+        _selectedTag = null; // 切换密码详情时，清空普通页面状态
+        _selectedPwdRecord = pwdRecord;
+        _selectedPwdIndex = index;
+      });
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PwdViewPage(
+            identifier: pwdRecord["identifier"] ?? "",
+            userName: pwdRecord["userName"] ?? "",
+            account: pwdRecord["account"] ?? "",
+          ),
+        ),
+      );
+    }
+  }
+
   // 构建单个瓦片
   Widget _buildTile({
-    required String tag,
-    required String title,
-    required String? titleTag,
-    required String subtitle,
-    required IconData leading,
-    required bool isFirst,
-    required bool isLast,
-    required bool isWide,
+    required String tag, required String title, required String? titleTag, required String subtitle,
+    required IconData leading, required bool isFirst, required bool isLast, required bool isWide,
     required BuildContext context,
   }) {
     final isSelected = _selectedTag == tag && isWide;
@@ -75,6 +97,7 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    // 下方入口部分
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 100),
       switchOutCurve: Curves.easeOutCubic,
@@ -104,7 +127,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           spacing: styles.layoutSpacing,
           children: [
-            StarredPasswords(hasConstraint: true),
+            StarredPasswords(hasConstraint: true, isWide: isWide, onItemTapped: _onStarredItemTapped, selectedIndex: _selectedPwdIndex),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -155,8 +178,21 @@ class _HomePageState extends State<HomePage> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 200) {
-          // 过窄时什么都不显示
           return buildHint("");
+        } else if (_selectedPwdRecord != null) {
+          // 如果有选中的密码记录，则渲染密码详情页
+          return AnimatedSwitcher(
+            switchOutCurve: Curves.easeOutCubic,
+            switchInCurve: Curves.easeOutCubic,
+            duration: Duration(milliseconds: 200),
+            child: PwdViewPage(
+              // 使用 hash 生成 Key，因为 identifier 可以相同
+              key: ValueKey(_selectedPwdRecord.hashCode),
+              identifier: _selectedPwdRecord!["identifier"] ?? "",
+              userName: _selectedPwdRecord!["userName"] ?? "",
+              account: _selectedPwdRecord!["account"] ?? "",
+            ),
+          );
         } else if (_selectedTag == null) {
           return buildHint("未选择项目");
         } else {

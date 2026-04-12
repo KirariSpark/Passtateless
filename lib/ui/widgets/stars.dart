@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:provider/provider.dart';
 
 class StarredPasswords extends StatelessWidget {
   final bool hasConstraint;
-  const StarredPasswords({super.key, required this.hasConstraint});
+  /// 用于告知当前是否为宽屏
+  final bool isWide;
+  /// 点击回调，发生于内部条目被点击时
+  final void Function(Map<String, dynamic> pwdRecord, bool isWide, int index)? onItemTapped;
+  /// 选中项的索引，用于高亮选中项
+  final int? selectedIndex;
+  /// 密码收藏夹页面
+  const StarredPasswords({
+    super.key, required this.hasConstraint, required this.isWide, this.onItemTapped, this.selectedIndex
+  });
 
   @override
   Widget build(BuildContext context) {
     final starredPasswords = context.watch<PwdProvider>().starredPwds;
-
     return Container(
       constraints: hasConstraint ? styles.tileHeightConstraint : null,
       decoration: BoxDecoration(
@@ -22,13 +29,13 @@ class StarredPasswords extends StatelessWidget {
       padding: styles.uniInsetsSmall,
       child: SingleChildScrollView(
         child: Column(
-          children: _buildList(context, starredPasswords),
+          children: _buildList(context, starredPasswords, selectedIndex),
         ),
       ),
     );
   }
 
-  List<Widget> _buildList(BuildContext context, List<Map<String, dynamic>> starredPasswords) {
+  List<Widget> _buildList(BuildContext context, List<Map<String, dynamic>> starredPasswords, int? selectedIndex) {
     if (starredPasswords.isEmpty) {
       return <Widget>[
         ListTile(
@@ -51,15 +58,13 @@ class StarredPasswords extends StatelessWidget {
               Provider.of<PwdProvider>(context, listen: false).switchStarStateFromStarred(index);
             },
             onTapped: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
-                identifier: starredPasswords[index]["identifier"],
-                userName: starredPasswords[index]["userName"],
-                account: starredPasswords[index]["account"],
-              )));
+              // 将点击事件和必要数据传递给父组件
+              onItemTapped?.call(starredPasswords[index], isWide, index);
             },
             hasEditButton: false,
             isFirst: index == 0,
             isLast: index == starredPasswords.length - 1,
+            isActive: selectedIndex == index ? true : false,
           )
         );
       }
