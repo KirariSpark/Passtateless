@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 class StarredPasswords extends StatelessWidget {
   /// 当前是否有高度约束
   final bool hasConstraint;
-  /// 用于告知当前是否为宽屏
+  /// 用于告知当前是否为宽屏，同时会决定是否使用 Hero 动画
   final bool isWide;
   /// 点击回调，发生于内部条目被点击时
   final void Function(String id)? onItemTapped; 
@@ -74,7 +74,8 @@ class StarredPasswords extends StatelessWidget {
             hasEditButton: false,
             isFirst: index == 0,
             isLast: index == starredPasswords.length - 1,
-            isActive: record["id"] == selectedId, 
+            isActive: record["id"] == selectedId,
+            useHero: !isWide,
           )
         );
       }

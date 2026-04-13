@@ -19,14 +19,20 @@ class _HomePageState extends State<HomePage> {
   String? _selectedTag;
   String? _selectedPwdId;
 
-  Widget _buildPage(String tag, bool isWide) {
+  // 右侧栏专属的 Navigator Key
+  final GlobalKey<NavigatorState> _homePageRightNavigatorKey = GlobalKey<NavigatorState>();
+
+  // 构建右侧页面（将tag设为pwd以使id起作用，此时id一定不能为空）
+  Widget _buildPage(String tag, bool isWide, String? id) {
     switch (tag) {
       case "folders":
         return PwdFolderPage(key: ValueKey(tag), useHero: !isWide);
       case "pwdEval":
         return PwdEvalPage(key: ValueKey(tag), useHero: !isWide);
+      case "pwd":
+        return PwdViewPage(key: ValueKey(_selectedPwdId), id: id!);
       default:
-        return const SizedBox.shrink();
+        return styled.buildPlaceHolder(text: "无效选择", context: context);
     }
   }
 
@@ -37,8 +43,11 @@ class _HomePageState extends State<HomePage> {
         _selectedTag = tag;
         _selectedPwdId = null; // 切换普通页面时，清空密码详情状态
       });
+      _homePageRightNavigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => _buildPage(tag, isWide, null)), (route) => false
+      );
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide, null)));
     }
   }
 
@@ -49,17 +58,11 @@ class _HomePageState extends State<HomePage> {
         _selectedTag = null; // 切换密码详情时，清空普通页面状态
         _selectedPwdId = id;
       });
+      _homePageRightNavigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, id)), (route) => false
+      );
     } else {
-      // 窄屏时通过 Provider 获取完整记录用于路由传参
-      final record = Provider.of<PwdProvider>(context, listen: false).getItemById(id);
-      if (record.isNotEmpty) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => PwdViewPage(
-            id: record["id"],
-          ),
-          ),
-        );
-      }
+      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, null)));
     }
   }
 
@@ -153,48 +156,41 @@ class _HomePageState extends State<HomePage> {
 
   // 构建第二栏(右侧)内容
   Widget _buildRightContent(BuildContext context) {
-    Widget buildHint(String text) {
-      return Container(
-        decoration: BoxDecoration(
-          borderRadius: styles.borderRadius,
-          color: ColorScheme.of(
-            context,
-          ).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
-        ),
-        child: Center(child: Text(text)),
-      );
-    }
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 200) {
-          return buildHint("");
+          // 页面过窄时，什么都不显示
+          return styled.buildPlaceHolder(text: '', context: context);
         } else if (_selectedPwdId != null) {
+          // 选择了密码项时，显示密码详情页
           // 通过 ID 从 Provider 获取密码记录
-          final pwdRecord = context.watch<PwdProvider>().getItemById(_selectedPwdId!);
-
-          if (pwdRecord.isNotEmpty) {
-            // 如果有选中的密码记录，则渲染密码详情页
-            return AnimatedSwitcher(
-              switchOutCurve: Curves.easeOutCubic,
-              switchInCurve: Curves.easeOutCubic,
-              duration: Duration(milliseconds: 200),
-              child: PwdViewPage(
-                key: ValueKey(_selectedPwdId),
-                id: pwdRecord["id"],
-              ),
-            );
-          } else {
-            return buildHint("未找到记录");
-          }
+          return Navigator(
+            key: _homePageRightNavigatorKey,
+            onGenerateRoute: (RouteSettings settings) {
+              return MaterialPageRoute(
+                builder: (context) => _buildPage("pwd", true, _selectedPwdId),
+              );
+            },
+          );
         } else if (_selectedTag == null) {
-          return buildHint("未选择项目");
+          // 没有选择设置项
+          return Navigator(
+            key: _homePageRightNavigatorKey,
+            onGenerateRoute: (_) {
+              return MaterialPageRoute(
+                builder: (context) => styled.buildPlaceHolder(text: "未选择项目", context: context)
+              );
+            },
+          );
         } else {
-          return AnimatedSwitcher(
-            switchOutCurve: Curves.easeOutCubic,
-            switchInCurve: Curves.easeOutCubic,
-            duration: Duration(milliseconds: 200),
-            child: _buildPage(_selectedTag!, true),
+          // 选择了设置项时
+          return Navigator(
+            key: _homePageRightNavigatorKey,
+            onGenerateRoute: (_) {
+              return MaterialPageRoute(
+                builder: (context) => _buildPage(_selectedTag!, true, null),
+              );
+            },
           );
         }
       },

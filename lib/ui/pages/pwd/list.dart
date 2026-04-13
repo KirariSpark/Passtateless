@@ -92,10 +92,10 @@ class PwdListPage extends StatelessWidget {
       ),
       floatingActionButton: PopupMenuButton(
         popUpAnimationStyle: AnimationStyle(
-            curve: Curves.easeInOut,
-            duration: Duration(milliseconds: 300),
-            reverseCurve: Curves.easeInOut,
-            reverseDuration: Duration(milliseconds: 300)
+          curve: Curves.easeInOut,
+          duration: Duration(milliseconds: 300),
+          reverseCurve: Curves.easeInOut,
+          reverseDuration: Duration(milliseconds: 300)
         ),
         tooltip: "更多功能",
         iconSize: 30,
@@ -121,7 +121,7 @@ class PwdListPage extends StatelessWidget {
               onTap: () async {
                 ui.showSnackBarQuick("正在保存", context);
                 var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                    Provider.of<AppProvider>(context, listen: false).masterPwd
+                  Provider.of<AppProvider>(context, listen: false).masterPwd
                 );
                 if (context.mounted) {
                   if (stat == ErrorCode.success) {

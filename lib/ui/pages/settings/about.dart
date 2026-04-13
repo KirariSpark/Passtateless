@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class AboutPage extends StatelessWidget {
@@ -10,8 +11,8 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: styled.buildAppBar(title: "关于", context: context, titleTag: useHero ? "about" : null),
-      body: SingleChildScrollView(
-        child: Center(
+      body: Center(
+        child: SingleChildScrollView(
           child: Container(
             padding: styles.uniInsetsSmall,
             constraints: styles.pageWidthConstraint,
@@ -31,9 +32,24 @@ class AboutPage extends StatelessWidget {
                 Text("0.0.10 - alpha"),
                 styles.spacingSizedBox,
                 TextButton(
-                  onPressed: (){},
+                  onPressed: () {
+                    ui.showAlertDialogQuick(
+                      title: "Passtateless",
+                      content: Text("Passtateless 是一个无状态密码管理器\n使用 Apache 2.0 许可证"),
+                      action: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
+                      actionText: "确定",
+                      action2: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                        showLicensePage(context: context);
+                      },
+                      action2Text: "许可证",
+                      context: context
+                    );
+                  },
                   style: styles.buttonStyle,
-                  child: Text("开源许可证")
+                  child: Text("详情")
                 )
               ],
             ),

@@ -105,14 +105,14 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                           title: "重命名：$displayTitle", content: styled.buildTextField(
                             context: context, controller: folderName, label: "新名称"
                           ),
-                          action: () => Navigator.pop(context),
+                          action: () => Navigator.of(context, rootNavigator: true).pop(),
                           actionText: "取消",
                           action2: () {
                             var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
                               folders[index], folderName.text
                             );
                             if (res == ErrorCode.success) {
-                              Navigator.pop(context);
+                              Navigator.of(context, rootNavigator: true).pop();
                             } else {
                               ui.showSnackBarQuick(res.generic, context);
                             }
@@ -184,12 +184,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                     label: "文件夹名", controller: folderName,
                     context: context
                   ),
-                  action: () => Navigator.pop(context),
+                  action: () => Navigator.of(context, rootNavigator: true).pop(),
                   actionText: "取消",
                   action2: () {
                     var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
                     if (stat == ErrorCode.success) {
-                      Navigator.pop(context);
+                      Navigator.of(context, rootNavigator: true).pop();
                       ui.showSnackBarQuick("文件夹已建立", context);
                     } else {
                       ui.showSnackBarQuick(stat.generic, context);

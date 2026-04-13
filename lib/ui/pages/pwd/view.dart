@@ -234,7 +234,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             groupValue: _preset,
                             onChanged: (value){
                               setState(() {_preset = value ?? Presets.simple;});
-                              Navigator.pop(context);
+                              Navigator.of(context, rootNavigator: true).pop();
                             },
                             child: Column(
                               children: [
@@ -266,7 +266,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             )
                           ),
                           actionText: "取消",
-                          action: (){Navigator.pop(context);},
+                          action: (){Navigator.of(context, rootNavigator: true).pop();},
                           context: context
                         );
                       },
@@ -285,7 +285,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               ui.showConfirmDialogQuick(
                                 context: context,
                                 function: () async {
-                                  Navigator.pop(context);
+                                  Navigator.of(context, rootNavigator: true).pop();
                                   var temp = await genPwd(
                                     context, false, pwdRecord["identifier"],
                                     pwdRecord["userName"], pwdRecord["account"]

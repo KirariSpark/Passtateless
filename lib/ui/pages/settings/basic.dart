@@ -18,7 +18,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   String? _selectedTag; // 仅用于控制左侧列表的高亮状态
 
   // 右侧栏专属的 Navigator Key
-  final GlobalKey<NavigatorState> _rightNavigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _settingsRightNavigatorKey = GlobalKey<NavigatorState>();
 
   // 设置项列表
   final List<_SettingItem> _settingItems = const [
@@ -51,13 +51,9 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       setState(() {
         _selectedTag = item.tag;
       });
-    }
-
-    if (isWide) {
       // 宽屏：在右侧嵌套 Navigator 中清空栈并推入新页面
-      // 这样无论右侧处于什么层级，点击左侧菜单都能完美“重置”为新的设置页
-      _rightNavigatorKey.currentState?.pushAndRemoveUntil(
-        _FadeRoute(builder: (_) => _buildPage(item.tag, isWide)), (route) => false
+      _settingsRightNavigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => _buildPage(item.tag, isWide)), (route) => false
       );
     } else {
       // 窄屏：常规的根 Navigator 跳转
@@ -113,10 +109,10 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         } else {
           // 使用嵌套 Navigator - 用于让右侧内容不要把整个页面都跳转掉
           return Navigator(
-            key: _rightNavigatorKey,
+            key: _settingsRightNavigatorKey,
             // 初始路由显示占位符
-            onGenerateRoute: (settings) {
-              return _FadeRoute(
+            onGenerateRoute: (_) {
+              return MaterialPageRoute(
                 builder: (context) => styled.buildPlaceHolder(text: "未选择设置项", context: context),
               );
             },
@@ -168,21 +164,6 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       },
     );
   }
-}
-
-// 淡入淡出路由
-class _FadeRoute extends PageRouteBuilder {
-  _FadeRoute({required WidgetBuilder builder}) : super(
-    pageBuilder: (context, animation, secondaryAnimation) => builder(context),
-    transitionDuration: const Duration(milliseconds: 200),
-    reverseTransitionDuration: const Duration(milliseconds: 200),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(
-        opacity: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-        child: child,
-      );
-    },
-  );
 }
 
 // 设置项数据类

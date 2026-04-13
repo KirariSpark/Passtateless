@@ -30,6 +30,9 @@ class PwdTile extends StatelessWidget {
   /// 背景的透明度
   final int? alpha;
 
+  /// 是否使用 Hero 动画
+  final bool useHero;
+
   /// 用于显示密码的改版ListTile
   const PwdTile({
     super.key,
@@ -41,6 +44,7 @@ class PwdTile extends StatelessWidget {
     this.isFirst = false,
     this.isLast = false,
     this.isActive = false,
+    this.useHero = true,
     this.alpha,
   }) : _onStarPressed = onStarPressed,
        _onEditPressed = onEditPressed,
@@ -79,7 +83,7 @@ class PwdTile extends StatelessWidget {
       constraints: styles.tileWidthConstraint,
       child: styled.buildListTile(
         title: pwdRecord["identifier"] == "" ? "未命名" : pwdRecord["identifier"],
-        titleTag: pwdRecord["id"],
+        titleTag: useHero ? pwdRecord["id"] : null,
         subtitle: subtitleText,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
