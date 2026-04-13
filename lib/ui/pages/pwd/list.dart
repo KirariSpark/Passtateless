@@ -36,22 +36,18 @@ class PwdListPage extends StatelessWidget {
     } else {
       List<Widget> temp = [];
       // 构建列表
-      for (var(index, item) in pwdList.indexed) {
+      for (final item in pwdList) {
         temp.add(
           PwdTile(
-            pwdRecord: pwdList[index],
+            pwdRecord: item,
             isFirst: true,
             isLast: true,
             alpha: styles.alphaAlmostTransparent,
             onStarPressed: (){
-              Provider.of<PwdProvider>(context, listen: false).switchStarState(
-                PwdLocation(folder: folder, index: index)
-              );
+              Provider.of<PwdProvider>(context, listen: false).switchStarStateById(item["id"]);
             },
             onEditPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(
-                location: PwdLocation(folder: folder, index: index)))
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: item["id"])));
             },
             onTapped: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(id: item["id"])));
@@ -142,13 +138,8 @@ class PwdListPage extends StatelessWidget {
                 ],
               ),
               onTap: (){
-                Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PwdEditPage(location: PwdLocation(folder: folder, index: pwdList.length - 1))
-                  )
-                );
+                final newId = Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId)));
               },
             )
           ];

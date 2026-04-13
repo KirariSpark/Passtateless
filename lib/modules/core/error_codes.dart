@@ -13,7 +13,9 @@ enum ErrorCode {
   emptyFolderName(11, "不能输入空名称"),
   wrongConfirmPwd(12, "新密码与确认密码不符"),
   wrongPwd(13, "密码错误"),
-  emptyPwd(14, "密码为空");
+  emptyPwd(14, "密码为空"),
+  noSuchId(15, "无效 ID", "无效 ID：{item}"),
+  noSuchLoc(16, "无效位置");
 
   final int code;
   final String _messageTemplate;
