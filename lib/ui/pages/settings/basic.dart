@@ -109,6 +109,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         } else {
           // 使用嵌套 Navigator - 用于让右侧内容不要把整个页面都跳转掉
           return Navigator(
+            observers: [HeroController()],
             key: _settingsRightNavigatorKey,
             // 初始路由显示占位符
             onGenerateRoute: (_) {

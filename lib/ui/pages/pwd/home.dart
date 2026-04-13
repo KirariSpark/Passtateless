@@ -165,6 +165,7 @@ class _HomePageState extends State<HomePage> {
           // 选择了密码项时，显示密码详情页
           // 通过 ID 从 Provider 获取密码记录
           return Navigator(
+            observers: [HeroController()],
             key: _homePageRightNavigatorKey,
             onGenerateRoute: (RouteSettings settings) {
               return MaterialPageRoute(
@@ -175,6 +176,7 @@ class _HomePageState extends State<HomePage> {
         } else if (_selectedTag == null) {
           // 没有选择设置项
           return Navigator(
+            observers: [HeroController()],
             key: _homePageRightNavigatorKey,
             onGenerateRoute: (_) {
               return MaterialPageRoute(
@@ -185,6 +187,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           // 选择了设置项时
           return Navigator(
+            observers: [HeroController()],
             key: _homePageRightNavigatorKey,
             onGenerateRoute: (_) {
               return MaterialPageRoute(

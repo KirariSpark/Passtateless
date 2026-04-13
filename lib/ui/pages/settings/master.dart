@@ -33,6 +33,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                     leading: Icons.edit_outlined,
                     trailing: Icon(Icons.arrow_forward),
                     title: "更改主密码",
+                    titleTag: "pages/settings/change_master",
                     onTapped: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => MasterPwdPage()));
                     },
@@ -54,7 +55,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                         content: Column(
                           spacing: styles.layoutSpacing,
                           children: <Widget>[
-                            Text("定期提醒您更改主密码\n此行为可以增强你的档案的安全性\n也能降低数据泄漏的风险"),
+                            Text("你的主密码会在设置的天数后失效，并需要重新设置\n此行为可以增强你的档案的安全性，也能降低数据泄漏的风险"),
                             RadioGroup(
                               groupValue: appProvider.remindMe,
                               onChanged: (value) {

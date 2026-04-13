@@ -27,6 +27,7 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
       key: ValueKey("change_master"),
       appBar: styled.buildAppBar(
         title: "更改主密码",
+        titleTag: "pages/settings/change_master",
         exitIcon: Icons.close,
         context: context
       ),
