@@ -3,6 +3,7 @@ import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/widgets/stars.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -14,13 +15,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // (命名空间, 值) 的 Record
-  (String, String)? _selectedTag;
+  (String, String)? _localSelectedTag;
 
-  // 右侧栏专属的 Navigator Key
-  final GlobalKey<NavigatorState> _homePageRightNavigatorKey = GlobalKey<NavigatorState>();
-
-  // 构建右侧页面
+  // 构建右侧页面（直接作为 AdaptiveView 的 pageBuilder）
   Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("pages", "folders"):
@@ -31,20 +28,6 @@ class _HomePageState extends State<HomePage> {
         return PwdViewPage(key: ValueKey(id), id: id);
       default:
         return styled.buildPlaceHolder(text: "无效选择", context: context);
-    }
-  }
-
-  // 统一的点击处理逻辑
-  void _onItemTapped((String, String) tag, bool isWide) {
-    if (isWide) {
-      setState(() {
-        _selectedTag = tag;
-      });
-      _homePageRightNavigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)), (route) => false,
-      );
-    } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)));
     }
   }
 
@@ -59,10 +42,12 @@ class _HomePageState extends State<HomePage> {
     required bool isLast,
     required bool isWide,
     required BuildContext context,
+    required void Function((String, String)) onTapped,
+    required bool Function((String, String)) isSelectedCallback,
   }) {
-    final isSelected = _selectedTag == tag && isWide;
+    // 使用 AdaptiveView 传递过来的 isSelected 判断方法
+    final isSelected = isSelectedCallback(tag);
     final alpha = isSelected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
-
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 100),
       switchOutCurve: Curves.easeOutCubic,
@@ -77,7 +62,12 @@ class _HomePageState extends State<HomePage> {
           subtitle: subtitle,
           leading: leading,
           trailing: const Icon(Icons.arrow_forward),
-          onTapped: () => _onItemTapped(tag, isWide),
+          onTapped: () {
+            setState(() {
+              _localSelectedTag = tag;
+            });
+            onTapped(tag);
+          },
           isFirst: isFirst,
           isLast: isLast,
           context: context,
@@ -86,8 +76,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 构建左侧部分
-  Widget _buildLeftContent(BuildContext context, bool isWide) {
+  // 构建左侧面板
+  Widget _buildLeftContent(
+      BuildContext context,
+      bool isWide,
+      void Function((String, String) tag) onItemTapped,
+      bool Function((String, String) tag) isSelected,
+      ) {
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
       child: Column(
@@ -107,6 +102,8 @@ class _HomePageState extends State<HomePage> {
                 isLast: false,
                 isWide: isWide,
                 context: context,
+                onTapped: onItemTapped,
+                isSelectedCallback: isSelected,
               ),
               _buildTile(
                 tag: ("pages", "pwdEval"),
@@ -118,6 +115,8 @@ class _HomePageState extends State<HomePage> {
                 isLast: true,
                 isWide: isWide,
                 context: context,
+                onTapped: onItemTapped,
+                isSelectedCallback: isSelected,
               ),
             ],
           ),
@@ -126,91 +125,29 @@ class _HomePageState extends State<HomePage> {
             child: StarredPasswords(
               hasConstraint: false,
               isWide: isWide,
-              onItemTapped: (id) => _onItemTapped(("pwd", id), isWide),
-              // 命名空间是pwd时才提供
-              selectedId: _selectedTag?.$1 == "pwd" && isWide ? _selectedTag?.$2 : null,
+              onItemTapped: (id) {
+                setState(() {
+                  _localSelectedTag = ("pwd", id);
+                });
+                onItemTapped(("pwd", id));
+              },
+              selectedId: _localSelectedTag?.$1 == "pwd" && isWide ? _localSelectedTag?.$2 : null,
             ),
           ),
         ],
       ),
-    );
-  }
-
-  // 构建第二栏(右侧)内容
-  Widget _buildRightContent(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 200) {
-          // 页面过窄时，什么都不显示
-          return styled.buildPlaceHolder(text: '', context: context);
-        } else if (_selectedTag != null) {
-          // 有选中项时显示对应页面
-          return Navigator(
-            observers: [HeroController()],
-            key: _homePageRightNavigatorKey,
-            onGenerateRoute: (_) {
-              return MaterialPageRoute(
-                builder: (context) => _buildPage(_selectedTag!, true),
-              );
-            },
-          );
-        } else {
-          // 没有选择任何项目
-          return Navigator(
-            observers: [HeroController()],
-            key: _homePageRightNavigatorKey,
-            onGenerateRoute: (_) {
-              return MaterialPageRoute(
-                builder: (context) => styled.buildPlaceHolder(text: "未选择项目", context: context),
-              );
-            },
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildWideLayout(BuildContext context) {
-    return Container(
-      key: const ValueKey('wide-home'),
-      padding: styles.pagePaddingAll,
-      child: Row(
-        spacing: styles.layoutSpacing,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLeftContent(context, true),
-          const VerticalDivider(width: 1, thickness: 1),
-          Expanded(
-            child: Container(
-              constraints: styles.tileWidthConstraint,
-              child: _buildRightContent(context),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNarrowLayout(BuildContext context) {
-    return Container(
-      padding: styles.pagePaddingAll,
-      alignment: Alignment.topCenter,
-      key: const ValueKey('narrow-home'),
-      child: _buildLeftContent(context, false),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        // 判断是否满足双栏布局条件
-        final bool isWide = constraints.maxWidth > (styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing);
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 100),
-          child: isWide ? _buildWideLayout(context) : _buildNarrowLayout(context),
-        );
+    return AdaptiveView(
+      leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
+        return _buildLeftContent(context, isWide, onItemTapped, isSelected);
       },
+      pageBuilder: _buildPage,
+      placeholderText: "未选择项目",
+      rightPaneConstraints: styles.tileWidthConstraint,
     );
   }
 }
