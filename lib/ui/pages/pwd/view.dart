@@ -4,6 +4,7 @@ import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:provider/provider.dart';
+import 'dart:convert';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
@@ -78,16 +79,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
     }
   }
 
-  /// 生成密码并显示提示
+  /// 生成密码并显示提示（返回生成的密码或错误信息）
   Future<String> genPwd(BuildContext context, bool copy, String identifier, String userName, String account) async {
     setState(() {isGenerating = true;});
-    if (<Presets>[
-      Presets.simple, Presets.complex, Presets.bank
-    ].contains(_preset)) {
-      var res = await parser.parseBuiltins(
-        _preset,"$identifier: $userName @ $account",
-        removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
-      );
+    // 生成后的处理
+    String postProcess((ErrorCode, String) res) {
       if (res.$1 == ErrorCode.success) {
         if (copy) {
           Clipboard.setData(ClipboardData(text: res.$2));
@@ -102,8 +98,21 @@ class _PwdViewPageState extends State<PwdViewPage> {
         }
         return res.$1.generic;
       }
+    }
+    // 实际生成
+    if (<Presets>[Presets.simple, Presets.complex, Presets.bank].contains(_preset)) {
+      // 使用预设
+      final res = await parser.parseBuiltins(
+        _preset, "$identifier: $userName @ $account",
+        removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
+      );
+      return postProcess(res);
     } else {
-      return "Coming S∞n";
+      final res = await parser.parse(
+        jsonDecode(_configController.text), "$identifier: $userName @ $account",
+        removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
+      );
+      return postProcess(res);
     }
   }
 
@@ -310,7 +319,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             onPressed: isGenerating ? null : () async {
                               // 开始生成
                               await genPwd(
-                                context, false, pwdRecord["identifier"],
+                                context, true, pwdRecord["identifier"],
                                 pwdRecord["userName"], pwdRecord["account"]
                               );
                               // 启用按钮

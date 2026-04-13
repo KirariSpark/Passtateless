@@ -21,7 +21,7 @@ dynamic _resolveArgVariable(dynamic arg, Generator generator) {
 
 /// 运行输入的列表定义的生成操作
 Future<(ErrorCode, String)> parse(
-  List<Map<String, dynamic>> commands,
+  List<dynamic> commands,
   String input,{
     bool removeDigits = false,
     bool removeAlpha = false,
