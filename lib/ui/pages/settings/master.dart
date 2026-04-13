@@ -63,26 +63,11 @@ class MasterPwdSettingsPage extends StatelessWidget {
                               },
                               child: Column(
                                 children: <Widget>[
-                                  RadioListTile(
-                                    value: RemindDays.days60,
-                                    title: Text(RemindDays.days60.displayName),
+                                  for (var item in RemindDays.values) RadioListTile(
+                                    value: item,
+                                    title: Text(item.displayName),
                                     shape: styles.roundedBorder,
-                                  ),
-                                  RadioListTile(
-                                    value: RemindDays.days90,
-                                    title: Text(RemindDays.days90.displayName),
-                                    shape: styles.roundedBorder,
-                                  ),
-                                  RadioListTile(
-                                    value: RemindDays.days180,
-                                    title: Text(RemindDays.days180.displayName),
-                                    shape: styles.roundedBorder,
-                                  ),
-                                  RadioListTile(
-                                    value: RemindDays.never,
-                                    title: Text(RemindDays.never.displayName),
-                                    shape: styles.roundedBorder,
-                                  ),
+                                  )
                                 ],
                               ),
                             ),

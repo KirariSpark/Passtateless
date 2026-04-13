@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/app.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
@@ -24,7 +24,10 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     final pwdProvider = context.watch<PwdProvider>();
+    Provider.of<AppProvider>(context, listen: false).readConfig();
+
     if (isDecrypting) {
+      // 正在解密
       btnChild = Row(
         spacing: styles.layoutSpacing,
         mainAxisSize: MainAxisSize.min,

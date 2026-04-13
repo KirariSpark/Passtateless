@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:provider/provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -24,9 +26,13 @@ class CustomizeSettingsPage extends StatelessWidget {
             child: Column(
               children: [
                 RadioGroup(
-                  groupValue: appProvider.color,
-                  onChanged: (value) {
-                    Provider.of<AppProvider>(context, listen: false).color = value ?? Colors.blueGrey;
+                  groupValue: appProvider.currentColor,
+                  onChanged: (value) async {
+                    Provider.of<AppProvider>(context, listen: false).color = value ?? AvailableColors.teal;
+                    var res = await Provider.of<AppProvider>(context, listen: false).saveConfig();
+                    if (res != ErrorCode.success && context.mounted) {
+                      ui.showSnackBarQuick(res.generic, context);
+                    }
                   },
                   child: Wrap(
                     runSpacing: styles.layoutSpacing,
@@ -35,30 +41,12 @@ class CustomizeSettingsPage extends StatelessWidget {
                       for (var item in AvailableColors.values) ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: 130),
                         child: RadioListTile(
-                          value: item.color,
+                          value: item,
                           shape: styles.roundedBorder,
-                          title: Text(item.name),
+                          title: Text(item.displayName),
                           tileColor: item.color.withAlpha(styles.alphaAlmostTransparent),
                         ),
                       ),
-                      // Container(
-                      //   decoration: BoxDecoration(
-                      //     gradient: LinearGradient(
-                      //       colors: [
-                      //         Colors.blueAccent.withAlpha(styles.alphaAlmostTransparent),
-                      //         Colors.teal.withAlpha(styles.alphaAlmostTransparent),
-                      //         Colors.amberAccent.withAlpha(styles.alphaAlmostTransparent)
-                      //       ]
-                      //     ),
-                      //     borderRadius: styles.borderRadius
-                      //   ),
-                      //   constraints: BoxConstraints(maxWidth: 130),
-                      //   child: RadioListTile(
-                      //     value: Colors.brown,
-                      //     shape: styles.roundedBorder,
-                      //     title: Text("莫奈")
-                      //   ),
-                      // )
                     ],
                   )
                 ),

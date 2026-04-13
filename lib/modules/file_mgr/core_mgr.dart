@@ -43,7 +43,7 @@ Future<(ErrorCode, String res)> readTextFile(String relativePath) async {
 ///
 /// [relativePath]要写入的文件相对于缓存路径的相对路径
 /// [content]要写入的内容
-Future<(ErrorCode, String errors)> writeTextFile(String relativePath, String content) async {
+Future<ErrorCode> writeTextFile(String relativePath, String content) async {
   try {
     final baseDir = await _getCacheDirectory();
     final filePath = '${baseDir.path}/$relativePath';
@@ -54,28 +54,28 @@ Future<(ErrorCode, String errors)> writeTextFile(String relativePath, String con
       await dir.create(recursive: true);
     }
     await file.writeAsString(content);
-    return (ErrorCode.success, "");
+    return (ErrorCode.success);
   } catch (e) {
-    return (ErrorCode.unknown, e.toString());
+    return (ErrorCode.unknown);
   }
 }
 
 /// 删除文件
 ///
 /// [relativePath]要删除的文件相对于缓存路径的相对路径
-Future<(ErrorCode, String errors)> deleteFile(String relativePath) async {
+Future<ErrorCode> deleteFile(String relativePath) async {
   try {
     final baseDir = await _getCacheDirectory();
     final filePath = '${baseDir.path}/$relativePath';
     final file = File(filePath);
     if (await file.exists()) {
       await file.delete();
-      return (ErrorCode.success, "删除成功");
+      return (ErrorCode.success);
     } else {
-      return (ErrorCode.fileNotExist, "目标文件不存在");
+      return (ErrorCode.fileNotExist);
     }
   } catch (e) {
-    return (ErrorCode.unknown, e.toString());
+    return (ErrorCode.unknown);
   }
 }
 
@@ -103,7 +103,7 @@ Future<(ErrorCode, String res)> readEncryptedTextFile(String relativePath, Strin
 ///
 /// [relativePath]要写入的文件相对于缓存路径的相对路径
 /// [content]要写入的明文内容
-Future<(ErrorCode, String errors)> writeEncryptedTextFile(String relativePath, String content, String key) async {
+Future<ErrorCode> writeEncryptedTextFile(String relativePath, String content, String key) async {
   try {
     // 使用AES256加密
     final encrypted = await Aes256.encrypt(text: content, passphrase: key);
@@ -112,7 +112,7 @@ Future<(ErrorCode, String errors)> writeEncryptedTextFile(String relativePath, S
     final res = await writeTextFile(relativePath, encrypted);
     return res;
   } catch (e) {
-    return (ErrorCode.unknown, e.toString());
+    return (ErrorCode.unknown);
   }
 }
 
@@ -120,15 +120,62 @@ Future<(ErrorCode, String errors)> writeEncryptedTextFile(String relativePath, S
 ///
 /// [relativePath]要删除的文件相对于缓存路径的相对路径
 /// [key]用于解密验证的密钥
-Future<(ErrorCode, String errors)> deleteEncryptedTextFile(String relativePath, String key) async {
+Future<ErrorCode> deleteEncryptedTextFile(String relativePath, String key) async {
   // 尝试读取并解密文件，验证是否能够成功解密
   final (readErrorCode, _) = await readEncryptedTextFile(relativePath, key);
 
   if (readErrorCode != ErrorCode.success) {
     // 无法解密或文件不存在，拒绝删除并报错
-    return (readErrorCode, "解密验证失败，拒绝删除文件");
+    return (readErrorCode);
   }
 
   // 解密成功，执行真正的删除操作
   return await deleteFile(relativePath);
+}
+
+/// 创建用于标记时间的空文件
+///
+/// [relativePath]要创建的文件相对于缓存路径的相对路径
+Future<ErrorCode> writeLabelFile(String relativePath) async {
+  try {
+    final baseDir = await _getCacheDirectory();
+    final filePath = '${baseDir.path}/$relativePath';
+    final file = File(filePath);
+
+    // 确保目录存在
+    final dir = file.parent;
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+
+    // 标记时间
+    if (!await file.exists()) {
+      await file.writeAsString("");
+    }
+
+    return ErrorCode.success;
+  } catch (e) {
+    return ErrorCode.unknown;
+  }
+}
+
+/// 读取用于标记时间的空文件的修改时间
+///
+/// [relativePath]要读取的文件相对于缓存路径的相对路径
+Future<(ErrorCode, DateTime?)> readLabelFile(String relativePath) async {
+  try {
+    final baseDir = await _getCacheDirectory();
+    final filePath = '${baseDir.path}/$relativePath';
+    final file = File(filePath);
+
+    if (await file.exists()) {
+      // 读取文件的最后修改时间作为标记时间
+      var res = await file.lastModified();
+      return (ErrorCode.success, res);
+    } else {
+      return (ErrorCode.fileNotExist, null);
+    }
+  } catch (e) {
+    return (ErrorCode.unknown, null);
+  }
 }

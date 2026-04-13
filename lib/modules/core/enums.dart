@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 enum Paths {
-  pwdRecord("saved_pwds.bin");
+  pwdRecord("saved_pwds.bin"),
+  config("config.json");
 
   final String path;
-
   const Paths(this.path);
 
   @override
@@ -24,10 +24,11 @@ enum Presets {
 }
 
 enum RemindDays {
+  debugAlways('0', "(Debug) 总是"),
   days60('60', '60天'),
   days90('90', '90天'),
   days180('180', '180天'),
-  never('0', '关闭');
+  never('-1', '从不');
 
   final String value;
   final String displayName;
@@ -45,6 +46,6 @@ enum AvailableColors {
   red(Colors.red, "红色");
 
   final MaterialColor color;
-  final String name;
-  const AvailableColors(this.color, this.name);
+  final String displayName;
+  const AvailableColors(this.color, this.displayName);
 }

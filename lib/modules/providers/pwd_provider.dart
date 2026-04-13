@@ -215,8 +215,8 @@ class PwdProvider extends ChangeNotifier {
 
   /// 保存当前数据到加密的归档文件
   Future<ErrorCode> saveArchive(String masterPwd) async {
-    final (errorCode, _) = await writeEncryptedJsonFile(enums.Paths.pwdRecord.path, _pwdMap, masterPwd);
-    return errorCode;
+    final stat = await writeEncryptedJsonFile(enums.Paths.pwdRecord.path, _pwdMap, masterPwd);
+    return stat;
   }
 
   /// 更改主密码

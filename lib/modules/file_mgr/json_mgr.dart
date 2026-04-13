@@ -28,17 +28,17 @@ Future<(ErrorCode, dynamic res)> readJsonFile(String relativePath) async {
 ///
 /// [relativePath]要写入的文件相对于缓存路径的相对路径
 /// [content]要写入的内容（List 或 Map）
-Future<(ErrorCode, String errors)> writeJsonFile(String relativePath, dynamic content) async {
+Future<ErrorCode> writeJsonFile(String relativePath, dynamic content) async {
   try {
     if (content is List || content is Map) {
       // 将 List 或 Map 编码为 JSON 字符串
       final jsonString = jsonEncode(content);
       return await core.writeTextFile(relativePath, jsonString);
     } else {
-      return (ErrorCode.jsonFormatError, "");
+      return (ErrorCode.jsonFormatError);
     }
   } catch (e) {
-    return (ErrorCode.unknown, e.toString());
+    return (ErrorCode.unknown);
   }
 }
 
@@ -72,7 +72,7 @@ Future<(ErrorCode, dynamic res)> readEncryptedJsonFile(String relativePath, Stri
 /// [relativePath]要写入的文件相对于缓存路径的相对路径
 /// [content]要写入的内容（List 或 Map）
 /// [key]用于加密的密钥（支持任意长度，内部自动哈希为符合要求的32字节）
-Future<(ErrorCode, String errors)> writeEncryptedJsonFile(String relativePath, dynamic content, String key) async {
+Future<ErrorCode> writeEncryptedJsonFile(String relativePath, dynamic content, String key) async {
   try {
     if (content is List || content is Map) {
       final jsonString = jsonEncode(content);
@@ -80,9 +80,9 @@ Future<(ErrorCode, String errors)> writeEncryptedJsonFile(String relativePath, d
       // 封装底层 core 的加密文本写入
       return await core.writeEncryptedTextFile(relativePath, jsonString, key);
     } else {
-      return (ErrorCode.jsonFormatError, "");
+      return (ErrorCode.jsonFormatError);
     }
   } catch (e) {
-    return (ErrorCode.unknown, e.toString());
+    return (ErrorCode.unknown);
   }
 }
