@@ -25,7 +25,7 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     final pwdProvider = context.watch<PwdProvider>();
     Provider.of<AppProvider>(context, listen: false).readConfig();
-
+    
     if (isDecrypting) {
       // 正在解密
       btnChild = Row(

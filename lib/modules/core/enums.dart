@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 enum Paths {
   pwdRecord("saved_pwds.bin"),
-  config("config.json");
+  config("config.json"),
+  masterPwdLabel("masterPwdChanged.txt");
 
   final String path;
   const Paths(this.path);
@@ -24,13 +25,13 @@ enum Presets {
 }
 
 enum RemindDays {
-  debugAlways('0', "(Debug) 总是"),
-  days60('60', '60天'),
-  days90('90', '90天'),
-  days180('180', '180天'),
-  never('-1', '从不');
+  debugAlways(Duration(milliseconds: 0), "(Debug) 总是"),
+  days60(Duration(days: 60), '60天'),
+  days90(Duration(days: 90), '90天'),
+  days180(Duration(days: 180), '180天'),
+  never(Duration(days: 0), '从不');
 
-  final String value;
+  final Duration value;
   final String displayName;
   const RemindDays(this.value, this.displayName);
 }

@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:passtateless/modules/core/error_codes.dart';
-import 'package:passtateless/modules/file_mgr/core_mgr.dart' as core;
+import 'package:passtateless/modules/file_mgr/core_mgr.dart' as core_mgr;
 
 /// 读取JSON文件内容
 ///
 /// [relativePath]要读取的文件相对于缓存路径的相对路径
 /// 返回 错误码和结果（解析后的 List 或 Map）
 Future<(ErrorCode, dynamic res)> readJsonFile(String relativePath) async {
-  final (errorCode, textContent) = await core.readTextFile(relativePath);
+  final (errorCode, textContent) = await core_mgr.readTextFile(relativePath);
   if (errorCode != ErrorCode.success) {
     return (errorCode, null);
   }
@@ -33,7 +33,7 @@ Future<ErrorCode> writeJsonFile(String relativePath, dynamic content) async {
     if (content is List || content is Map) {
       // 将 List 或 Map 编码为 JSON 字符串
       final jsonString = jsonEncode(content);
-      return await core.writeTextFile(relativePath, jsonString);
+      return await core_mgr.writeTextFile(relativePath, jsonString);
     } else {
       return (ErrorCode.jsonFormatError);
     }
@@ -49,7 +49,7 @@ Future<ErrorCode> writeJsonFile(String relativePath, dynamic content) async {
 /// 返回 错误码和结果（解析后的 List 或 Map）
 Future<(ErrorCode, dynamic res)> readEncryptedJsonFile(String relativePath, String key) async {
   // 封装底层 core 的加密文本读取
-  final (errorCode, textContent) = await core.readEncryptedTextFile(relativePath, key);
+  final (errorCode, textContent) = await core_mgr.readEncryptedTextFile(relativePath, key);
 
   if (errorCode != ErrorCode.success) {
     return (errorCode, null);
@@ -78,7 +78,7 @@ Future<ErrorCode> writeEncryptedJsonFile(String relativePath, dynamic content, S
       final jsonString = jsonEncode(content);
 
       // 封装底层 core 的加密文本写入
-      return await core.writeEncryptedTextFile(relativePath, jsonString, key);
+      return await core_mgr.writeEncryptedTextFile(relativePath, jsonString, key);
     } else {
       return (ErrorCode.jsonFormatError);
     }
