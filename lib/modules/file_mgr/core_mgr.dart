@@ -162,7 +162,8 @@ Future<ErrorCode> writeLabelFile(String relativePath) async {
 /// 读取用于标记时间的空文件的修改时间
 ///
 /// [relativePath]要读取的文件相对于缓存路径的相对路径
-Future<(ErrorCode, DateTime?)> readLabelFile(String relativePath) async {
+/// [autoCreate] 在标记文件不存在时，自动创建对应文件
+Future<(ErrorCode, DateTime?)> readLabelFile(String relativePath, {bool autoCreate = false}) async {
   try {
     final baseDir = await _getCacheDirectory();
     final filePath = '${baseDir.path}/$relativePath';
@@ -170,10 +171,16 @@ Future<(ErrorCode, DateTime?)> readLabelFile(String relativePath) async {
 
     if (await file.exists()) {
       // 读取文件的最后修改时间作为标记时间
-      var res = await file.lastModified();
+      final res = await file.lastModified();
       return (ErrorCode.success, res);
     } else {
-      return (ErrorCode.fileNotExist, null);
+      // 文件不存在时，检查是否允许自动创建
+      if (autoCreate) {
+        final stat = await writeLabelFile(relativePath);
+        return (stat, DateTime.now());
+      } else {
+        return (ErrorCode.fileNotExist, null);
+      }
     }
   } catch (e) {
     return (ErrorCode.unknown, null);

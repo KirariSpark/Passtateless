@@ -101,7 +101,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   Future<(ErrorCode, DateTime)> masterLastChanged() async {
-    final res = await core_mgr.readLabelFile(Paths.masterPwdLabel.path);
+    final res = await core_mgr.readLabelFile(Paths.masterPwdLabel.path, autoCreate: true);
     if (res.$1 == ErrorCode.success) {
       return (ErrorCode.success, res.$2!);
     } else {

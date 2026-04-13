@@ -3,6 +3,7 @@ import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/help/overview.dart';
 import 'package:passtateless/ui/pages/pwd/home.dart';
 import 'package:passtateless/ui/pages/settings/basic.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui ;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:provider/provider.dart';
 
@@ -15,6 +16,25 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   Axis? _lastScrollDirection;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appProvider = Provider.of<AppProvider>(context, listen: false);
+      if (appProvider.needChangeMaster) {
+        ui.showAlertDialogQuick(
+          title: "主密码过期",
+          content: Text("您的密码已超过设定的安全使用期限，为了您的信息安全，建议尽快更改主密码"),
+          action: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+          actionText: "确定",
+          context: context
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -29,7 +29,7 @@ enum RemindDays {
   days60(Duration(days: 60), '60天'),
   days90(Duration(days: 90), '90天'),
   days180(Duration(days: 180), '180天'),
-  never(Duration(days: 0), '从不');
+  never(Duration(days: 2147483647), '从不');
 
   final Duration value;
   final String displayName;
