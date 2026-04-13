@@ -14,59 +14,43 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? _selectedTag;
-  String? _selectedPwdId;
+  // (命名空间, 值) 的 Record
+  (String, String)? _selectedTag;
 
   // 右侧栏专属的 Navigator Key
   final GlobalKey<NavigatorState> _homePageRightNavigatorKey = GlobalKey<NavigatorState>();
 
-  // 构建右侧页面（将tag设为pwd以使id起作用，此时id一定不能为空）
-  Widget _buildPage(String tag, bool isWide, String? id) {
+  // 构建右侧页面
+  Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
-      case "folders":
-        return PwdFolderPage(key: ValueKey(tag), useHero: !isWide);
-      case "pwdEval":
-        return PwdEvalPage(key: ValueKey(tag), useHero: !isWide);
-      case "pwd":
-        return PwdViewPage(key: ValueKey(_selectedPwdId), id: id!);
+      case ("pages", "folders"):
+        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide);
+      case ("pages", "pwdEval"):
+        return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide);
+      case ("pwd", String id):
+        return PwdViewPage(key: ValueKey(id), id: id);
       default:
         return styled.buildPlaceHolder(text: "无效选择", context: context);
     }
   }
 
-  // 普通项目的点击
-  void _onItemTapped(String tag, bool isWide) {
+  // 统一的点击处理逻辑
+  void _onItemTapped((String, String) tag, bool isWide) {
     if (isWide) {
       setState(() {
         _selectedTag = tag;
-        _selectedPwdId = null; // 切换普通页面时，清空密码详情状态
       });
       _homePageRightNavigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => _buildPage(tag, isWide, null)), (route) => false
+        MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)), (route) => false,
       );
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide, null)));
-    }
-  }
-
-  // 收藏夹项目的点击
-  void _onStarredItemTapped(String id, bool isWide) {
-    if (isWide) {
-      setState(() {
-        _selectedTag = null; // 切换密码详情时，清空普通页面状态
-        _selectedPwdId = id;
-      });
-      _homePageRightNavigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, id)), (route) => false
-      );
-    } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, id)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)));
     }
   }
 
   // 构建单个瓦片
   Widget _buildTile({
-    required String tag,
+    required (String, String) tag,
     required String title,
     required String? titleTag,
     required String subtitle,
@@ -79,7 +63,6 @@ class _HomePageState extends State<HomePage> {
     final isSelected = _selectedTag == tag && isWide;
     final alpha = isSelected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
 
-    // 下方入口部分
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 100),
       switchOutCurve: Curves.easeOutCubic,
@@ -115,7 +98,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildTile(
-                tag: "folders",
+                tag: ("pages", "folders"),
                 title: "资料夹",
                 titleTag: isWide ? null : "folders",
                 subtitle: "查看和修改全部密码资料夹",
@@ -126,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                 context: context,
               ),
               _buildTile(
-                tag: "pwdEval",
+                tag: ("pages", "pwdEval"),
                 title: "密码强度",
                 titleTag: isWide ? null : "pwdEval",
                 subtitle: "评估密码强度，并获取相关建议",
@@ -141,10 +124,11 @@ class _HomePageState extends State<HomePage> {
           // 收藏夹
           Expanded(
             child: StarredPasswords(
-              hasConstraint: false, // 取消固定高度约束，由 Expanded 控制
+              hasConstraint: false,
               isWide: isWide,
-              onItemTapped: (id) => _onStarredItemTapped(id, isWide),
-              selectedId: _selectedPwdId,
+              onItemTapped: (id) => _onItemTapped(("pwd", id), isWide),
+              // 命名空间是pwd时才提供
+              selectedId: _selectedTag?.$1 == "pwd" && isWide ? _selectedTag?.$2 : null,
             ),
           ),
         ],
@@ -159,37 +143,25 @@ class _HomePageState extends State<HomePage> {
         if (constraints.maxWidth < 200) {
           // 页面过窄时，什么都不显示
           return styled.buildPlaceHolder(text: '', context: context);
-        } else if (_selectedPwdId != null) {
-          // 选择了密码项时，显示密码详情页
-          // 通过 ID 从 Provider 获取密码记录
-          return Navigator(
-            observers: [HeroController()],
-            key: _homePageRightNavigatorKey,
-            onGenerateRoute: (RouteSettings settings) {
-              return MaterialPageRoute(
-                builder: (context) => _buildPage("pwd", true, _selectedPwdId),
-              );
-            },
-          );
-        } else if (_selectedTag == null) {
-          // 没有选择设置项
+        } else if (_selectedTag != null) {
+          // 有选中项时显示对应页面
           return Navigator(
             observers: [HeroController()],
             key: _homePageRightNavigatorKey,
             onGenerateRoute: (_) {
               return MaterialPageRoute(
-                builder: (context) => styled.buildPlaceHolder(text: "未选择项目", context: context)
+                builder: (context) => _buildPage(_selectedTag!, true),
               );
             },
           );
         } else {
-          // 选择了设置项时
+          // 没有选择任何项目
           return Navigator(
             observers: [HeroController()],
             key: _homePageRightNavigatorKey,
             onGenerateRoute: (_) {
               return MaterialPageRoute(
-                builder: (context) => _buildPage(_selectedTag!, true, null),
+                builder: (context) => styled.buildPlaceHolder(text: "未选择项目", context: context),
               );
             },
           );

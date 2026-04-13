@@ -69,7 +69,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: _buildSettingTiles(context, false),
+          children: _buildLeftContent(context, false),
         ),
       ),
     );
@@ -87,7 +87,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
           SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: _buildSettingTiles(context, true),
+              children: _buildLeftContent(context, true),
             ),
           ),
           const VerticalDivider(width: 1, thickness: 1),
@@ -123,8 +123,8 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     );
   }
 
-  // 构建设置项列表
-  List<Widget> _buildSettingTiles(BuildContext context, bool isWide) {
+  // 构建设置项列表(左侧)
+  List<Widget> _buildLeftContent(BuildContext context, bool isWide) {
     final List<Widget> tiles = [];
     for (var item in _settingItems) {
       final isSelected = _selectedTag == item.tag;

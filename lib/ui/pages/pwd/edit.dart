@@ -76,8 +76,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       controller: _identifierController,
                       onChanged: (value) {
                         var res = Provider.of<PwdProvider>(
-                          context,
-                          listen: false,
+                          context, listen: false
                         ).setValueById(widget.id, "identifier", value);
                         if (res != ErrorCode.success) {
                           ui.showSnackBarQuick(res.generic, context);
@@ -94,8 +93,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       controller: _userNameController,
                       onChanged: (value) {
                         var res = Provider.of<PwdProvider>(
-                          context,
-                          listen: false,
+                          context, listen: false,
                         ).setValueById(widget.id, "userName", value);
                         if (res != ErrorCode.success) {
                           ui.showSnackBarQuick(res.generic, context);
@@ -112,8 +110,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       controller: _accountController,
                       onChanged: (value) {
                         var res = Provider.of<PwdProvider>(
-                          context,
-                          listen: false,
+                          context, listen: false,
                         ).setValueById(widget.id, "account", value);
                         if (res != ErrorCode.success) {
                           ui.showSnackBarQuick(res.generic, context);
@@ -133,9 +130,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       setState(() {
                         _isDeleting = true;
                       });
-                      final res = Provider.of<PwdProvider>(
-                        context, listen: false,
-                      ).removeRecordById(widget.id);
+                      final res = Provider.of<PwdProvider>(context, listen: false).removeRecordById(widget.id);
                       if (res != ErrorCode.success) {
                         ui.showSnackBarQuick(res.generic, context);
                       }
