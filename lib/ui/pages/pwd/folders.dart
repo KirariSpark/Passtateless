@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/pages/pwd/list.dart';
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/pages/pwd/list.dart';
+import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
 class PwdFolderPage extends StatefulWidget {

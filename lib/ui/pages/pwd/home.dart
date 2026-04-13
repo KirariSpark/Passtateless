@@ -78,9 +78,7 @@ class _HomePageState extends State<HomePage> {
     required BuildContext context,
   }) {
     final isSelected = _selectedTag == tag && isWide;
-    final alpha = isSelected
-        ? styles.alphaOpaque
-        : styles.alphaAlmostTransparent;
+    final alpha = isSelected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
 
     // 下方入口部分
     return AnimatedSwitcher(
@@ -89,9 +87,7 @@ class _HomePageState extends State<HomePage> {
       switchInCurve: Curves.easeOutCubic,
       child: ConstrainedBox(
         constraints: styles.tileWidthConstraint,
-        key: isSelected
-            ? const ValueKey("selected")
-            : const ValueKey("notSelected"),
+        key: isSelected ? const ValueKey("selected") : const ValueKey("notSelected"),
         child: styled.buildListTile(
           alpha: alpha,
           title: title,
@@ -218,6 +214,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildLeftContent(context, true),
+          const VerticalDivider(width: 1, thickness: 1),
           Expanded(
             child: Container(
               constraints: styles.tileWidthConstraint,

@@ -100,6 +100,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
               children: _buildDocTiles(context, true),
             ),
           ),
+          const VerticalDivider(width: 1, thickness: 1),
           // 选中项的内容
           Expanded(
             child: Container(
