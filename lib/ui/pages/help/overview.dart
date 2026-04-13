@@ -145,7 +145,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
         duration: Duration(milliseconds: 100),
         child: ConstrainedBox(
           key: isSelected ? ValueKey("selected") : ValueKey("notSelected"),
-          constraints: isWide ? styles.tileWidthConstraint : styles.tileWidthConstraintWider,
+          constraints: styles.tileWidthConstraintWider,
           child: styled.buildListTile(
             alpha: alpha,
             isFirst: item.isFirst,
@@ -170,7 +170,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bool isWide = constraints.maxWidth > styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing;
+        final bool isWide = constraints.maxWidth > styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintWider.maxWidth + styles.layoutSpacing;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 100),
           child: isWide ? _buildWideLayout(context, isWide) : _buildNarrowLayout(context),

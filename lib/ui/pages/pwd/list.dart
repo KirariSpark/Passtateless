@@ -10,6 +10,9 @@ import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:provider/provider.dart';
 
+/// 查看资料夹中所有密码的页面
+///
+/// 资料夹名称将会被用于 Hero 动画
 class PwdListPage extends StatelessWidget {
   final String folder;
   const PwdListPage({super.key, required this.folder});
@@ -33,7 +36,7 @@ class PwdListPage extends StatelessWidget {
     } else {
       List<Widget> temp = [];
       // 构建列表
-      for (var(index, _) in pwdList.indexed) {
+      for (var(index, item) in pwdList.indexed) {
         temp.add(
           PwdTile(
             pwdRecord: pwdList[index],
@@ -51,11 +54,7 @@ class PwdListPage extends StatelessWidget {
               );
             },
             onTapped: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(
-                identifier: pwdList[index]["identifier"],
-                userName: pwdList[index]["userName"],
-                account: pwdList[index]["account"]
-              )));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(id: item["id"])));
             }
           ),
         );
@@ -66,7 +65,7 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "查看：${folder.isEmpty ? '未分类' : folder}", context: context),
+      appBar: styled.buildAppBar(title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: folder),
       body: Container(
         padding: styles.uniInsetsSmall,
         alignment: Alignment.topCenter,

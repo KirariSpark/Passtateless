@@ -88,6 +88,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   },
                   child: styled.buildListTile(
                     title: displayTitle,
+                    titleTag: folders[index],
                     onTapped: (){
                       Navigator.push(
                         context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))

@@ -79,6 +79,7 @@ class PwdTile extends StatelessWidget {
       constraints: styles.tileWidthConstraint,
       child: styled.buildListTile(
         title: pwdRecord["identifier"] == "" ? "未命名" : pwdRecord["identifier"],
+        titleTag: pwdRecord["id"],
         subtitle: subtitleText,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -87,16 +88,14 @@ class PwdTile extends StatelessWidget {
               style: styles.buttonStyle,
               onPressed: _onStarPressed,
               icon: pwdRecord["starred"]
-                  ? Icon(Icons.star, color: ColorScheme.of(context).primary)
-                  : Icon(Icons.star_border),
+                ? Icon(Icons.star, color: ColorScheme.of(context).primary)
+                : Icon(Icons.star_border),
             ),
-            ?hasEditButton
-                ? IconButton(
-                    style: styles.buttonStyle,
-                    onPressed: _onEditPressed,
-                    icon: Icon(Icons.edit_outlined),
-                  )
-                : null,
+            ?hasEditButton ? IconButton(
+              style: styles.buttonStyle,
+              onPressed: _onEditPressed,
+              icon: Icon(Icons.edit_outlined),
+            ) : null,
           ],
         ),
         onTapped: _onTapped,

@@ -3,27 +3,29 @@ import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/generator/parser.dart' as parser;
+import 'package:provider/provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
+import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
 import 'package:re_editor/re_editor.dart';
 
+/// 密码记录的只读页面
+///
+/// 记录的 id 将被用于 Hero 动画
 class PwdViewPage extends StatefulWidget {
-  final String identifier;
-  final String userName;
-  final String account;
-
-  const PwdViewPage({super.key, required this.identifier, required this.userName, required this.account});
+  final String id;
+  const PwdViewPage({super.key,required this.id});
 
   @override
   State<PwdViewPage> createState() => _PwdViewPageState();
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
-  Presets _preset = Presets.simple;
   final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  Presets _preset = Presets.simple;
   bool isGenerating = false;
   bool removeDigits = false;
   bool removeAlpha = false;
@@ -77,14 +79,14 @@ class _PwdViewPageState extends State<PwdViewPage> {
   }
 
   /// 生成密码并显示提示
-  Future<String> genPwd(BuildContext context, bool copy) async {
+  Future<String> genPwd(BuildContext context, bool copy, String identifier, String userName, String account) async {
     setState(() {isGenerating = true;});
     if (<Presets>[
       Presets.simple, Presets.complex, Presets.bank
     ].contains(_preset)) {
       var res = await parser.parseBuiltins(
-          _preset, "${widget.identifier}: ${widget.userName} @ ${widget.account}",
-          removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
+        _preset,"$identifier: $userName @ $account",
+        removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
       );
       if (res.$1 == ErrorCode.success) {
         if (copy) {
@@ -107,9 +109,12 @@ class _PwdViewPageState extends State<PwdViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final pwdRecord = context.watch<PwdProvider>().getItemById(widget.id);
+
     return Scaffold(
       appBar: styled.buildAppBar(
-        title: "查看：${widget.identifier.isEmpty ? '未命名' : widget.identifier}",
+        title: pwdRecord["identifier"].toString().isEmpty ? '未命名' : pwdRecord["identifier"].toString(),
+        titleTag: pwdRecord["id"],
         context: context
       ),
       body: SingleChildScrollView(
@@ -132,7 +137,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           constraints: styles.tileWidthConstraint,
                           child: styled.buildTextField(
                             context: context,
-                            controller: TextEditingController(text: widget.identifier),
+                            controller: TextEditingController(text: pwdRecord["identifier"]),
                             label: "档案名",
                             readonly: true
                           )
@@ -142,7 +147,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           constraints: styles.tileWidthConstraint,
                           child: styled.buildTextField(
                             context: context,
-                            controller: TextEditingController(text: widget.userName),
+                            controller: TextEditingController(text: pwdRecord["userName"]),
                             label: "用户名",
                             readonly: true
                           )
@@ -152,7 +157,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           constraints: styles.tileWidthConstraint,
                           child: styled.buildTextField(
                             context: context,
-                            controller: TextEditingController(text: widget.account),
+                            controller: TextEditingController(text: pwdRecord["account"]),
                             label: "账号",
                             readonly: true
                           ),
@@ -281,7 +286,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
                                 context: context,
                                 function: () async {
                                   Navigator.pop(context);
-                                  var temp = await genPwd(context, false);
+                                  var temp = await genPwd(
+                                    context, false, pwdRecord["identifier"],
+                                    pwdRecord["userName"], pwdRecord["account"]
+                                  );
                                   if (context.mounted) {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => FullscreenPwd(temp)));
                                   }
@@ -301,7 +309,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           child: ElevatedButton(
                             onPressed: isGenerating ? null : () async {
                               // 开始生成
-                              await genPwd(context, true);
+                              await genPwd(
+                                context, false, pwdRecord["identifier"],
+                                pwdRecord["userName"], pwdRecord["account"]
+                              );
                               // 启用按钮
                               setState(() {isGenerating = false;});
                             },

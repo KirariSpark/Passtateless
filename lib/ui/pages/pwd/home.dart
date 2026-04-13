@@ -54,11 +54,9 @@ class _HomePageState extends State<HomePage> {
       final record = Provider.of<PwdProvider>(context, listen: false).getItemById(id);
       if (record.isNotEmpty) {
         Navigator.push(context, MaterialPageRoute(
-            builder: (context) => PwdViewPage(
-              identifier: record["identifier"] ?? "",
-              userName: record["userName"] ?? "",
-              account: record["account"] ?? "",
-            ),
+          builder: (context) => PwdViewPage(
+            id: record["id"],
+          ),
           ),
         );
       }
@@ -183,9 +181,7 @@ class _HomePageState extends State<HomePage> {
               duration: Duration(milliseconds: 200),
               child: PwdViewPage(
                 key: ValueKey(_selectedPwdId),
-                identifier: pwdRecord["identifier"] ?? "",
-                userName: pwdRecord["userName"] ?? "",
-                account: pwdRecord["account"] ?? "",
+                id: pwdRecord["id"],
               ),
             );
           } else {
