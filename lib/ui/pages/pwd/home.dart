@@ -3,10 +3,8 @@ import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/stars.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -62,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, id)), (route) => false
       );
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, null)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage("pwd", isWide, id)));
     }
   }
 
