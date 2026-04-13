@@ -44,10 +44,14 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   }
 
   void _onItemTapped(_SettingItem item, bool isWide) {
-    // 更新左侧高亮状态
-    setState(() {
-      _selectedTag = item.tag;
-    });
+    // 只有宽屏下需要更新高亮状态
+    // 同时也是为了避免窄屏下更新状态，触发AnimatedSwitcher，导致同时有两个Hero（加上新页面时三个）在场的问题
+    if (isWide) {
+      // 更新左侧高亮状态
+      setState(() {
+        _selectedTag = item.tag;
+      });
+    }
 
     if (isWide) {
       // 宽屏：在右侧嵌套 Navigator 中清空栈并推入新页面
@@ -125,8 +129,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   // 构建设置项列表
   List<Widget> _buildSettingTiles(BuildContext context, bool isWide) {
     final List<Widget> tiles = [];
-    for (int i = 0; i < _settingItems.length; i++) {
-      final item = _settingItems[i];
+    for (var item in _settingItems) {
       final isSelected = _selectedTag == item.tag;
       final alpha = isSelected && isWide ? styles.alphaOpaque : styles.alphaAlmostTransparent;
 
