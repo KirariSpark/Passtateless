@@ -15,49 +15,51 @@ class BasicSettingsPage extends StatefulWidget {
 }
 
 class _BasicSettingsPageState extends State<BasicSettingsPage> {
-  String? _selectedTag; // 仅用于控制左侧列表的高亮状态
+  // (命名空间, 值) 的 Record
+  (String, String)? _selectedTag;
 
   // 右侧栏专属的 Navigator Key
   final GlobalKey<NavigatorState> _settingsRightNavigatorKey = GlobalKey<NavigatorState>();
 
   // 设置项列表
   final List<_SettingItem> _settingItems = const [
-    _SettingItem(tag: "masterPwd", icon: Icons.key, title: "主密码", isFirst: true),
-    _SettingItem(tag: "customize", icon: Icons.color_lens_outlined, title: "个性化"),
-    _SettingItem(tag: "advanced", icon: Icons.developer_mode, title: "高级设置"),
-    _SettingItem(tag: "about", icon: Icons.info_outlined, title: "关于", isLast: true),
+    _SettingItem(tag: ("basic", "masterPwd"), icon: Icons.key, title: "主密码", isFirst: true),
+    _SettingItem(tag: ("basic", "customize"), icon: Icons.color_lens_outlined, title: "个性化"),
+    _SettingItem(tag: ("basic", "advanced"), icon: Icons.developer_mode, title: "高级设置"),
+    _SettingItem(tag: ("basic", "about"), icon: Icons.info_outlined, title: "关于", isLast: true),
   ];
 
-  Widget _buildPage(String tag, bool isWide) {
+  Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
-      case "masterPwd":
-        return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag));
-      case "customize":
-        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag));
-      case "advanced":
-        return AdvancedSettingsPage(key: ValueKey(tag));
-      case "about":
-        return AboutPage(useHero: !isWide, key: ValueKey(tag));
+      case ("basic", "masterPwd"):
+        return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2));
+      case ("basic", "customize"):
+        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2));
+      case ("basic", "advanced"):
+        return AdvancedSettingsPage(key: ValueKey(tag.$2));
+      case ("basic", "about"):
+        return AboutPage(useHero: !isWide, key: ValueKey(tag.$2));
       default:
         return const SizedBox.shrink();
     }
   }
 
-  void _onItemTapped(_SettingItem item, bool isWide) {
+  void _onItemTapped((String, String) tag, bool isWide) {
     // 只有宽屏下需要更新高亮状态
-    // 同时也是为了避免窄屏下更新状态，触发AnimatedSwitcher，导致同时有两个Hero（加上新页面时三个）在场的问题
+    // 同时也是为了避免窄屏下更新状态，触发AnimatedSwitcher，导致同时有两个Hero（加上新页面就是三个）在场的问题
     if (isWide) {
       // 更新左侧高亮状态
       setState(() {
-        _selectedTag = item.tag;
+        _selectedTag = tag;
       });
+
       // 宽屏：在右侧嵌套 Navigator 中清空栈并推入新页面
       _settingsRightNavigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => _buildPage(item.tag, isWide)), (route) => false
+        MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)), (route) => false,
       );
     } else {
       // 窄屏：常规的根 Navigator 跳转
-      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(item.tag, isWide)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => _buildPage(tag, isWide)));
     }
   }
 
@@ -105,13 +107,24 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 200) {
+          // 页面过窄时，什么都不显示
           return styled.buildPlaceHolder(text: "", context: context);
-        } else {
-          // 使用嵌套 Navigator - 用于让右侧内容不要把整个页面都跳转掉
+        } else if (_selectedTag != null) {
+          // 有选中项时显示对应页面
           return Navigator(
             observers: [HeroController()],
             key: _settingsRightNavigatorKey,
-            // 初始路由显示占位符
+            onGenerateRoute: (_) {
+              return MaterialPageRoute(
+                builder: (context) => _buildPage(_selectedTag!, true),
+              );
+            },
+          );
+        } else {
+          // 没有选择任何项目
+          return Navigator(
+            observers: [HeroController()],
+            key: _settingsRightNavigatorKey,
             onGenerateRoute: (_) {
               return MaterialPageRoute(
                 builder: (context) => styled.buildPlaceHolder(text: "未选择设置项", context: context),
@@ -119,7 +132,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
             },
           );
         }
-      }
+      },
     );
   }
 
@@ -127,8 +140,8 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   List<Widget> _buildLeftContent(BuildContext context, bool isWide) {
     final List<Widget> tiles = [];
     for (var item in _settingItems) {
-      final isSelected = _selectedTag == item.tag;
-      final alpha = isSelected && isWide ? styles.alphaOpaque : styles.alphaAlmostTransparent;
+      final isSelected = _selectedTag == item.tag && isWide;
+      final alpha = isSelected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
 
       Widget tile = AnimatedSwitcher(
         duration: const Duration(milliseconds: 100),
@@ -141,9 +154,10 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
             isLast: item.isLast,
             leading: item.icon,
             title: item.title,
-            titleTag: isWide ? null : item.tag,
+            // 窄屏下传具体名称标签，宽屏不传以避免 Hero 错误
+            titleTag: isWide ? null : item.tag.$2,
             trailing: const Icon(Icons.arrow_forward),
-            onTapped: () => _onItemTapped(item, isWide),
+            onTapped: () => _onItemTapped(item.tag, isWide),
             context: context,
           ),
         ),
@@ -160,7 +174,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         final bool isWide = constraints.maxWidth > styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 100),
-          child: isWide ? _buildWideLayout(context, isWide) : _buildNarrowLayout(context)
+          child: isWide ? _buildWideLayout(context, isWide) : _buildNarrowLayout(context),
         );
       },
     );
@@ -169,7 +183,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
 
 // 设置项数据类
 class _SettingItem {
-  final String tag;
+  final (String, String) tag;
   final IconData icon;
   final String title;
   final bool isFirst;
