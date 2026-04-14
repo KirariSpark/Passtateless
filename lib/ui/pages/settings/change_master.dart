@@ -6,8 +6,16 @@ import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
+/// 更改主密码页面
 class MasterPwdPage extends StatefulWidget {
-  const MasterPwdPage({super.key});
+  /// 有AppBar时，是否要使用Hero动画
+  final bool useHero;
+  /// 是否要包含AppBar
+  final bool hasAppBar;
+  /// 是否有内边距
+  final bool hasPadding;
+
+  const MasterPwdPage({super.key, this.useHero = true, this.hasAppBar = true, this.hasPadding = true});
 
   @override
   State<MasterPwdPage> createState() => _MasterPwdPageState();
@@ -25,16 +33,16 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: ValueKey("change_master"),
-      appBar: styled.buildAppBar(
+      appBar: widget.hasAppBar ? styled.buildAppBar(
         title: "更改主密码",
-        titleTag: "pages/settings/change_master",
+        titleTag: widget.useHero ? "pages/settings/change_master" : null,
         exitIcon: Icons.close,
         context: context
-      ),
+      ) : null,
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: styles.pagePadding,
+          padding: widget.hasPadding ? styles.pagePadding : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(

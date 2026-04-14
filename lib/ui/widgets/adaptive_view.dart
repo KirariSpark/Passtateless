@@ -6,8 +6,8 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 class AdaptiveView extends StatefulWidget {
   /// 构建左侧面板<br>
   /// [isWide] 当前是否为宽屏<br>
-  /// [onItemTapped] 点击左侧项的回调，内部已处理宽窄屏路由分发逻辑<br>
-  /// [isSelected] 判断某项是否被选中（内部已包含 isWide 判断，窄屏下永远返回 false）<br>
+  /// [onItemTapped] 点击左侧项的回调，内部已处理宽窄屏路由分发逻辑，通常来说，你需要提供左侧面板项的一个tag（String, String）<br>
+  /// [isSelected] 判断某项是否被选中（窄屏下永远返回 false），通常来说，你需要提供左侧面板项的一个tag（String, String）<br>
   final Widget Function(
     BuildContext context,
     bool isWide,

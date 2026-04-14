@@ -27,7 +27,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("basic", "masterPwd"):
-        return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2));
+        return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "customize"):
         return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2));
       case ("basic", "advanced"):
