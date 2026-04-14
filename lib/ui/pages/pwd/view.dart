@@ -17,8 +17,15 @@ import 'package:re_editor/re_editor.dart';
 ///
 /// 记录的 id 将被用于 Hero 动画
 class PwdViewPage extends StatefulWidget {
+  /// 要查看的密码记录的id
   final String id;
-  const PwdViewPage({super.key,required this.id});
+  /// 有AppBar时，AppBar是否要使用Hero动画
+  final bool useHero;
+  /// 页面是否有AppBar
+  final bool hasAppBar;
+  /// 页面是否有内边距
+  final bool hasPadding;
+  const PwdViewPage({super.key,required this.id, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
 
   @override
   State<PwdViewPage> createState() => _PwdViewPageState();
@@ -121,14 +128,14 @@ class _PwdViewPageState extends State<PwdViewPage> {
     final pwdRecord = context.watch<PwdProvider>().getItemById(widget.id);
 
     return Scaffold(
-      appBar: styled.buildAppBar(
+      appBar: widget.hasAppBar ? styled.buildAppBar(
         title: pwdRecord["identifier"].toString().isEmpty ? '未命名' : pwdRecord["identifier"].toString(),
-        titleTag: pwdRecord["id"],
+        titleTag: widget.useHero ? pwdRecord["id"] : null,
         context: context
-      ),
+      ) : null,
       body: SingleChildScrollView(
         child: Container(
-          padding: styles.pagePaddingAll,
+          padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           alignment: Alignment.center,
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
@@ -137,6 +144,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 constraints: BoxConstraints(maxWidth: maxWidth),
                 child: Column(
                   children: <Widget>[
+                    styles.spacingSizedBox,
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -247,29 +255,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             child: Column(
                               children: [
-                                RadioListTile(
-                                  title: Text(Presets.simple.displayName),
-                                  subtitle: Text("简易预设，适用于对安全性要求不高的场景"),
+                                for (var item in Presets.values) RadioListTile(
+                                  value: item,
+                                  subtitle: Text(item.desc),
                                   shape: styles.roundedBorder,
-                                  value: Presets.simple,
-                                ),
-                                RadioListTile(
-                                  title: Text(Presets.complex.displayName),
-                                  subtitle: Text("使用更复杂的生成流程和 PBKDF2 算法，可能较慢"),
-                                  shape: styles.roundedBorder,
-                                  value: Presets.complex
-                                ),
-                                RadioListTile(
-                                  title: Text(Presets.bank.displayName),
-                                  subtitle: Text("基于 PBKDF2 算法生成六位的纯数字密码，可能较慢"),
-                                  shape: styles.roundedBorder,
-                                  value: Presets.bank
-                                ),
-                                RadioListTile(
-                                  title: Text(Presets.custom.displayName),
-                                  subtitle: Text("使用 JSON 完全自定义整个生成流程"),
-                                  shape: styles.roundedBorder,
-                                  value: Presets.custom
+                                  title: Text(item.displayName)
                                 )
                               ],
                             )

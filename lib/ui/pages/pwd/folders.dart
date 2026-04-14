@@ -91,7 +91,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                 titleTag: folders[index],
                 onTapped: (){
                   Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index]))
+                    context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index], useHero: true))
                   );
                 },
                 trailing: IconButton(
@@ -148,10 +148,10 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       ),
       floatingActionButton: PopupMenuButton(
         popUpAnimationStyle: AnimationStyle(
-            curve: Curves.easeInOut,
-            duration: Duration(milliseconds: 300),
-            reverseCurve: Curves.easeInOut,
-            reverseDuration: Duration(milliseconds: 300)
+          curve: Curves.easeInOut,
+          duration: Duration(milliseconds: 300),
+          reverseCurve: Curves.easeInOut,
+          reverseDuration: Duration(milliseconds: 300)
         ),
         tooltip: "更多功能",
         iconSize: 30,
@@ -182,45 +182,45 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             ),
             // 新建资料夹
             PopupMenuItem(
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [
-                    Icon(Icons.create_new_folder_outlined),
-                    Text("新建资料夹")
-                  ],
-                ),
-                onTap: (){
-                  ui.showAlertDialogQuick(
-                      title: "新建文件夹",
-                      content: styled.buildTextField(
-                          label: "文件夹名", controller: folderName,
-                          context: context
-                      ),
-                      action: () => Navigator.of(context, rootNavigator: true).pop(),
-                      actionText: "取消",
-                      action2: () {
-                        var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
-                        if (stat == ErrorCode.success) {
-                          Navigator.of(context, rootNavigator: true).pop();
-                          ui.showSnackBarQuick("文件夹已建立", context);
-                        } else {
-                          ui.showSnackBarQuick(stat.generic, context);
-                        }
-                      },
-                      action2Text: "确定",
-                      context: context
-                  );
-                }
+              child: Row(
+                spacing: styles.layoutSpacing,
+                children: [
+                  Icon(Icons.create_new_folder_outlined),
+                  Text("新建资料夹")
+                ],
+              ),
+              onTap: (){
+                ui.showAlertDialogQuick(
+                  title: "新建文件夹",
+                  content: styled.buildTextField(
+                    label: "文件夹名", controller: folderName,
+                    context: context
+                  ),
+                  action: () => Navigator.of(context, rootNavigator: true).pop(),
+                  actionText: "取消",
+                  action2: () {
+                    var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
+                    if (stat == ErrorCode.success) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                      ui.showSnackBarQuick("文件夹已建立", context);
+                    } else {
+                      ui.showSnackBarQuick(stat.generic, context);
+                    }
+                  },
+                  action2Text: "确定",
+                  context: context
+                );
+              }
             )
           ];
         },
         child: Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: ColorScheme.of(context).primaryContainer,
-                borderRadius: styles.borderRadius
-            ),
-            child: Icon(Icons.menu)
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: ColorScheme.of(context).primaryContainer,
+            borderRadius: styles.borderRadius
+          ),
+          child: Icon(Icons.menu)
         ),
       ),
     );

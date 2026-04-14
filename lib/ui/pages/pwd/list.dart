@@ -15,7 +15,20 @@ import 'package:provider/provider.dart';
 /// 资料夹名称将会被用于 Hero 动画
 class PwdListPage extends StatelessWidget {
   final String folder;
-  const PwdListPage({super.key, required this.folder});
+  /// 是否使用 Hero 动画
+  final bool useHero;
+  /// 页面是否有 AppBar
+  final bool hasAppBar;
+  /// 页面是否有内边距
+  final bool hasPadding;
+
+  const PwdListPage({
+    super.key,
+    required this.folder,
+    required this.useHero,
+    this.hasAppBar = true,
+    this.hasPadding = true,
+  });
 
   List<Widget> _buildList(List<Map<String, dynamic>> pwdList, BuildContext context){
     if (pwdList.isEmpty) {
@@ -50,7 +63,7 @@ class PwdListPage extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: item["id"])));
             },
             onTapped: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(id: item["id"])));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(id: item["id"], useHero: true)));
             }
           ),
         );
@@ -59,11 +72,15 @@ class PwdListPage extends StatelessWidget {
     }
   }
 
-  Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context) {
+  Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context, {required bool useHero, required bool hasAppBar, required bool hasPadding}) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: folder),
+      appBar: hasAppBar ? styled.buildAppBar(
+        title: folder.isEmpty ? '未分类' : folder,
+        context: context,
+        titleTag: useHero ? folder : null
+      ) : null,
       body: Container(
-        padding: styles.uniInsetsSmall,
+        padding: hasPadding ? styles.uniInsetsSmall : EdgeInsets.zero,
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
           child: Column(
@@ -79,7 +96,7 @@ class PwdListPage extends StatelessWidget {
               // TODO: 增加实际功能
               TextField(
                 decoration: InputDecoration(
-                  border: InputBorder.none
+                  border: InputBorder.none,
                 ),
               )
             ],
@@ -117,7 +134,7 @@ class PwdListPage extends StatelessWidget {
               onTap: () async {
                 ui.showSnackBarQuick("正在保存", context);
                 var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                  Provider.of<AppProvider>(context, listen: false).masterPwd
+                    Provider.of<AppProvider>(context, listen: false).masterPwd
                 );
                 if (context.mounted) {
                   if (stat == ErrorCode.success) {
@@ -151,6 +168,6 @@ class PwdListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pwdList = context.watch<PwdProvider>().getPwdList(folder);
-    return _buildUi(pwdList, context);
+    return _buildUi(pwdList, context, useHero: useHero, hasAppBar: hasAppBar, hasPadding: hasPadding);
   }
 }

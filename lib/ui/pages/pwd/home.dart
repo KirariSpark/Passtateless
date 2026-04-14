@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pwd", String id):
-        return PwdViewPage(key: ValueKey(id), id: id);
+        return PwdViewPage(key: ValueKey(id), id: id, useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       default:
         return styled.buildPlaceHolder(text: "无效选择", context: context);
     }

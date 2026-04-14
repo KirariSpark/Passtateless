@@ -13,15 +13,16 @@ enum Paths {
 }
 
 enum Presets {
-  simple("simple", "简易"),
-  complex("complex", "复杂"),
-  bank("bank", "支付密码"),
-  custom("custom", "自定义");
+  simple("simple", "简易", "简易预设，适用于对安全性要求不高的场景"),
+  complex("complex", "复杂", "使用更复杂的生成流程和 PBKDF2 算法，可能较慢"),
+  bank("bank", "支付密码", "基于 PBKDF2 算法生成六位的纯数字密码，可能较慢"),
+  custom("custom", "自定义", "使用 JSON 完全自定义整个生成流程");
 
   final String preset;
   final String displayName;
+  final String desc;
 
-  const Presets(this.preset, this.displayName);
+  const Presets(this.preset, this.displayName, this.desc);
 }
 
 enum RemindDays {
