@@ -149,6 +149,7 @@ class _HomePageState extends State<HomePage> {
       pageBuilder: _buildPage,
       placeholderText: "未选择项目",
       rightPaneConstraints: styles.tileWidthConstraint,
+      padding: styles.pagePaddingAll,
     );
   }
 }

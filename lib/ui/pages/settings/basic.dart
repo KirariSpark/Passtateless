@@ -73,6 +73,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
           ),
         );
       },
+      padding: styles.pagePaddingAll,
     );
   }
 }

@@ -24,12 +24,16 @@ class AdaptiveView extends StatefulWidget {
   /// 宽屏下右侧内容区的可选约束
   final BoxConstraints? rightPaneConstraints;
 
+  /// 内边距值
+  final EdgeInsets padding;
+
   const AdaptiveView({
     super.key,
     required this.leftPaneBuilder,
     required this.pageBuilder,
     this.placeholderText = "未选择项目",
     this.rightPaneConstraints,
+    this.padding = EdgeInsets.zero
   });
 
   @override
@@ -93,7 +97,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
   Widget _buildWideLayout(BuildContext context, bool isWide) {
     return Container(
       key: const ValueKey('wide-layout'),
-      padding: styles.pagePaddingAll,
+      padding: widget.padding,
       child: Row(
         spacing: styles.layoutSpacing,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +117,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
   Widget _buildNarrowLayout(BuildContext context, bool isWide) {
     return Container(
       key: const ValueKey('narrow-layout'),
-      padding: styles.pagePaddingAll,
+      padding: widget.padding,
       alignment: Alignment.topCenter,
       child: widget.leftPaneBuilder(context, isWide, (tag) => _onItemTapped(tag, isWide), (tag) => _isSelected(tag, isWide)),
     );

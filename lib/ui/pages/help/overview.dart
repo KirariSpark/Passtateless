@@ -66,6 +66,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
           ),
         );
       },
+      padding: styles.pagePaddingAll,
     );
   }
 }
