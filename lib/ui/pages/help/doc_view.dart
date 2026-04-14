@@ -7,12 +7,23 @@ import 'package:provider/provider.dart';
 
 class DocViewPage extends StatelessWidget {
   final String title;
+  /// 决定了选择哪个文档来展示，支持的值和文档目录中文档的文件名相同
   final String mode;
+  /// 有AppBar时，是否要使用Hero动画
+  final bool useHero;
+  /// 是否要包含AppBar
+  final bool hasAppBar;
+  /// 是否有内边距
+  final bool hasPadding;
 
-  /// 构造函数
-  ///
-  /// [mode] 决定了选择哪个文档来展示，支持的值和文档目录中文档的文件名相同
-  const DocViewPage({super.key, required this.title, required this.mode});
+  const DocViewPage({
+    super.key,
+    required this.title,
+    required this.mode,
+    this.useHero = true,
+    this.hasPadding = true,
+    this.hasAppBar = true
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +49,16 @@ class DocViewPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: styled.buildAppBarWidget(
+      appBar: hasAppBar ? styled.buildAppBarWidget(
         title: Row(
           children: [
             Text("帮助："),
-            Hero(tag: mode, child: Text(title, style: Theme.of(context).textTheme.titleLarge))
+            useHero ? Hero(tag: mode, child: Text(title, style: Theme.of(context).textTheme.titleLarge)) : Text(title)
           ],
         ), context: context
-      ),
+      ) : null,
       body: Container(
-        padding: styles.uniInsetsSmall,
+        padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
         alignment: AlignmentGeometry.topCenter,
         child: Container(
           decoration: BoxDecoration(

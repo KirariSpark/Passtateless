@@ -29,6 +29,9 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
       title: item.title,
       mode: item.tag.$2,
       key: ValueKey(tag),
+      hasPadding: !isWide,
+      hasAppBar: !isWide,
+      useHero: !isWide,
     );
   }
 
