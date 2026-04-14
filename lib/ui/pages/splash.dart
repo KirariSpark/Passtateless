@@ -22,9 +22,14 @@ class _SplashPageState extends State<SplashPage> {
   Widget btnChild = Text("确定");
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<AppProvider>(context, listen: false).readConfig();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final pwdProvider = context.watch<PwdProvider>();
-    Provider.of<AppProvider>(context, listen: false).readConfig();
     
     if (isDecrypting) {
       // 正在解密
