@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 enum Paths {
   pwdRecord("saved_pwds.bin"),
   config("config.json"),
-  masterPwdLabel("masterPwdChanged.txt");
+  masterPwdLabel("masterPwdChanged.txt"),
+  log("log.log");
 
   final String path;
   const Paths(this.path);
