@@ -4,17 +4,24 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class AboutPage extends StatelessWidget {
+  /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
-  const AboutPage({super.key, required this.useHero});
+  /// 是否要包含AppBar
+  final bool hasAppBar;
+  /// 是否有内边距
+  final bool hasPadding;
+  const AboutPage({super.key, required this.useHero, this.hasPadding = true, this.hasAppBar = true});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "关于", context: context, titleTag: useHero ? "about" : null),
+      appBar: hasAppBar
+        ? styled.buildAppBar(title: "关于", context: context, titleTag: useHero ? "about" : null)
+        : null,
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            padding: styles.uniInsetsSmall,
+            padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
             constraints: styles.pageWidthConstraint,
             child: Column(
               mainAxisSize: MainAxisSize.min,

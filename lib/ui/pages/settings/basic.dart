@@ -29,11 +29,11 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       case ("basic", "masterPwd"):
         return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "customize"):
-        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2));
+        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "advanced"):
         return AdvancedSettingsPage(key: ValueKey(tag.$2));
       case ("basic", "about"):
-        return AboutPage(useHero: !isWide, key: ValueKey(tag.$2));
+        return AboutPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       default:
         return const SizedBox.shrink();
     }
