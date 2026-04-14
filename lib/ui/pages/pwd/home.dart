@@ -21,9 +21,10 @@ class _HomePageState extends State<HomePage> {
   Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("pages", "folders"):
-        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide);
+        // 宽屏状态下无需使用Scaffold，因为不需要AppBar，也不需要额外的Padding
+        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pages", "pwdEval"):
-        return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide);
+        return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pwd", String id):
         return PwdViewPage(key: ValueKey(id), id: id);
       default:
@@ -78,11 +79,11 @@ class _HomePageState extends State<HomePage> {
 
   // 构建左侧面板
   Widget _buildLeftContent(
-      BuildContext context,
-      bool isWide,
-      void Function((String, String) tag) onItemTapped,
-      bool Function((String, String) tag) isSelected,
-      ) {
+    BuildContext context,
+    bool isWide,
+    void Function((String, String) tag) onItemTapped,
+    bool Function((String, String) tag) isSelected,
+  ) {
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
       child: Column(

@@ -5,9 +5,15 @@ import 'package:passtateless/ui/widgets/eval_res.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:zxcvbn/zxcvbn.dart';
 
+/// 密码强度评估页面
 class PwdEvalPage extends StatefulWidget {
+  /// 有AppBar时，AppBar是否要使用Hero动画
   final bool useHero;
-  const PwdEvalPage({super.key, required this.useHero});
+  /// 页面是否有AppBar
+  final bool hasAppBar;
+  /// 页面是否有内边距
+  final bool hasPadding;
+  const PwdEvalPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
 
   @override
   State<PwdEvalPage> createState() => _PwdEvalPageState();
@@ -22,11 +28,13 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: styled.buildAppBar(title: "密码强度", context: context, titleTag: widget.useHero ? "pwdEval" : null),
+      appBar:widget.hasAppBar
+        ? styled.buildAppBar(title: "密码强度", context: context, titleTag: widget.useHero ? "pwdEval" : null)
+        : null,
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: styles.pagePadding,
+          padding: widget.hasPadding ? styles.pagePadding : null,
           constraints: styles.pageWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
