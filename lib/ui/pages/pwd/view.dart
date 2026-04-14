@@ -87,10 +87,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
   }
 
   /// 生成密码并显示提示（返回生成的密码或错误信息）
-  Future<String> genPwd(BuildContext context, bool copy, String identifier, String userName, String account) async {
+  Future<(ErrorCode, String)> genPwd(BuildContext context, bool copy, String identifier, String userName, String account) async {
     setState(() {isGenerating = true;});
-    // 生成后的处理
-    String postProcess((ErrorCode, String) res) {
+    // 生成后的处理，复制和显示snack bar
+    (ErrorCode, String) postProcess((ErrorCode, String) res) {
       if (res.$1 == ErrorCode.success) {
         if (copy) {
           Clipboard.setData(ClipboardData(text: res.$2));
@@ -98,13 +98,12 @@ class _PwdViewPageState extends State<PwdViewPage> {
         if (context.mounted && copy) {
           ui.showSnackBarQuick("密码已复制", context);
         }
-        return res.$2;
       } else {
         if (context.mounted) {
           ui.showSnackBarQuick(res.$1.generic, context);
         }
-        return res.$1.generic;
       }
+      return res;
     }
     // 实际生成
     if (<Presets>[Presets.simple, Presets.complex, Presets.bank].contains(_preset)) {
@@ -115,11 +114,28 @@ class _PwdViewPageState extends State<PwdViewPage> {
       );
       return postProcess(res);
     } else {
-      final res = await parser.parse(
-        jsonDecode(_configController.text), "$identifier: $userName @ $account",
-        removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
-      );
-      return postProcess(res);
+      try {
+        final cfg = jsonDecode(_configController.text);
+        final res = await parser.parse(
+          jsonDecode(cfg), "$identifier: $userName @ $account",
+          removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
+        );
+        return postProcess(res);
+      } catch(e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "JSON 格式错误\n${e.toString()}",
+                style: TextStyle(fontFamily: "SourceCodePro"),
+              ),
+              showCloseIcon: true
+            )
+          );
+        }
+        return (ErrorCode.jsonFormatError, "");
+      }
     }
   }
 
@@ -290,7 +306,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
                                     pwdRecord["userName"], pwdRecord["account"]
                                   );
                                   if (context.mounted) {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => FullscreenPwd(temp)));
+                                    if (temp.$1 == ErrorCode.success) {
+                                      Navigator.push(
+                                        context, MaterialPageRoute(builder: (context) => FullscreenPwd(temp.$2))
+                                      );
+                                    }
                                   }
                                   // 启用按钮
                                   setState(() {isGenerating = false;});

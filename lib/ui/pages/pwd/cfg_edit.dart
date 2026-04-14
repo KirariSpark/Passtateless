@@ -53,13 +53,12 @@ class _CfgEditPageState extends State<CfgEditPage> {
         constraints: styles.tileWidthConstraint,
         child: SingleChildScrollView(
           child: Column(
-            spacing: styles.layoutSpacing,
             children: <Widget>[
               styled.buildListTile(
                 title: "JSON 语法基础",
                 alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
-                  Navigator.pop(context);
+                  Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -67,13 +66,14 @@ class _CfgEditPageState extends State<CfgEditPage> {
                     ),
                   );
                 },
+                isFirst: true,
                 context: context,
               ),
               styled.buildListTile(
                 title: "生成配置",
                 alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
-                  Navigator.pop(context);
+                  Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -87,7 +87,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 title: "生成规则提示",
                 alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
-                  Navigator.pop(context);
+                  Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -101,7 +101,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 title: "格式化与可读性",
                 alpha: styles.alphaAlmostTransparent,
                 onTapped: () {
-                  Navigator.pop(context);
+                  Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -109,6 +109,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                     )
                   );
                 },
+                isLast: true,
                 context: context,
               ),
             ],
@@ -116,7 +117,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
         ),
       ),
       actionText: "取消",
-      action: () {Navigator.pop(context);},
+      action: () {Navigator.of(context, rootNavigator: true).pop();},
       context: context,
     );
   }
