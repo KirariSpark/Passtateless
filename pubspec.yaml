@@ -49,6 +49,7 @@ dependencies:
   aes256: ^2.2.2
   uuid: ^4.5.3
   logger: ^2.7.0
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
