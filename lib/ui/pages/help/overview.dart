@@ -53,7 +53,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
                   key: selected ? const ValueKey("selected") : const ValueKey("notSelected"),
                   constraints: styles.tileWidthConstraint,
                   child: styled.buildListTile(
-                    alpha: alpha,
+                    active: selected,
                     isFirst: item.isFirst,
                     isLast: item.isLast,
                     title: item.title,

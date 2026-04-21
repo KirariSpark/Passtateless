@@ -94,7 +94,7 @@ class _MainAppState extends State<MainApp> {
                 ),
               ],
               showUnselectedLabels: false,
-              elevation: 20,
+              backgroundColor: ColorScheme.of(context).surfaceContainer,
             ),
           );
         } else {
@@ -109,7 +109,7 @@ class _MainAppState extends State<MainApp> {
                     selectedIndex: appProvider.currentIndex,
                     onDestinationSelected: onNavigate,
                     labelType: NavigationRailLabelType.all,
-                    elevation: 3,
+                    backgroundColor: ColorScheme.of(context).surfaceContainer,
                     destinations: const [
                       NavigationRailDestination(
                         icon: Icon(Icons.home_outlined),

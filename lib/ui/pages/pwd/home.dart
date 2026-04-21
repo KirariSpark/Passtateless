@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
         constraints: styles.tileWidthConstraint,
         key: isSelected ? const ValueKey("selected") : const ValueKey("notSelected"),
         child: styled.buildListTile(
-          alpha: alpha,
+          active: isSelected,
           title: title,
           titleTag: titleTag,
           subtitle: subtitle,

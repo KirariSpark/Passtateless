@@ -8,7 +8,7 @@ class Generator {
   String original;
   String password = "";
   bool spCharMissing = false;
-  final List<String> specialChars = ["!", "@", "#", "=", "%", "^", "&", "*"];
+  static const List<String> specialChars = ["!", "@", "#", "=", "%", "^", "&", "*"];
 
   Generator(this.original);
 

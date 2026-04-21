@@ -24,11 +24,8 @@ class PwdTile extends StatelessWidget {
   /// 是否是第二项
   final bool isLast;
 
-  /// 是否是被激活的项，存在 isAlpha 时此项失效
+  /// 是否是被激活的项
   final bool isActive;
-
-  /// 背景的透明度
-  final int? alpha;
 
   /// 是否使用 Hero 动画
   final bool useHero;
@@ -45,7 +42,6 @@ class PwdTile extends StatelessWidget {
     this.isLast = false,
     this.isActive = false,
     this.useHero = true,
-    this.alpha,
   }) : _onStarPressed = onStarPressed,
        _onEditPressed = onEditPressed,
        _onTapped = onTapped;
@@ -71,42 +67,36 @@ class PwdTile extends StatelessWidget {
       subtitleText = "${pwdRecord["userName"]} @ ${pwdRecord["account"]}";
     }
 
-    // 决定透明度
-    final int realAlpha;
-    if (alpha != null) {
-      realAlpha = alpha!;
-    } else {
-      realAlpha = isActive ? styles.alphaOpaque : 0;
-    }
-
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
-      child: styled.buildListTile(
-        title: pwdRecord["identifier"] == "" ? "未命名" : pwdRecord["identifier"],
-        titleTag: useHero ? pwdRecord["id"] : null,
-        subtitle: subtitleText,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              style: styles.buttonStyle,
-              onPressed: _onStarPressed,
-              icon: pwdRecord["starred"]
-                ? Icon(Icons.star, color: ColorScheme.of(context).primary)
-                : Icon(Icons.star_border),
-            ),
-            ?hasEditButton ? IconButton(
-              style: styles.buttonStyle,
-              onPressed: _onEditPressed,
-              icon: Icon(Icons.edit_outlined),
-            ) : null,
-          ],
+      child: Material(
+        child: styled.buildListTile(
+          title: pwdRecord["identifier"] == "" ? "未命名" : pwdRecord["identifier"],
+          titleTag: useHero ? pwdRecord["id"] : null,
+          subtitle: subtitleText,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                style: styles.buttonStyle,
+                onPressed: _onStarPressed,
+                icon: pwdRecord["starred"]
+                  ? Icon(Icons.star, color: ColorScheme.of(context).primary)
+                  : Icon(Icons.star_border),
+              ),
+              ?hasEditButton ? IconButton(
+                style: styles.buttonStyle,
+                onPressed: _onEditPressed,
+                icon: Icon(Icons.edit_outlined),
+              ) : null,
+            ],
+          ),
+          onTapped: _onTapped,
+          isFirst: isFirst,
+          isLast: isLast,
+          context: context,
+          active: isActive
         ),
-        onTapped: _onTapped,
-        isFirst: isFirst,
-        isLast: isLast,
-        alpha: realAlpha,
-        context: context,
       ),
     );
   }

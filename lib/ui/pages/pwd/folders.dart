@@ -32,7 +32,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
         constraints: styles.tileWidthConstraint,
         decoration: BoxDecoration(
           borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+          color: ColorScheme.of(context).surfaceContainerLow
         ),
         clipBehavior: Clip.antiAlias,
         child: ListView.builder(
@@ -86,47 +86,49 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                 Provider.of<PwdProvider>(context, listen: false).removeFolder(folders[index]);
                 ui.showSnackBarQuick("文件夹已删除", context);
               },
-              child: styled.buildListTile(
-                title: displayTitle,
-                titleTag: folders[index],
-                onTapped: (){
-                  Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index], useHero: true))
-                  );
-                },
-                trailing: IconButton(
-                  tooltip: "重命名",
-                  onPressed: () {
-                    if (folders[index] == "") {
-                      ui.showSnackBarQuick("你不能重命名此文件夹", context);
-                      return;
-                    }
-                    ui.showAlertDialogQuick(
-                      title: "重命名：$displayTitle", content: styled.buildTextField(
-                      context: context, controller: folderName, label: "新名称"
-                    ),
-                      action: () => Navigator.of(context, rootNavigator: true).pop(),
-                      actionText: "取消",
-                      action2: () {
-                        var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
-                          folders[index], folderName.text
-                        );
-                        if (res == ErrorCode.success) {
-                          Navigator.of(context, rootNavigator: true).pop();
-                        } else {
-                          ui.showSnackBarQuick(res.generic, context);
-                        }
-                      },
-                      action2Text: "确定",
-                      context: context
+              child: Material(
+                child: styled.buildListTile(
+                  title: displayTitle,
+                  titleTag: folders[index],
+                  onTapped: (){
+                    Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index], useHero: true))
                     );
                   },
-                  style: styles.buttonStyle,
-                  icon: Icon(Icons.drive_file_rename_outline_outlined)
+                  trailing: IconButton(
+                    tooltip: "重命名",
+                    onPressed: () {
+                      if (folders[index] == "") {
+                        ui.showSnackBarQuick("你不能重命名此文件夹", context);
+                        return;
+                      }
+                      ui.showAlertDialogQuick(
+                        title: "重命名：$displayTitle", content: styled.buildTextField(
+                        context: context, controller: folderName, label: "新名称"
+                      ),
+                        action: () => Navigator.of(context, rootNavigator: true).pop(),
+                        actionText: "取消",
+                        action2: () {
+                          var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
+                            folders[index], folderName.text
+                          );
+                          if (res == ErrorCode.success) {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          } else {
+                            ui.showSnackBarQuick(res.generic, context);
+                          }
+                        },
+                        action2Text: "确定",
+                        context: context
+                      );
+                    },
+                    style: styles.buttonStyle,
+                    icon: Icon(Icons.drive_file_rename_outline_outlined)
+                  ),
+                  isFirst: isFirst,
+                  isLast: isLast,
+                  context: context
                 ),
-                isFirst: isFirst,
-                isLast: isLast,
-                context: context
               ),
             );
           }
@@ -220,7 +222,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             color: ColorScheme.of(context).primaryContainer,
             borderRadius: styles.borderRadius
           ),
-          child: Icon(Icons.menu)
+          child: Icon(Icons.menu, color: ColorScheme.of(context).onPrimaryContainer, size: 30)
         ),
       ),
     );

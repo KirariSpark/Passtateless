@@ -39,9 +39,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: styled.buildListTile(
-                        alpha: isSelected(("master","change"))
-                          ? styles.alphaSemitransparent
-                          : styles.alphaAlmostTransparent,
+                        active: isSelected(("master","change")),
                         isFirst: true,
                         leading: Icons.edit_outlined,
                         trailing: Icon(Icons.arrow_forward),
@@ -57,9 +55,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                     ConstrainedBox(
                       constraints: styles.tileWidthConstraint,
                       child: styled.buildListTile(
-                        alpha: isSelected(("master","remind"))
-                          ? styles.alphaSemitransparent
-                          : styles.alphaAlmostTransparent,
+                        active: isSelected(("master","remind")),
                         isLast: true,
                         leading: Icons.lock_clock_outlined,
                         title: "提醒我更改主密码",

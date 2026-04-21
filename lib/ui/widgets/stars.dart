@@ -28,7 +28,7 @@ class StarredPasswords extends StatelessWidget {
     return Container(
       constraints: hasConstraint ? styles.tileHeightConstraint : null,
       decoration: BoxDecoration(
-        color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+        color: ColorScheme.of(context).surfaceContainerLow,
         borderRadius: styles.borderRadius
       ),
       padding: styles.uniInsetsSmall,

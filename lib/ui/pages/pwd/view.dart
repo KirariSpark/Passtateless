@@ -257,7 +257,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           Icon(Icons.arrow_drop_down)
                         ],
                       ),
-                      alpha: styles.alphaAlmostTransparent,
                       isFirst: true,
                       isLast: _preset == Presets.custom ? false : true,
                       onTapped: (){

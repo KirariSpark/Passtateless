@@ -39,7 +39,6 @@ class PwdListPage extends StatelessWidget {
             title: "没有密码",
             subtitle: "点击页面右下角的 + 以新增一条密码",
             leading: Icons.not_interested,
-            alpha: styles.alphaAlmostTransparent,
             isFirst: true,
             isLast: true,
             context: context
@@ -55,7 +54,6 @@ class PwdListPage extends StatelessWidget {
             pwdRecord: item,
             isFirst: true,
             isLast: true,
-            alpha: styles.alphaAlmostTransparent,
             onStarPressed: (){
               Provider.of<PwdProvider>(context, listen: false).switchStarStateById(item["id"]);
             },

@@ -12,7 +12,8 @@ import 'package:flutter/material.dart';
 /// [onTapped] 当ListTile被点击时，调用的函数<br>
 /// [alpha] ListTile背景的透明度（0-255）<br>
 /// [isFirst] 决定上方是否有圆角<br>
-/// [isLast] 决定下方是否有圆角
+/// [isLast] 决定下方是否有圆角<br>
+/// [active] 非active状态，颜色为surfaceContainerLow，否则为secondaryContainer
 ListTile buildListTile({
   required String title,
   required BuildContext context,
@@ -24,6 +25,7 @@ ListTile buildListTile({
   int? alpha,
   bool isFirst = false,
   bool isLast = false,
+  bool active = false
 }) {
   return ListTile(
     onTap: onTapped,
@@ -36,7 +38,7 @@ ListTile buildListTile({
       bottom: isLast ? styles.radius : Radius.zero
     )),
     iconColor: ColorScheme.of(context).primary,
-    tileColor: ColorScheme.of(context).primaryContainer.withAlpha(alpha ?? 0)
+    tileColor: active ? ColorScheme.of(context).secondaryContainer : ColorScheme.of(context).surfaceContainerLow
   );
 }
 

@@ -40,7 +40,7 @@ class EvalRes extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+          color: ColorScheme.of(context).surfaceContainerLow
         ),
         child: Column(
           children: <Widget>[
@@ -81,7 +81,7 @@ class EvalRes extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent)
+          color: ColorScheme.of(context).surfaceContainerLow
         ),
         child: styled.buildListTile(
           title: "请输入评估对象",
@@ -89,7 +89,6 @@ class EvalRes extends StatelessWidget {
           context: context,
           isLast: true,
           isFirst: true,
-          alpha: styles.alphaAlmostTransparent
         )
       );
     }

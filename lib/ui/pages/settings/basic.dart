@@ -57,7 +57,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                   key: selected ? const ValueKey("selected") : const ValueKey("notSelected"),
                   constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
                   child: styled.buildListTile(
-                    alpha: alpha,
+                    active: selected,
                     isFirst: item.isFirst,
                     isLast: item.isLast,
                     leading: item.icon,
