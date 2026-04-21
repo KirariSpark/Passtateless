@@ -178,7 +178,7 @@ Future<(ErrorCode, String)> parseBuiltins(
     bool removeAlpha = false,
     bool removeSp = false
 }) async {
-  appLogger.logger.i("Parsing builtin commands ${cfg.displayName}");
+  appLogger.logger.i("Parsing builtin commands ${cfg.name}");
   switch (cfg) {
     case enums.Presets.simple:
       return await parse(builtin.simple, input, removeDigits: removeDigits, removeAlpha: removeAlpha, removeSp: removeSp);
