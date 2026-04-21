@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/utils/utils.dart' as utils;
-import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart' as core_mgr;
 import 'package:passtateless/modules/file_mgr/json_mgr.dart' as json_mgr;
-import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 
 class AppProvider extends ChangeNotifier {
   // ————UI相关状态————
