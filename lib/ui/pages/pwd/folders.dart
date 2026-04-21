@@ -28,6 +28,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
   Widget _buildMainBody(List<String> folders) {
     return Container(
       alignment: Alignment.topCenter,
+      padding: widget.hasPadding ? styles.pagePadding : EdgeInsets.all(0),
       child: Container(
         constraints: styles.tileWidthConstraint,
         decoration: BoxDecoration(
@@ -144,10 +145,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       appBar: widget.hasAppBar
         ? styled.buildAppBar(title: "资料夹", context: context, titleTag: widget.useHero ? "folders" : null)
         : null,
-      body: Padding(
-        padding: widget.hasPadding ? styles.pagePadding : EdgeInsets.all(0),
-        child: _buildMainBody(folders)
-      ),
+      body: _buildMainBody(folders),
       floatingActionButton: PopupMenuButton(
         popUpAnimationStyle: AnimationStyle(
           curve: Curves.easeInOut,
