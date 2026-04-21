@@ -92,9 +92,7 @@ Container buildPlaceHolder({
   return Container(
     decoration: BoxDecoration(
       borderRadius: styles.borderRadius,
-      color: ColorScheme.of(
-        context,
-      ).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+      color: ColorScheme.of(context).surfaceContainerLow
     ),
     alignment: Alignment.center,
     child: Text(text),

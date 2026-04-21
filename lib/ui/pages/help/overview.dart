@@ -46,7 +46,6 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
             mainAxisSize: MainAxisSize.min,
             children: _docItems.map((item) {
               final selected = isSelected(item.tag);
-              final alpha = selected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
               return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 100),
                 child: ConstrainedBox(

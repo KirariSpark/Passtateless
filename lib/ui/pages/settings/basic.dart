@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/master.dart';
-import 'package:passtateless/ui/pages/settings/customize.dart';
+import 'package:passtateless/ui/pages/settings/themes.dart';
 import 'package:passtateless/ui/pages/settings/advanced.dart';
+import 'package:passtateless/ui/pages/settings/a11y.dart';
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -20,7 +21,8 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   final List<_SettingItem> _settingItems = const [
     _SettingItem(tag: ("basic", "masterPwd"), icon: Icons.key, title: "主密码", isFirst: true),
     _SettingItem(tag: ("basic", "customize"), icon: Icons.color_lens_outlined, title: "个性化"),
-    _SettingItem(tag: ("basic", "advanced"), icon: Icons.developer_mode, title: "高级设置"),
+    _SettingItem(tag: ("basic", "a11y"), icon: Icons.accessibility_new, title: "可访问性"),
+    _SettingItem(tag: ("basic", "advanced"), icon: Icons.code, title: "高级设置"),
     _SettingItem(tag: ("basic", "about"), icon: Icons.info_outlined, title: "关于", isLast: true),
   ];
 
@@ -29,9 +31,11 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       case ("basic", "masterPwd"):
         return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "customize"):
-        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
+        return ThemeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "advanced"):
-        return AdvancedSettingsPage(key: ValueKey(tag.$2));
+        return AdvancedSettingsPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+      case ("basic", "a11y"):
+        return A11ySettingsPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "about"):
         return AboutPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       default:
@@ -50,7 +54,6 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: _settingItems.map((item) {
               final selected = isSelected(item.tag);
-              final alpha = selected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
               return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 100),
                 child: ConstrainedBox(

@@ -48,7 +48,6 @@ class _HomePageState extends State<HomePage> {
   }) {
     // 使用 AdaptiveView 传递过来的 isSelected 判断方法
     final isSelected = isSelectedCallback(tag);
-    final alpha = isSelected ? styles.alphaOpaque : styles.alphaAlmostTransparent;
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 100),
       switchOutCurve: Curves.easeOutCubic,

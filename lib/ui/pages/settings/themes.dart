@@ -7,14 +7,14 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
-class CustomizeSettingsPage extends StatelessWidget {
+class ThemeSettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
   /// 是否要包含AppBar
   final bool hasAppBar;
   /// 是否有内边距
   final bool hasPadding;
-  const CustomizeSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+  const ThemeSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
 
   @override
   Widget build(BuildContext context) {

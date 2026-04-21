@@ -39,16 +39,22 @@ enum RemindDays {
 }
 
 enum AvailableColors {
-  deepPurple(Colors.purple, "紫色"),
+  deepPurple(Colors.deepPurple, "深紫"),
   indigo(Colors.indigo, "靛蓝"),
   blueGrey(Colors.blue, "蓝色"),
   teal(Colors.teal, "暗青"),
+  cyan(Colors.cyan, "青色"),
   greed(Colors.lightGreen, "浅绿"),
   amber(Colors.yellow, "黄色"),
   orange(Colors.orange, "橙色"),
   red(Colors.red, "红色");
 
-  final MaterialColor color;
+  final Color color;
   final String displayName;
   const AvailableColors(this.color, this.displayName);
+}
+
+enum NavigatorMode {
+  material,
+  cupertino
 }

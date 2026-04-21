@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
-// 高级设置页面
-class AdvancedSettingsPage extends StatelessWidget {
+class A11ySettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
   /// 是否要包含AppBar
   final bool hasAppBar;
   /// 是否有内边距
   final bool hasPadding;
-  const AdvancedSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+  const A11ySettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: hasAppBar
-        ? styled.buildAppBar(title: "高级设置", titleTag: useHero ? "advanced" : null, context: context)
+        ? styled.buildAppBar(title: "可访问性", titleTag: useHero ? "a11y" : null, context: context)
         : null,
       body: Container(
         alignment: Alignment.topCenter,
@@ -27,19 +26,30 @@ class AdvancedSettingsPage extends StatelessWidget {
             child: Column(
               children: [
                 styled.buildListTile(
+                  title: "字体",
+                  leading: Icons.text_format,
+                  trailing: Icon(Icons.arrow_forward),
                   isFirst: true,
-                  title: "日志等级",
-                  trailing: Icon(Icons.arrow_drop_down),
+                  onTapped: () {},
                   context: context
                 ),
                 styled.buildListTile(
-                  isLast: true,
-                  title: "查看日志",
+                  title: "动画",
+                  leading: Icons.animation,
                   trailing: Icon(Icons.arrow_forward),
+                  onTapped: () {},
+                  context: context
+                ),
+                styled.buildListTile(
+                  title: "对比度",
+                  leading: Icons.contrast,
+                  trailing: Icon(Icons.arrow_drop_down),
+                  isLast: true,
+                  onTapped: () {},
                   context: context
                 )
               ],
-            )
+            ),
           ),
         ),
       ),
