@@ -37,8 +37,9 @@ ListTile buildListTile({
       top: isFirst ? styles.radius : Radius.zero,
       bottom: isLast ? styles.radius : Radius.zero
     )),
-    iconColor: ColorScheme.of(context).primary,
-    tileColor: active ? ColorScheme.of(context).secondaryContainer : ColorScheme.of(context).surfaceContainerLow
+    iconColor: ColorScheme.of(context).onSurface,
+    textColor: ColorScheme.of(context).onSurface,
+    tileColor: active ? ColorScheme.of(context).secondaryContainer : ColorScheme.of(context).surfaceContainerLow,
   );
 }
 
@@ -146,5 +147,21 @@ AppBar buildAppBarWidget({
     ) : null,
     title: title,
     actions: actions,
+  );
+}
+
+TextButton buildTextButton({
+  required Widget child,
+  required BuildContext context,
+  required void Function()? onPressed
+}) {
+  return TextButton(
+    onPressed: onPressed,
+    style: TextButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: styles.borderRadius),
+        backgroundColor: ColorScheme.of(context).secondaryContainer,
+        foregroundColor: ColorScheme.of(context).onSecondaryContainer
+    ),
+    child: child,
   );
 }

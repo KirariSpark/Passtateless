@@ -35,9 +35,7 @@ double calcWidthConstraint(
 /// 便捷地显示SnackBar
 void showSnackBarQuick(String content, BuildContext context) {
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
-  ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(content), showCloseIcon: true));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(content), showCloseIcon: true));
 }
 
 /// 便捷地显示AlertDialog

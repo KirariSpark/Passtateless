@@ -124,8 +124,8 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
                   children: [
                     // 切换可见性
                     Expanded(
-                      child: ElevatedButton(
-                        style: styles.buttonStyle,
+                      child: styled.buildTextButton(
+                        context: context,
                         onPressed: () {
                           setState(() {
                             pwdModeOld = pwdModeNew = pwdModeConfirm = pwdModeConfirm && pwdModeNew && pwdModeOld ? false : true;
@@ -136,8 +136,8 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
                     ),
                     // 确认更改
                     Expanded(
-                      child: ElevatedButton(
-                        style: styles.buttonStyle,
+                      child: styled.buildTextButton(
+                        context: context,
                         onPressed: () async {
                           var res = await Provider.of<PwdProvider>(context, listen: false).changeMasterPwd(
                             currentMaster: Provider.of<AppProvider>(context, listen: false).masterPwd,

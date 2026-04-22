@@ -24,7 +24,6 @@ class PwdProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _stars = [];
 
   List<Map<String, dynamic>> get starredPwds {
-    appLogger.logger.i("Getting starred passwords");
     _stars = [];
     _pwdMap.forEach((folder, items) {
       for (var item in items) {
@@ -33,7 +32,6 @@ class PwdProvider extends ChangeNotifier {
         }
       }
     });
-    appLogger.logger.i("Got ${_stars.length} starred passwords");
     return _stars;
   }
 

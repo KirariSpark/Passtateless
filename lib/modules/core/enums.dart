@@ -44,7 +44,7 @@ enum AvailableColors {
   blueGrey(Colors.blue, "蓝色"),
   teal(Colors.teal, "暗青"),
   cyan(Colors.cyan, "青色"),
-  greed(Colors.lightGreen, "浅绿"),
+  green(Colors.lightGreen, "浅绿"),
   amber(Colors.yellow, "黄色"),
   orange(Colors.orange, "橙色"),
   red(Colors.red, "红色");
