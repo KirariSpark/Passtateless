@@ -5,6 +5,7 @@ import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/a11y-dark.dart';
@@ -26,6 +27,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
   void initState() {
     super.initState();
     // 初始化时填入父页面传来的数据
+    appLogger.logger.i("Showing generator config edit page with ${widget.initialText.length} characters");
     _configController = CodeLineEditingController.fromText(widget.initialText);
   }
 
@@ -36,12 +38,14 @@ class _CfgEditPageState extends State<CfgEditPage> {
   }
 
   void _formatJSON() {
+    appLogger.logger.i("Formatting generator config JSON");
     var res = utils.formatJSON(_configController.text);
     if (res.$1 == ErrorCode.success) {
       setState(() {
         _configController.text = res.$2;
       });
     } else {
+      appLogger.logger.e("Formatting failed: ${res.$1.code}");
       ui.showSnackBarQuick("JSON 格式错误", context);
     }
   }
@@ -57,6 +61,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               styled.buildListTile(
                 title: "JSON 语法基础",
                 onTapped: () {
+                  appLogger.logger.i("Pushing to help page json");
                   Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
@@ -71,6 +76,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               styled.buildListTile(
                 title: "生成配置",
                 onTapped: () {
+                  appLogger.logger.i("Pushing to help page cfg");
                   Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
@@ -84,6 +90,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               styled.buildListTile(
                 title: "生成规则提示",
                 onTapped: () {
+                  appLogger.logger.i("Pushing to help page cfg_tips");
                   Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
@@ -97,6 +104,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               styled.buildListTile(
                 title: "格式化与可读性",
                 onTapped: () {
+                  appLogger.logger.i("Pushing to help page formatting");
                   Navigator.of(context, rootNavigator: true).pop();
                   Navigator.push(
                     context,
@@ -128,6 +136,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
         actions: [
           IconButton(
             onPressed: () {
+              appLogger.logger.i("Saving latest config and exiting");
               Navigator.pop(context, _configController.text);
             },
             icon: const Icon(Icons.save_outlined),

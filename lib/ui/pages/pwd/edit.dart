@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
@@ -24,6 +25,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
 
   @override
   void initState() {
+    appLogger.logger.i("Editing password id ${widget.id}");
     super.initState();
     final data = Provider.of<PwdProvider>(context, listen: false).getItemById(widget.id);
     _identifierController = TextEditingController(text: data["identifier"]);
@@ -52,8 +54,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
 
     return Scaffold(
       appBar: styled.buildAppBar(
-        title:
-            "编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}",
+        title: "编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}",
         context: context,
       ),
       body: SingleChildScrollView(
@@ -79,6 +80,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           context, listen: false
                         ).setValueById(widget.id, "identifier", value);
                         if (res != ErrorCode.success) {
+                          appLogger.logger.e("Failed to rename: ${res.code}");
                           ui.showSnackBarQuick(res.generic, context);
                         }
                       },
@@ -96,6 +98,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           context, listen: false,
                         ).setValueById(widget.id, "userName", value);
                         if (res != ErrorCode.success) {
+                          appLogger.logger.e("Cannot change userName: ${res.code}");
                           ui.showSnackBarQuick(res.generic, context);
                         }
                       },
@@ -113,6 +116,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                           context, listen: false,
                         ).setValueById(widget.id, "account", value);
                         if (res != ErrorCode.success) {
+                          appLogger.logger.e("Cannot change account: ${res.code}");
                           ui.showSnackBarQuick(res.generic, context);
                         }
                       },
@@ -127,13 +131,16 @@ class _PwdEditPageState extends State<PwdEditPage> {
                   ui.showConfirmDialogQuick(
                     context: context,
                     function: () {
+                      appLogger.logger.i("Deleting password archive");
                       setState(() {
                         _isDeleting = true;
                       });
                       final res = Provider.of<PwdProvider>(context, listen: false).removeRecordById(widget.id);
                       if (res != ErrorCode.success) {
+                        appLogger.logger.e("Can not delete archive: ${res.code}");
                         ui.showSnackBarQuick(res.generic, context);
                       }
+                      appLogger.logger.i("Archive deleted");
                       Navigator.of(context, rootNavigator: true).pop();
                       Navigator.pop(context);
                     },
