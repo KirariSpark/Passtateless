@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -58,6 +59,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
               confirmDismiss: (direction) async {
                 // 未分类 文件夹是内置文件夹，不能删除
                 if (folders[index].isEmpty) {
+                  appLogger.logger.i("folder (empty string) is builtin and can not be deleted");
                   ui.showSnackBarQuick("你不能删除此文件夹", context);
                   return false;
                 } else {
@@ -84,7 +86,9 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                 }
               },
               onDismissed: (_) {
+                appLogger.logger.i("Trying to delete folder ${folders[index]}");
                 Provider.of<PwdProvider>(context, listen: false).removeFolder(folders[index]);
+                appLogger.logger.i("Folder deleted");
                 ui.showSnackBarQuick("文件夹已删除", context);
               },
               child: Material(
@@ -92,30 +96,37 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   title: displayTitle,
                   titleTag: folders[index],
                   onTapped: (){
+                    appLogger.logger.i("Pushing to page listing items in folder ${folders[index]}");
                     Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index], useHero: true))
+                      context,
+                      MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index], useHero: true))
                     );
                   },
                   trailing: IconButton(
                     tooltip: "重命名",
                     onPressed: () {
+                      appLogger.logger.i("Trying to rename folder ${folders[index]}");
+                      // 内置文件夹 未分类 不能重命名
                       if (folders[index] == "") {
+                        appLogger.logger.e("Folder (empty string) is builtin and can not be renamed");
                         ui.showSnackBarQuick("你不能重命名此文件夹", context);
                         return;
                       }
                       ui.showAlertDialogQuick(
-                        title: "重命名：$displayTitle", content: styled.buildTextField(
-                        context: context, controller: folderName, label: "新名称"
-                      ),
+                        title: "重命名：$displayTitle",
+                        content: styled.buildTextField(context: context, controller: folderName, label: "新名称"),
                         action: () => Navigator.of(context, rootNavigator: true).pop(),
                         actionText: "取消",
                         action2: () {
+                          appLogger.logger.i("Renaming folder to ${folderName.text}");
                           var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
                             folders[index], folderName.text
                           );
                           if (res == ErrorCode.success) {
+                            appLogger.logger.i("Renamed successfully");
                             Navigator.of(context, rootNavigator: true).pop();
                           } else {
+                            appLogger.logger.e("Can not rename folder: ${res.code}");
                             ui.showSnackBarQuick(res.generic, context);
                           }
                         },
@@ -161,20 +172,20 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             PopupMenuItem(
               child: Row(
                 spacing: styles.layoutSpacing,
-                children: [
-                  Icon(Icons.save_outlined),
-                  Text("保存更改")
-                ],
+                children: [Icon(Icons.save_outlined), Text("保存更改")],
               ),
               onTap: () async {
+                appLogger.logger.i("Saving changes in password archive");
                 ui.showSnackBarQuick("正在保存", context);
                 var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                    Provider.of<AppProvider>(context, listen: false).masterPwd
+                  Provider.of<AppProvider>(context, listen: false).masterPwd
                 );
                 if (context.mounted) {
                   if (stat == ErrorCode.success) {
+                    appLogger.logger.i("Saved successfully");
                     ui.showSnackBarQuick("你的档案已保存", context);
                   } else {
+                    appLogger.logger.i("Can not save archive: ${stat.code}");
                     ui.showSnackBarQuick(stat.generic, context);
                   }
                 }
@@ -184,26 +195,23 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             PopupMenuItem(
               child: Row(
                 spacing: styles.layoutSpacing,
-                children: [
-                  Icon(Icons.create_new_folder_outlined),
-                  Text("新建资料夹")
-                ],
+                children: [Icon(Icons.create_new_folder_outlined), Text("新建资料夹")],
               ),
               onTap: (){
                 ui.showAlertDialogQuick(
                   title: "新建文件夹",
-                  content: styled.buildTextField(
-                    label: "文件夹名", controller: folderName,
-                    context: context
-                  ),
+                  content: styled.buildTextField(label: "文件夹名", controller: folderName, context: context),
                   action: () => Navigator.of(context, rootNavigator: true).pop(),
                   actionText: "取消",
                   action2: () {
+                    appLogger.logger.i("Add folder ${folderName.text}");
                     var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
                     if (stat == ErrorCode.success) {
+                      appLogger.logger.i("Added successfully");
                       Navigator.of(context, rootNavigator: true).pop();
                       ui.showSnackBarQuick("文件夹已建立", context);
                     } else {
+                      appLogger.logger.e("Can not add folder: ${stat.code}");
                       ui.showSnackBarQuick(stat.generic, context);
                     }
                   },

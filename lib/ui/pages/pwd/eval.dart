@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/eval_res.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -56,10 +57,12 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
                       children: <Widget>[
                         IconButton(
                           onPressed: (){
+                            appLogger.logger.i("Evaluating password");
                             if (_pwdController.text.isEmpty) {
                               setState(() {
                                 _res = null;
                               });
+                              appLogger.logger.e("No password provided");
                               ui.showSnackBarQuick("请输入要评估的密码", context);
                               return;
                             } else {

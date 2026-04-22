@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
@@ -17,7 +18,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   (String, String)? _localSelectedTag;
 
-  // 构建右侧页面（直接作为 AdaptiveView 的 pageBuilder）
   Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("pages", "folders"):
@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
           leading: leading,
           trailing: const Icon(Icons.arrow_forward),
           onTapped: () {
+            appLogger.logger.d("Selected tag: $tag");
             setState(() {
               _localSelectedTag = tag;
             });
@@ -126,6 +127,7 @@ class _HomePageState extends State<HomePage> {
               hasConstraint: false,
               isWide: isWide,
               onItemTapped: (id) {
+                appLogger.logger.d("Selected password: $id");
                 setState(() {
                   _localSelectedTag = ("pwd", id);
                 });
