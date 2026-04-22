@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/generator/parser.dart' as parser;
 import 'package:provider/provider.dart';
 import 'dart:convert';
@@ -52,10 +53,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              "点击编辑",
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
+            Text("点击编辑", style: Theme.of(context).textTheme.bodyLarge),
             const Icon(Icons.arrow_forward_ios, size: 16)
           ],
         ),
@@ -63,21 +61,17 @@ class _PwdViewPageState extends State<PwdViewPage> {
         isLast: true,
         onTapped: () async {
           // 跳转并等待返回结果
+          appLogger.logger.i("Pushing to generator config edit page");
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => CfgEditPage(
-                // 把当前的文本传给新页面
-                initialText: _configController.text,
-              ),
-            ),
+            MaterialPageRoute(builder: (context) => CfgEditPage(initialText: _configController.text)),
           );
 
-          // 如果用户点击了保存(result不为空)，则更新本地的控制器
           if (result != null && result is String) {
             setState(() {
               _configController.text = result;
             });
+            appLogger.logger.i("Got new config with ${result.length} characters");
             // 发送通知
             if (mounted) {
               ui.showSnackBarQuick("编辑结果已保存", context);
@@ -91,19 +85,25 @@ class _PwdViewPageState extends State<PwdViewPage> {
   }
 
   /// 生成密码并显示提示（返回生成的密码或错误信息）
-  Future<(ErrorCode, String)> genPwd(BuildContext context, bool copy, String identifier, String userName, String account) async {
+  Future<(ErrorCode, String)> genPwd(
+    BuildContext context, bool copy, String identifier, String userName, String account
+  ) async {
+    appLogger.logger.i("Generating password");
     setState(() {isGenerating = true;});
     // 生成后的处理，复制和显示snack bar
     (ErrorCode, String) postProcess((ErrorCode, String) res) {
       if (res.$1 == ErrorCode.success) {
+        appLogger.logger.i("Generated successfully");
         if (copy) {
           Clipboard.setData(ClipboardData(text: res.$2));
         }
         if (context.mounted && copy) {
+          appLogger.logger.i("Password copied");
           ui.showSnackBarQuick("密码已复制", context);
         }
       } else {
         if (context.mounted) {
+          appLogger.logger.e("Can not generate password: ${res.$1.generic}");
           ui.showSnackBarQuick(res.$1.generic, context);
         }
       }
@@ -112,6 +112,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
     // 实际生成
     if (<Presets>[Presets.simple, Presets.complex, Presets.bank].contains(_preset)) {
       // 使用预设
+      appLogger.logger.i("Generating using builtin presets");
       final res = await parser.parseBuiltins(
         _preset, "$identifier: $userName @ $account",
         removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
@@ -119,6 +120,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
       return postProcess(res);
     } else {
       try {
+        appLogger.logger.i("Generating using custom config");
         final cfg = jsonDecode(_configController.text);
         final res = await parser.parse(
           jsonDecode(cfg), "$identifier: $userName @ $account",
@@ -127,13 +129,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
         return postProcess(res);
       } catch(e) {
         if (context.mounted) {
+          appLogger.logger.e("Can not generate password: $e");
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                "JSON 格式错误\n${e.toString()}",
-                style: TextStyle(fontFamily: "SourceCodePro"),
-              ),
+              content: Text("JSON 格式错误\n${e.toString()}", style: TextStyle(fontFamily: "SourceCodePro")),
               showCloseIcon: true
             )
           );
@@ -155,8 +155,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: widget.hasAppBar ? styled.buildAppBar(
         title: identifier.isEmpty ? '未命名' : identifier,
@@ -221,6 +219,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               setState(() {
                                 removeDigits = !removeDigits;
                               });
+                              appLogger.logger.d("Current digit removal state: $removeDigits");
                             },
                             title: const Text("移除数字"),
                             shape: styles.roundedBorder,
@@ -236,6 +235,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               setState(() {
                                 removeAlpha = !removeAlpha;
                               });
+                              appLogger.logger.d("Current alphabet removal state: $removeAlpha");
                             },
                             title: const Text("移除字母"),
                             shape: styles.roundedBorder,
@@ -251,6 +251,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               setState(() {
                                 removeSp = !removeSp;
                               });
+                              appLogger.logger.d("Current special char removal state: $removeSp");
                             },
                             title: const Text("移除特殊字符"),
                             shape: styles.roundedBorder,
@@ -267,10 +268,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            _preset.displayName,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
+                          Text(_preset.displayName, style: Theme.of(context).textTheme.bodyLarge),
                           Icon(Icons.arrow_drop_down)
                         ],
                       ),
@@ -282,6 +280,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           content: RadioGroup(
                             groupValue: _preset,
                             onChanged: (value){
+                              appLogger.logger.i("Setting preset to ${value?.name}");
                               setState(() {_preset = value ?? Presets.simple;});
                               Navigator.of(context, rootNavigator: true).pop();
                             },
@@ -316,13 +315,17 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               ui.showConfirmDialogQuick(
                                 context: context,
                                 function: () async {
+                                  appLogger.logger.i("Generating password for viewing");
                                   Navigator.of(context, rootNavigator: true).pop();
-                                  var temp = await genPwd(context, false, identifier, userName, account);
+                                  var (stat, res) = await genPwd(context, false, identifier, userName, account);
                                   if (context.mounted) {
-                                    if (temp.$1 == ErrorCode.success) {
+                                    if (stat == ErrorCode.success) {
+                                      appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
                                       Navigator.push(
-                                        context, MaterialPageRoute(builder: (context) => FullscreenPwd(temp.$2))
+                                        context, MaterialPageRoute(builder: (context) => FullscreenPwd(res))
                                       );
+                                    } else {
+                                      appLogger.logger.e("Can not generate password: ${stat.code}");
                                     }
                                   }
                                   // 启用按钮
@@ -341,6 +344,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                           child: styled.buildTextButton(
                             onPressed: isGenerating ? null : () async {
                               // 开始生成
+                              appLogger.logger.i("Generating password for copying");
                               await genPwd(context, true, identifier, userName, account);
                               // 启用按钮
                               setState(() {isGenerating = false;});

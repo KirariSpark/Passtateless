@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/pwd/edit.dart';
@@ -58,9 +59,11 @@ class PwdListPage extends StatelessWidget {
               Provider.of<PwdProvider>(context, listen: false).switchStarStateById(item["id"]);
             },
             onEditPressed: (){
+              appLogger.logger.i("Pushing to edit page for ${item["id"]}");
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: item["id"])));
             },
             onTapped: (){
+              appLogger.logger.i("Pushing to view page for ${item["id"]}");
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(id: item["id"], useHero: true)));
             }
           ),
@@ -72,11 +75,10 @@ class PwdListPage extends StatelessWidget {
 
   Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context, {required bool useHero, required bool hasAppBar, required bool hasPadding}) {
     return Scaffold(
-      appBar: hasAppBar ? styled.buildAppBar(
-        title: folder.isEmpty ? '未分类' : folder,
-        context: context,
-        titleTag: useHero ? folder : null
-      ) : null,
+      appBar: hasAppBar
+        ? styled.buildAppBar(
+          title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: useHero ? folder : null
+        ) : null,
       body: Container(
         padding: hasPadding ? styles.uniInsetsSmall : EdgeInsets.zero,
         alignment: Alignment.topCenter,
@@ -124,20 +126,20 @@ class PwdListPage extends StatelessWidget {
             PopupMenuItem(
               child: Row(
                 spacing: styles.layoutSpacing,
-                children: [
-                  Icon(Icons.save_outlined),
-                  Text("保存更改")
-                ],
+                children: [Icon(Icons.save_outlined), Text("保存更改")],
               ),
               onTap: () async {
+                appLogger.logger.i("Saving changes in password archive");
                 ui.showSnackBarQuick("正在保存", context);
                 var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                    Provider.of<AppProvider>(context, listen: false).masterPwd
+                  Provider.of<AppProvider>(context, listen: false).masterPwd
                 );
                 if (context.mounted) {
                   if (stat == ErrorCode.success) {
+                    appLogger.logger.i("Saved successfully");
                     ui.showSnackBarQuick("你的档案已保存", context);
                   } else {
+                    appLogger.logger.e("Can not save: ${stat.code}");
                     ui.showSnackBarQuick(stat.generic, context);
                   }
                 }
@@ -153,7 +155,9 @@ class PwdListPage extends StatelessWidget {
                 ],
               ),
               onTap: (){
+                appLogger.logger.i("Adding empty record to folder $folder");
                 final newId = Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
+                appLogger.logger.i("Record added, pushing to edit page for new record $newId");
                 Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId)));
               },
             )
