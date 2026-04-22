@@ -33,6 +33,10 @@ class PwdViewPage extends StatefulWidget {
 
 class _PwdViewPageState extends State<PwdViewPage> {
   final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  late String identifier;
+  late String userName;
+  late String account;
+  late String id;
   Presets _preset = Presets.simple;
   bool isGenerating = false;
   bool removeDigits = false;
@@ -140,13 +144,23 @@ class _PwdViewPageState extends State<PwdViewPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final data = Provider.of<PwdProvider>(context, listen: false).getItemById(widget.id);
+    identifier = data["identifier"];
+    userName = data["userName"];
+    account = data["account"];
+    id = data["id"];
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final pwdRecord = context.watch<PwdProvider>().getItemById(widget.id);
+
 
     return Scaffold(
       appBar: widget.hasAppBar ? styled.buildAppBar(
-        title: pwdRecord["identifier"].toString().isEmpty ? '未命名' : pwdRecord["identifier"].toString(),
-        titleTag: widget.useHero ? pwdRecord["id"] : null,
+        title: identifier.isEmpty ? '未命名' : identifier,
+        titleTag: widget.useHero ? id : null,
         context: context
       ) : null,
       body: SingleChildScrollView(
@@ -160,40 +174,43 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 constraints: BoxConstraints(maxWidth: maxWidth),
                 child: Column(
                   children: <Widget>[
-                    styles.spacingSizedBox,
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
+                      // TODO: 等待将来页面重构，才能合理设置isFirst和isLast
                       children: [
                         // 档案名
                         ConstrainedBox(
                           constraints: styles.tileWidthConstraint,
-                          child: styled.buildTextField(
-                            context: context,
-                            controller: TextEditingController(text: pwdRecord["identifier"]),
-                            label: "档案名",
-                            readonly: true
-                          )
+                            child: styled.buildListTile(
+                              title: "档案名",
+                              subtitle: identifier,
+                              isLast: true,
+                              isFirst: true,
+                              context: context
+                            )
                         ),
                         // 用户名
                         ConstrainedBox(
                           constraints: styles.tileWidthConstraint,
-                          child: styled.buildTextField(
-                            context: context,
-                            controller: TextEditingController(text: pwdRecord["userName"]),
-                            label: "用户名",
-                            readonly: true
-                          )
+                            child: styled.buildListTile(
+                              title: "用户名",
+                              subtitle: userName,
+                              isLast: true,
+                              isFirst: true,
+                              context: context
+                            )
                         ),
                         // 账号
                         ConstrainedBox(
                           constraints: styles.tileWidthConstraint,
-                          child: styled.buildTextField(
-                            context: context,
-                            controller: TextEditingController(text: pwdRecord["account"]),
-                            label: "账号",
-                            readonly: true
-                          ),
+                          child: styled.buildListTile(
+                            title: "账号",
+                            subtitle: account,
+                            isLast: true,
+                            isFirst: true,
+                            context: context
+                          )
                         ),
                         // 移除数字
                         ConstrainedBox(
@@ -207,7 +224,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             title: const Text("移除数字"),
                             shape: styles.roundedBorder,
-                            tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+                            tileColor: ColorScheme.of(context).surfaceContainerLow,
                           ),
                         ),
                         // 移除字母
@@ -222,7 +239,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             title: const Text("移除字母"),
                             shape: styles.roundedBorder,
-                            tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+                            tileColor: ColorScheme.of(context).surfaceContainerLow,
                           ),
                         ),
                         // 移除特殊字符
@@ -237,7 +254,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                             },
                             title: const Text("移除特殊字符"),
                             shape: styles.roundedBorder,
-                            tileColor: ColorScheme.of(context).primaryContainer.withAlpha(styles.alphaAlmostTransparent),
+                            tileColor: ColorScheme.of(context).surfaceContainerLow,
                           ),
                         )
                       ]
@@ -294,16 +311,13 @@ class _PwdViewPageState extends State<PwdViewPage> {
                       children: [
                         // 查看密码
                         Expanded(
-                          child: ElevatedButton(
+                          child: styled.buildTextButton(
                             onPressed: isGenerating ? null : () async {
                               ui.showConfirmDialogQuick(
                                 context: context,
                                 function: () async {
                                   Navigator.of(context, rootNavigator: true).pop();
-                                  var temp = await genPwd(
-                                    context, false, pwdRecord["identifier"],
-                                    pwdRecord["userName"], pwdRecord["account"]
-                                  );
+                                  var temp = await genPwd(context, false, identifier, userName, account);
                                   if (context.mounted) {
                                     if (temp.$1 == ErrorCode.success) {
                                       Navigator.push(
@@ -318,23 +332,20 @@ class _PwdViewPageState extends State<PwdViewPage> {
                                 info: "此操作将会显示你的密码，以便于你的记忆。\n请确保周围没有人能够窥视到你的屏幕。"
                               );
                             },
-                            style: styles.buttonStyle,
-                            child: Text("查看密码"),
+                            context: context,
+                            child: const Text("查看密码"),
                           ),
                         ),
                         // 复制密码
                         Expanded(
-                          child: ElevatedButton(
+                          child: styled.buildTextButton(
                             onPressed: isGenerating ? null : () async {
                               // 开始生成
-                              await genPwd(
-                                context, true, pwdRecord["identifier"],
-                                pwdRecord["userName"], pwdRecord["account"]
-                              );
+                              await genPwd(context, true, identifier, userName, account);
                               // 启用按钮
                               setState(() {isGenerating = false;});
                             },
-                            style: styles.buttonStyle,
+                            context: context,
                             child: const Text("复制密码"),
                           ),
                         )

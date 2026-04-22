@@ -50,11 +50,9 @@ class _PwdEditPageState extends State<PwdEditPage> {
       );
     }
 
-    final currentItem = context.watch<PwdProvider>().getItemById(widget.id);
-
     return Scaffold(
       appBar: styled.buildAppBar(
-        title: "编辑：${currentItem['identifier'] == '' ? '未命名' : currentItem['identifier']}",
+        title: "编辑：${_identifierController.text == '' ? '未命名' : _identifierController.text}",
         context: context,
       ),
       body: SingleChildScrollView(
