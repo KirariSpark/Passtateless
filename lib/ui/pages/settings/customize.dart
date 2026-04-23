@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/pages/settings/animations.dart';
+import 'package:passtateless/ui/pages/settings/themes.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
-import 'package:passtateless/ui/pages/settings/themes.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class CustomizeSettingsPage extends StatelessWidget {
@@ -40,6 +40,7 @@ class CustomizeSettingsPage extends StatelessWidget {
                     isFirst: true,
                     onTapped: () => onItemTapped(("customize", "theme")),
                     active: isSelected(("customize", "theme")),
+                    titleTag: isWide ? null : "settings/themes",
                     context: context
                   ),
                   styled.buildListTile(
@@ -47,6 +48,9 @@ class CustomizeSettingsPage extends StatelessWidget {
                     title: "动画",
                     trailing: Icon(Icons.arrow_forward),
                     isLast: true,
+                    onTapped: () => onItemTapped(("customize", "animations")),
+                    active: isSelected(("customize", "animations")),
+                    titleTag: isWide ? null : "settings/animations",
                     context: context
                   )
                 ],
@@ -58,11 +62,14 @@ class CustomizeSettingsPage extends StatelessWidget {
           switch (tag) {
             case ("customize", "theme"):
               return ThemeSettingsPage(useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+            case ("customize", "animations"):
+              return AnimationSettingsPage(useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
             default:
               return SizedBox.shrink();
           }
         },
-        widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth + styles.layoutSpacing,
+        widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
+            styles.layoutSpacing,
       )
     );
   }

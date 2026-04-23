@@ -25,7 +25,7 @@ class ThemeSettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: hasAppBar
-        ? styled.buildAppBar(title: "个性化", context: context, titleTag: useHero ? "customize" : null)
+        ? styled.buildAppBar(title: "主题", context: context, titleTag: useHero ? "settings/themes" : null)
         : null,
       body: Container(
         alignment: Alignment.topCenter,

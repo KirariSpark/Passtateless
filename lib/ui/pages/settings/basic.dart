@@ -77,6 +77,8 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         );
       },
       padding: styles.pagePaddingAll,
+      widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
+          styles.layoutSpacing,
     );
   }
 }
