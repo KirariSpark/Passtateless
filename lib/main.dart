@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'modules/core/logger.dart';
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/pwd_provider.dart';
