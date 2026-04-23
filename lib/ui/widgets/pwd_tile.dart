@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/styles.dart' as styles;
 
@@ -61,6 +62,7 @@ class PwdTile extends StatelessWidget {
       subtitleText = pwdRecord["userName"];
     } else if (!hasUserName && !hasAccount) {
       // 都没有设置
+      appLogger.logger.w("Password record ${pwdRecord["id"]} invalid");
       subtitleText = "无效记录，添加用户名或账号";
     } else {
       // 都设置了

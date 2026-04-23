@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/help/overview.dart';
 import 'package:passtateless/ui/pages/pwd/home.dart';
@@ -23,6 +24,7 @@ class _MainAppState extends State<MainApp> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appProvider = Provider.of<AppProvider>(context, listen: false);
       if (appProvider.needChangeMaster) {
+        appLogger.logger.w("Outdated master password detected");
         ui.showAlertDialogQuick(
           title: "主密码过期",
           content: Text("您的密码已超过设定的安全使用期限，为了您的信息安全，建议尽快更改主密码"),
@@ -57,6 +59,8 @@ class _MainAppState extends State<MainApp> {
 
         // 滚动方向改变时，重新布局前要做的事
         if (_lastScrollDirection != null && _lastScrollDirection != currentAxis) {
+          appLogger.logger.d("Layout direction changed, recovering page index");
+          appLogger.logger.d("Current direction is ${currentAxis.name}");
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (appProvider.pageController.hasClients) {
               appProvider.pageController.animateToPage(

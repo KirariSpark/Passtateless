@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
@@ -7,6 +8,7 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/app.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
@@ -37,9 +39,13 @@ class _SplashPageState extends State<SplashPage> {
         spacing: styles.layoutSpacing,
         mainAxisSize: MainAxisSize.min,
         children: [
-          SpinKitFoldingCube(
-            color: ColorScheme.of(context).primary,
-            size: 15,
+          SizedBox(
+            height: 15,
+            width: 15,
+            child: CircularProgressIndicator(
+              color: ColorScheme.of(context).primary,
+              strokeWidth: 3,
+            ),
           ),
           Text("正在解密")
         ],
@@ -59,10 +65,7 @@ class _SplashPageState extends State<SplashPage> {
               children: [
                 Image.asset("assets/icon.png", width: 100),
                 styles.spacingSizedBox,
-                Text(
-                  "Passtateless 已被锁定",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text("Passtateless 已被锁定", style: Theme.of(context).textTheme.titleLarge),
                 Column(
                   children: [
                     Text("请输入你的主密码以继续"),
@@ -77,8 +80,10 @@ class _SplashPageState extends State<SplashPage> {
                 ),
                 TextButton(
                   onPressed: () async {
+                    appLogger.logger.i("Trying to decrypt archive");
                     // 检查是否为空
                     if (_pwdController.text.isEmpty) {
+                      appLogger.logger.e("Empty password");
                       ui.showSnackBarQuick("不能输入空密码", context);
                       return;
                     }
@@ -88,7 +93,7 @@ class _SplashPageState extends State<SplashPage> {
                         isDecrypting = true;
                       });
                       // 设置主密码
-                      // setter会进行一次哈希处理，因此不能与controller同步
+                      // setter会进行一次哈希，因此不能与controller同步
                       Provider.of<AppProvider>(context, listen: false).masterPwd = _pwdController.text;
                       // 解密档案
                       var stat = await pwdProvider.readArchive(
@@ -100,8 +105,10 @@ class _SplashPageState extends State<SplashPage> {
                           isDecrypting = false;
                         });
                         if (stat != ErrorCode.success) {
+                          appLogger.logger.e("Can not decrypt: $e");
                           ui.showSnackBarQuick(stat.generic, context);
                         } else {
+                          appLogger.logger.i("Archive decrypted, pushing to main app");
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp()));
                         }
                       }

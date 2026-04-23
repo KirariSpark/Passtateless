@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -46,6 +47,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
 
   // 点击处理逻辑
   void _onItemTapped((String, String) tag, bool isWide) {
+    appLogger.logger.d("Tag $tag tapped while wide layout is $isWide");
     if (isWide) {
       setState(() {
         _selectedTag = tag;
