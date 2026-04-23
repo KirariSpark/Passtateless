@@ -25,6 +25,9 @@ class AdaptiveView extends StatefulWidget {
   /// 宽屏下右侧内容区的可选约束
   final BoxConstraints? rightPaneConstraints;
 
+  /// 触发布局切换的阈值，默认 styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing
+  final double? widthThreshold;
+
   /// 内边距值
   final EdgeInsets padding;
 
@@ -34,7 +37,8 @@ class AdaptiveView extends StatefulWidget {
     required this.pageBuilder,
     this.placeholderText = "未选择项目",
     this.rightPaneConstraints,
-    this.padding = EdgeInsets.zero
+    this.padding = EdgeInsets.zero,
+    this.widthThreshold
   });
 
   @override
@@ -129,7 +133,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final bool isWide = constraints.maxWidth > (styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing);
+        final bool isWide = constraints.maxWidth > (widget.widthThreshold ?? (styles.tileWidthConstraint.maxWidth * 2 + styles.layoutSpacing));
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 100),
           child: isWide ? _buildWideLayout(context, isWide) : _buildNarrowLayout(context, isWide),

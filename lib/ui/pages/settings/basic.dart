@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/master.dart';
-import 'package:passtateless/ui/pages/settings/themes.dart';
 import 'package:passtateless/ui/pages/settings/advanced.dart';
 import 'package:passtateless/ui/pages/settings/a11y.dart';
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
+import 'package:passtateless/ui/pages/settings/customize.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -31,7 +31,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       case ("basic", "masterPwd"):
         return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "customize"):
-        return ThemeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
+        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "advanced"):
         return AdvancedSettingsPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("basic", "a11y"):

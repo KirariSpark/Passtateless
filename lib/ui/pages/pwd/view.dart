@@ -121,9 +121,8 @@ class _PwdViewPageState extends State<PwdViewPage> {
     } else {
       try {
         appLogger.logger.i("Generating using custom config");
-        final cfg = jsonDecode(_configController.text);
         final res = await parser.parse(
-          jsonDecode(cfg), "$identifier: $userName @ $account",
+          jsonDecode(_configController.text), "$identifier: $userName @ $account",
           removeAlpha: removeAlpha, removeDigits: removeDigits, removeSp: removeSp
         );
         return postProcess(res);

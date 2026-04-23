@@ -29,84 +29,81 @@ class MasterPwdSettingsPage extends StatelessWidget {
       body: AdaptiveView(
         leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
           return Container(
-            alignment: Alignment.topCenter,
-            child: Container(
-              padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
-              constraints: styles.pageWidthConstraint,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // 更改主密码
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: styled.buildListTile(
-                        active: isSelected(("master","change")),
-                        isFirst: true,
-                        leading: Icons.edit_outlined,
-                        trailing: Icon(Icons.arrow_forward),
-                        title: "更改主密码",
-                        titleTag: "pages/settings/change_master",
-                        onTapped: () {
-                          onItemTapped(("master", "change"));
-                        },
-                        context: context
-                      ),
+            padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
+            constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // 更改主密码
+                  ConstrainedBox(
+                    constraints: styles.tileWidthConstraint,
+                    child: styled.buildListTile(
+                      active: isSelected(("master","change")),
+                      isFirst: true,
+                      leading: Icons.edit_outlined,
+                      trailing: Icon(Icons.arrow_forward),
+                      title: "更改主密码",
+                      titleTag: "pages/settings/change_master",
+                      onTapped: () {
+                        onItemTapped(("master", "change"));
+                      },
+                      context: context
                     ),
-                    // 提醒我更改密码
-                    ConstrainedBox(
-                      constraints: styles.tileWidthConstraint,
-                      child: styled.buildListTile(
-                        active: isSelected(("master","remind")),
-                        isLast: true,
-                        leading: Icons.lock_clock_outlined,
-                        title: "提醒我更改主密码",
-                        trailing: Icon(Icons.arrow_forward),
-                        onTapped: () {
-                          ui.showAlertDialogQuick(
-                            title: "选择时间",
-                            content: Column(
-                              spacing: styles.layoutSpacing,
-                              children: <Widget>[
-                                Text("你的主密码会在设置的天数后失效，并需要重新设置\n此行为可以增强你的档案的安全性，也能降低数据泄漏的风险"),
-                                RadioGroup(
-                                  groupValue: appProvider.remindMe,
-                                  onChanged: (value) async {
-                                    appProvider.remindMe = value!;
-                                    appLogger.logger.i("Remind settings updated to ${value.name}");
-                                    await appProvider.saveConfig();
-                                    if (context.mounted) {
-                                      appLogger.logger.i("Changes in settings saved");
-                                      Navigator.of(context, rootNavigator: true).pop(context);
-                                    }
-                                  },
-                                  child: Column(
-                                    children: <Widget>[
-                                      for (var item in RemindDays.values) RadioListTile(
-                                        value: item,
-                                        title: Text(item.displayName),
-                                        shape: styles.roundedBorder,
-                                      )
-                                    ],
-                                  ),
+                  ),
+                  // 提醒我更改密码
+                  ConstrainedBox(
+                    constraints: styles.tileWidthConstraint,
+                    child: styled.buildListTile(
+                      active: isSelected(("master","remind")),
+                      isLast: true,
+                      leading: Icons.lock_clock_outlined,
+                      title: "提醒我更改主密码",
+                      trailing: Icon(Icons.arrow_forward),
+                      onTapped: () {
+                        ui.showAlertDialogQuick(
+                          title: "选择时间",
+                          content: Column(
+                            spacing: styles.layoutSpacing,
+                            children: <Widget>[
+                              Text("你的主密码会在设置的天数后失效，并需要重新设置\n此行为可以增强你的档案的安全性，也能降低数据泄漏的风险"),
+                              RadioGroup(
+                                groupValue: appProvider.remindMe,
+                                onChanged: (value) async {
+                                  appProvider.remindMe = value!;
+                                  appLogger.logger.i("Remind settings updated to ${value.name}");
+                                  await appProvider.saveConfig();
+                                  if (context.mounted) {
+                                    appLogger.logger.i("Changes in settings saved");
+                                    Navigator.of(context, rootNavigator: true).pop(context);
+                                  }
+                                },
+                                child: Column(
+                                  children: <Widget>[
+                                    for (var item in RemindDays.values) RadioListTile(
+                                      value: item,
+                                      title: Text(item.displayName),
+                                      shape: styles.roundedBorder,
+                                    )
+                                  ],
                                 ),
-                              ],
-                            ),
-                            context: context,
-                            action: () {
-                              if (context.mounted) {
-                                Navigator.of(context, rootNavigator: true).pop(context);
-                              }
-                            },
-                            actionText: '取消',
-                          );
-                        },
-                        context: context,
-                      ),
+                              ),
+                            ],
+                          ),
+                          context: context,
+                          action: () {
+                            if (context.mounted) {
+                              Navigator.of(context, rootNavigator: true).pop(context);
+                            }
+                          },
+                          actionText: '取消',
+                        );
+                      },
+                      context: context,
                     ),
-                  ]
-                )
+                  ),
+                ]
               )
-            ),
+            )
           );
         },
         pageBuilder: (tag, isWide) {
@@ -115,7 +112,8 @@ class MasterPwdSettingsPage extends StatelessWidget {
           } else {
             return styled.buildPlaceHolder(text: "未选择项目", context: context);
           }
-        }
+        },
+        widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth + styles.layoutSpacing,
       )
     );
   }
