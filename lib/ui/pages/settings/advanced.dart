@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/file_mgr/core_mgr.dart';
+import 'package:passtateless/ui/pages/settings/log_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -36,6 +39,12 @@ class AdvancedSettingsPage extends StatelessWidget {
                   isLast: true,
                   title: "查看日志",
                   trailing: Icon(Icons.arrow_forward),
+                  onTapped: () async {
+                    final res = await readTextFile(Paths.log.path);
+                    if (context.mounted) {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => LogViewPage(log: res.$2,)));
+                    }
+                  },
                   context: context
                 )
               ],
