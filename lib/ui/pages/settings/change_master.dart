@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
 /// 更改主密码页面
@@ -126,9 +127,10 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
                     Expanded(
                       child: styled.buildTextButton(
                         context: context,
+                        // 只要有一个显示状态，则按钮就是全部隐藏
                         onPressed: () {
                           setState(() {
-                            pwdModeOld = pwdModeNew = pwdModeConfirm = pwdModeConfirm && pwdModeNew && pwdModeOld ? false : true;
+                            pwdModeOld = pwdModeNew = pwdModeConfirm = !(pwdModeConfirm && pwdModeNew && pwdModeOld);
                           });
                         },
                         child: Text(pwdModeConfirm && pwdModeNew && pwdModeOld ? "全部显示" : "全部隐藏")
@@ -139,6 +141,7 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
                       child: styled.buildTextButton(
                         context: context,
                         onPressed: () async {
+                          appLogger.logger.i("Requesting provider to change master password");
                           var res = await Provider.of<PwdProvider>(context, listen: false).changeMasterPwd(
                             currentMaster: Provider.of<AppProvider>(context, listen: false).masterPwd,
                             inputOld: _pwdOldController.text,

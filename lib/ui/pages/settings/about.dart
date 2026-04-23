@@ -26,16 +26,10 @@ class AboutPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  "assets/icon.png",
-                  width: 100,
-                ),
+                Image.asset("assets/icon.png", width: 100),
                 styles.spacingSizedBox,
                 styles.spacingSizedBox,
-                Text(
-                  "Passtateless",
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+                Text("Passtateless", style: Theme.of(context).textTheme.bodyLarge),
                 Text("0.1.1 - beta"),
                 styles.spacingSizedBox,
                 TextButton(
@@ -43,9 +37,7 @@ class AboutPage extends StatelessWidget {
                     ui.showAlertDialogQuick(
                       title: "Passtateless",
                       content: Text("Passtateless 是一个无状态密码管理器\n使用 Apache 2.0 许可证"),
-                      action: () {
-                        Navigator.of(context, rootNavigator: true).pop();
-                      },
+                      action: () => Navigator.of(context, rootNavigator: true).pop(),
                       actionText: "确定",
                       action2: () {
                         Navigator.of(context, rootNavigator: true).pop();

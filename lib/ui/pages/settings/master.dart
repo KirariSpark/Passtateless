@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/settings/change_master.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
 /// 主密码设置页面
@@ -71,8 +72,10 @@ class MasterPwdSettingsPage extends StatelessWidget {
                                   groupValue: appProvider.remindMe,
                                   onChanged: (value) async {
                                     appProvider.remindMe = value!;
+                                    appLogger.logger.i("Remind settings updated to ${value.name}");
                                     await appProvider.saveConfig();
                                     if (context.mounted) {
+                                      appLogger.logger.i("Changes in settings saved");
                                       Navigator.of(context, rootNavigator: true).pop(context);
                                     }
                                   },

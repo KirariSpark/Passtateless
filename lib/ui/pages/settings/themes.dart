@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
@@ -36,9 +39,13 @@ class ThemeSettingsPage extends StatelessWidget {
                   groupValue: appProvider.currentColor,
                   onChanged: (value) async {
                     Provider.of<AppProvider>(context, listen: false).color = value ?? AvailableColors.teal;
+                    appLogger.logger.i("Theme changed to ${value?.name}");
                     var res = await Provider.of<AppProvider>(context, listen: false).saveConfig();
                     if (res != ErrorCode.success && context.mounted) {
+                      appLogger.logger.e("Can not save config: $e}");
                       ui.showSnackBarQuick(res.generic, context);
+                    } else {
+                      appLogger.logger.i("Changes in settings saved");
                     }
                   },
                   child: Wrap(

@@ -158,9 +158,9 @@ TextButton buildTextButton({
   return TextButton(
     onPressed: onPressed,
     style: TextButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: styles.borderRadius),
-        backgroundColor: ColorScheme.of(context).secondaryContainer,
-        foregroundColor: ColorScheme.of(context).onSecondaryContainer
+      shape: RoundedRectangleBorder(borderRadius: styles.borderRadius),
+      backgroundColor: ColorScheme.of(context).secondaryContainer,
+      foregroundColor: ColorScheme.of(context).onSecondaryContainer
     ),
     child: child,
   );
