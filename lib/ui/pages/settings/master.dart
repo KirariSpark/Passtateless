@@ -65,7 +65,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                           content: Column(
                             spacing: styles.layoutSpacing,
                             children: <Widget>[
-                              Text("你的主密码会在设置的天数后失效，并需要重新设置\n此行为可以增强你的档案的安全性，也能降低数据泄漏的风险"),
+                              Text("定期提醒你更改你的主密码，助你保持良好的安全习惯\n此行为可以增强你的档案的安全性，也能降低数据泄漏的风险"),
                               RadioGroup(
                                 groupValue: appProvider.remindMe,
                                 onChanged: (value) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
@@ -42,6 +43,16 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 动画速度
+  AnimationDilation _currentDilation = AnimationDilation.normal;
+  AnimationDilation get currentDilation => _currentDilation;
+  set currentDilation(AnimationDilation value) {
+    appLogger.logger.i("Setting time dilation to $value");
+    timeDilation = value.dilation;
+    _currentDilation = value;
+    notifyListeners();
+  }
+
   // ————主密码相关————
   // 主密码
   String _masterPwd = "";
@@ -69,7 +80,11 @@ class AppProvider extends ChangeNotifier {
         appLogger.logger.i("Restoring remind settings");
         remindMe = RemindDays.values.firstWhere(
           (e) => e.name == res['remindMe'],
-          orElse: () => _remindMe, // 如果名称没找到对应的枚举，保持默认值
+          // 如果名称没找到对应的枚举，保持默认值
+          orElse: () {
+            appLogger.logger.w("Invalid remind setting, falling back to default");
+            return _remindMe;
+          },
         );
       }
 
@@ -78,7 +93,23 @@ class AppProvider extends ChangeNotifier {
         appLogger.logger.i("Restoring color settings");
         color = AvailableColors.values.firstWhere(
           (e) => e.name == res['currentColor'],
-          orElse: () => _currentColor, // 如果名称没找到对应的枚举，保持默认值
+          // 如果名称没找到对应的枚举，保持默认值
+          orElse: () {
+            appLogger.logger.w("Invalid theme setting, falling back to default");
+            return _currentColor;
+          },
+        );
+      }
+
+      // 读取并还原动画速度设置
+      if (res.containsKey('currentDilation') && res['currentDilation'] is String) {
+        appLogger.logger.i("Restoring time dilation settings");
+        currentDilation = AnimationDilation.values.firstWhere(
+            (e) => e.name == res['currentDilation'],
+          orElse: () {
+            appLogger.logger.w("Invalid time dilation setting, falling back to default");
+            return _currentDilation;
+          }
         );
       }
 
@@ -111,6 +142,7 @@ class AppProvider extends ChangeNotifier {
     final configMap = {
       'remindMe': _remindMe.name,
       'currentColor': _currentColor.name,
+      'currentDilation': _currentDilation.name
     };
     return await json_mgr.writeJsonFile(Paths.config.toString(), configMap);
   }

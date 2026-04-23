@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:provider/provider.dart';
 
 class AnimationSettingsPage extends StatefulWidget {
   /// 有AppBar时，是否要使用Hero动画
@@ -19,8 +20,6 @@ class AnimationSettingsPage extends StatefulWidget {
 }
 
 class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
-  double currentDilation = AnimationDurations.normal.dilation;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,18 +73,17 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
                         context: context,
                         title: "动画速度",
                         content: RadioGroup(
-                          groupValue: currentDilation,
+                          groupValue: Provider.of<AppProvider>(context, listen: false).currentDilation,
                           onChanged: (value) {
-                            timeDilation = value ?? AnimationDurations.normal.dilation;
-                            setState(() {
-                              currentDilation = value ?? AnimationDurations.normal.dilation;
-                            });
+                            Provider.of<AppProvider>(context, listen: false).currentDilation =
+                                value ?? AnimationDilation.normal;
+                            Provider.of<AppProvider>(context, listen: false).saveConfig();
                             Navigator.of(context, rootNavigator: true).pop();
                           },
                           child: Column(
                             children: [
-                              for (var item in AnimationDurations.values) RadioListTile(
-                                value: item.dilation,
+                              for (var item in AnimationDilation.values) RadioListTile(
+                                value: item,
                                 title: Text(item.displayName),
                                 shape: styles.roundedBorder,
                               )

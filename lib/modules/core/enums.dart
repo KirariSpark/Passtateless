@@ -63,17 +63,17 @@ enum NavigatorMode {
   const NavigatorMode(this.displayName);
 }
 
-enum AnimationDurations {
-  fastest(0.1, "冲刺！冲！"),
+enum AnimationDilation {
+  fastest(0.1, "♿♿♿"),
   veryFast(0.5, "极快"),
   fast(0.75, "快速"),
   normal(1, "标准"),
   slow(1.5, "慢速"),
   verySlow(2, "极慢"),
-  slowest(10, "老头");
+  slowest(10, "🐌🐌🐌");
 
   final double dilation;
   final String displayName;
 
-  const AnimationDurations(this.dilation, this.displayName);
+  const AnimationDilation(this.dilation, this.displayName);
 }

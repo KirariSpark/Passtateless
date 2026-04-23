@@ -34,13 +34,6 @@ class A11ySettingsPage extends StatelessWidget {
                   context: context
                 ),
                 styled.buildListTile(
-                  title: "动画",
-                  leading: Icons.animation,
-                  trailing: Icon(Icons.arrow_forward),
-                  onTapped: () {},
-                  context: context
-                ),
-                styled.buildListTile(
                   title: "对比度",
                   leading: Icons.contrast,
                   trailing: Icon(Icons.arrow_drop_down),
