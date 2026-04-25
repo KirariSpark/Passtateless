@@ -38,6 +38,7 @@ class AdvancedSettingsPage extends StatelessWidget {
                 styled.buildListTile(
                   isLast: true,
                   title: "查看日志",
+                  titleTag: "log_view",
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () async {
                     final res = await readTextFile(Paths.log.path);
