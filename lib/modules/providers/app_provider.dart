@@ -53,6 +53,16 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 日志等级
+  LogLevels _currentLogLevel = LogLevels.debug;
+  LogLevels get currentLogLevel => _currentLogLevel;
+  set currentLogLevel(LogLevels value) {
+    appLogger.logger.i("Setting log level to ${value.name}");
+    appLogger.setLevel(value.lvl);
+    _currentLogLevel = value;
+    notifyListeners();
+  }
+
   // ————主密码相关————
   // 主密码
   String _masterPwd = "";

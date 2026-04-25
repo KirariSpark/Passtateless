@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 enum Paths {
   pwdRecord("saved_pwds.bin"),
@@ -76,4 +77,16 @@ enum AnimationDilation {
   final String displayName;
 
   const AnimationDilation(this.dilation, this.displayName);
+}
+
+enum LogLevels {
+  debug("调试", Level.debug),
+  info("信息", Level.info),
+  warning("警告", Level.warning),
+  error("错误", Level.error);
+
+  final String displayName;
+  final Level lvl;
+
+  const LogLevels(this.displayName, this.lvl);
 }

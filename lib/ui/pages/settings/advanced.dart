@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/settings/log_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:provider/provider.dart';
 
 // 高级设置页面
 class AdvancedSettingsPage extends StatelessWidget {
@@ -33,6 +38,32 @@ class AdvancedSettingsPage extends StatelessWidget {
                   isFirst: true,
                   title: "日志等级",
                   trailing: Icon(Icons.arrow_drop_down),
+                  onTapped: () {
+                    ui.showAlertDialogQuick(
+                      title: "日志等级",
+                      content: RadioGroup(
+                        groupValue: Provider.of<AppProvider>(context, listen: false).currentLogLevel,
+                        onChanged: (value) {
+                          Provider.of<AppProvider>(context, listen: false).currentLogLevel = value!;
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                        child: Column(
+                          children: [
+                            for (var item in LogLevels.values) RadioListTile(
+                              value: item,
+                              title: Text(item.displayName),
+                              shape: styles.roundedBorder,
+                            )
+                          ],
+                        )
+                      ),
+                      action: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
+                      actionText: "取消",
+                      context: context
+                    );
+                  },
                   context: context
                 ),
                 styled.buildListTile(
@@ -41,9 +72,13 @@ class AdvancedSettingsPage extends StatelessWidget {
                   titleTag: "log_view",
                   trailing: Icon(Icons.arrow_forward),
                   onTapped: () async {
-                    final res = await readTextFile(Paths.log.path);
-                    if (context.mounted) {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => LogViewPage(log: res.$2,)));
+                    appLogger.logger.i("Loading log");
+                    final (stat, res) = await readTextFile(Paths.log.path);
+                    if (context.mounted && stat == ErrorCode.success) {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => LogViewPage(log: res)));
+                    } else {
+                      appLogger.logger.e("Can not load log: ${stat.code}");
+                      ui.showSnackBarQuick(stat.generic, context);
                     }
                   },
                   context: context
