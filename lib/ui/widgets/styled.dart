@@ -22,7 +22,6 @@ ListTile buildListTile({
   Widget? trailing,
   String? titleTag,
   void Function()? onTapped,
-  int? alpha,
   bool isFirst = false,
   bool isLast = false,
   bool active = false

@@ -57,7 +57,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
             const Icon(Icons.arrow_forward_ios, size: 16)
           ],
         ),
-        alpha: styles.alphaAlmostTransparent,
         isLast: true,
         onTapped: () async {
           // 跳转并等待返回结果

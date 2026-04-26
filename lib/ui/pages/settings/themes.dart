@@ -51,10 +51,7 @@ class ThemeSettingsPage extends StatelessWidget {
                   for (final (index, item) in AvailableColors.values.indexed) RadioListTile(
                     value: item,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: index == 0 ? styles.radius : Radius.zero,
-                        bottom: index == AvailableColors.values.length - 1 ? styles.radius : Radius.zero
-                      )
+                      borderRadius: ui.calcRadius(isFirst: index == 0, isLast: index == AvailableColors.values.length)
                     ),
                     title: Container(
                       constraints: BoxConstraints(minHeight: 50),
@@ -64,20 +61,20 @@ class ThemeSettingsPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Container(
-                              color: ColorScheme.fromSeed(seedColor: item.color).primary,
+                              color: ColorScheme.fromSeed(seedColor: item.color, brightness: Brightness.dark).primary,
                               constraints: BoxConstraints(minHeight: 50),
                             ),
                           ),
                           Expanded(
                             child: Container(
-                              color: ColorScheme.fromSeed(seedColor: item.color).secondary,
+                              color: ColorScheme.fromSeed(seedColor: item.color, brightness: Brightness.dark).secondary,
                               constraints: BoxConstraints(minHeight: 50),
                             ),
                           ),
                           Expanded(
                             child: Container(
-                              color: ColorScheme.fromSeed(seedColor: item.color).tertiary,
-                              constraints: BoxConstraints(minHeight: 50),
+                              color: ColorScheme.fromSeed(seedColor: item.color, brightness: Brightness.dark).tertiary,
+                              constraints: BoxConstraints(minHeight: 50)
                             ),
                           )
                         ],
