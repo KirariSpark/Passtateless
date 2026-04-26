@@ -35,11 +35,18 @@ class AppProvider extends ChangeNotifier {
   // 主题
   AvailableColors _currentColor = AvailableColors.indigo;
   AvailableColors get currentColor => _currentColor;
-  ColorScheme get colorScheme => ColorScheme.fromSeed(seedColor: _currentColor.color);
-  ColorScheme get darkColorScheme => ColorScheme.fromSeed(seedColor: _currentColor.color, brightness: Brightness.dark);
+  ContrastLevels _currentContrast = ContrastLevels.normal;
+  ContrastLevels get currentContrast => _currentContrast;
+  ColorScheme get colorScheme => ColorScheme.fromSeed(seedColor: _currentColor.color, contrastLevel: _currentContrast.contrast);
+  ColorScheme get darkColorScheme => ColorScheme.fromSeed(seedColor: _currentColor.color, brightness: Brightness.dark, contrastLevel: _currentContrast.contrast);
   set color(AvailableColors value) {
     appLogger.logger.i("Setting color to ${value.name}");
     _currentColor = value;
+    notifyListeners();
+  }
+  set contrast(ContrastLevels value) {
+    appLogger.logger.i("Setting contrast to ${value.name}");
+    _currentContrast = value;
     notifyListeners();
   }
 

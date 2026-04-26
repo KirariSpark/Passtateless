@@ -90,3 +90,16 @@ enum LogLevels {
 
   const LogLevels(this.displayName, this.lvl);
 }
+
+enum ContrastLevels {
+  veryLow(-0.7, "低"),
+  low(-0.3, "较低"),
+  normal(0, "普通"),
+  high(0.3, "较高"),
+  veryHigh(0.7, "高");
+
+  final double contrast;
+  final String displayName;
+
+  const ContrastLevels(this.contrast, this.displayName);
+}

@@ -37,8 +37,8 @@ ListTile buildListTile({
       top: isFirst ? styles.radius : Radius.zero,
       bottom: isLast ? styles.radius : Radius.zero
     )),
-    iconColor: ColorScheme.of(context).onSurface,
-    textColor: ColorScheme.of(context).onSurface,
+    iconColor: active ? ColorScheme.of(context).onSecondaryContainer : ColorScheme.of(context).onSurface,
+    textColor: active ? ColorScheme.of(context).onSecondaryContainer : ColorScheme.of(context).onSurface,
     tileColor: active ? ColorScheme.of(context).secondaryContainer : ColorScheme.of(context).surfaceContainerLow,
   );
 }
