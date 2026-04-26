@@ -31,40 +31,62 @@ class ThemeSettingsPage extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Container(
           padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
-          constraints: styles.pageWidthConstraint,
+          constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                RadioGroup(
-                  groupValue: appProvider.currentColor,
-                  onChanged: (value) async {
-                    Provider.of<AppProvider>(context, listen: false).color = value ?? AvailableColors.teal;
-                    appLogger.logger.i("Theme changed to ${value?.name}");
-                    var res = await Provider.of<AppProvider>(context, listen: false).saveConfig();
-                    if (res != ErrorCode.success && context.mounted) {
-                      appLogger.logger.e("Can not save config: $e}");
-                      ui.showSnackBarQuick(res.generic, context);
-                    } else {
-                      appLogger.logger.i("Changes in settings saved");
-                    }
-                  },
-                  child: Wrap(
-                    runSpacing: styles.layoutSpacing,
-                    spacing: styles.layoutSpacing,
-                    children: [
-                      for (var item in AvailableColors.values) ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: 130),
-                        child: RadioListTile(
-                          value: item,
-                          shape: styles.roundedBorder,
-                          title: Text(item.displayName),
-                          tileColor: item.color.withAlpha(styles.alphaAlmostTransparent),
-                        ),
+            child: RadioGroup(
+              groupValue: appProvider.currentColor,
+              onChanged: (value) async {
+                Provider.of<AppProvider>(context, listen: false).color = value ?? AvailableColors.teal;
+                appLogger.logger.i("Theme changed to ${value?.name}");
+                var res = await Provider.of<AppProvider>(context, listen: false).saveConfig();
+                if (res != ErrorCode.success && context.mounted) {
+                  appLogger.logger.e("Can not save config: $e}");
+                  ui.showSnackBarQuick(res.generic, context);
+                } else {
+                  appLogger.logger.i("Changes in settings saved");
+                }
+              },
+              child: Column(
+                children: [
+                  for (final (index, item) in AvailableColors.values.indexed) RadioListTile(
+                    value: item,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: index == 0 ? styles.radius : Radius.zero,
+                        bottom: index == AvailableColors.values.length - 1 ? styles.radius : Radius.zero
+                      )
+                    ),
+                    title: Container(
+                      constraints: BoxConstraints(minHeight: 50),
+                      decoration: BoxDecoration(borderRadius: styles.borderRadius),
+                      clipBehavior: Clip.antiAlias,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              color: ColorScheme.fromSeed(seedColor: item.color).primary,
+                              constraints: BoxConstraints(minHeight: 50),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              color: ColorScheme.fromSeed(seedColor: item.color).secondary,
+                              constraints: BoxConstraints(minHeight: 50),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              color: ColorScheme.fromSeed(seedColor: item.color).tertiary,
+                              constraints: BoxConstraints(minHeight: 50),
+                            ),
+                          )
+                        ],
                       ),
-                    ],
-                  )
-                ),
-              ]
+                    ),
+                    tileColor: ColorScheme.of(context).surfaceContainerLow,
+                  ),
+                ],
+              )
             )
           )
         )
