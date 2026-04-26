@@ -49,12 +49,12 @@ class PwdListPage extends StatelessWidget {
     } else {
       List<Widget> temp = [];
       // 构建列表
-      for (final item in pwdList) {
+      for (final (index, item) in pwdList.indexed) {
         temp.add(
           PwdTile(
             pwdRecord: item,
-            isFirst: true,
-            isLast: true,
+            isFirst: index == 0,
+            isLast: index == pwdList.length - 1,
             onStarPressed: (){
               Provider.of<PwdProvider>(context, listen: false).switchStarStateById(item["id"]);
             },
@@ -81,16 +81,11 @@ class PwdListPage extends StatelessWidget {
         ) : null,
       body: Container(
         padding: hasPadding ? styles.uniInsetsSmall : EdgeInsets.zero,
-        alignment: Alignment.topCenter,
         child: SingleChildScrollView(
           child: Column(
             children: [
               // 主列表区域
-              Wrap(
-                spacing: styles.layoutSpacing,
-                runSpacing: styles.layoutSpacing,
-                children: _buildList(pwdList, context),
-              ),
+              Column(children: _buildList(pwdList, context)),
               // 防止列表被FAB挡住
               SizedBox(height: 25),
               // TODO: 增加实际功能

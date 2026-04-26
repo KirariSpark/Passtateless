@@ -164,51 +164,42 @@ class _PwdViewPageState extends State<PwdViewPage> {
         child: Container(
           padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           alignment: Alignment.center,
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              double maxWidth = ui.calcWidthConstraint(constraints.maxWidth, true, maxColumns: 3);
-              return ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxWidth),
-                child: Column(
-                  children: <Widget>[
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      // TODO: 等待将来页面重构，才能合理设置isFirst和isLast
+          child: ConstrainedBox(
+              constraints: styles.tileWidthConstraint,
+              child: Column(
+                children: <Widget>[
+                  Column(
                       children: [
                         // 档案名
                         ConstrainedBox(
-                          constraints: styles.tileWidthConstraint,
+                            constraints: styles.tileWidthConstraint,
                             child: styled.buildListTile(
-                              title: "档案名",
-                              subtitle: identifier,
-                              isLast: true,
-                              isFirst: true,
-                              context: context
+                                title: "档案名",
+                                subtitle: identifier,
+                                isFirst: true,
+                                context: context
                             )
                         ),
                         // 用户名
                         ConstrainedBox(
-                          constraints: styles.tileWidthConstraint,
+                            constraints: styles.tileWidthConstraint,
                             child: styled.buildListTile(
-                              title: "用户名",
-                              subtitle: userName,
-                              isLast: true,
-                              isFirst: true,
-                              context: context
+                                title: "用户名",
+                                subtitle: userName,
+                                context: context
                             )
                         ),
                         // 账号
                         ConstrainedBox(
-                          constraints: styles.tileWidthConstraint,
-                          child: styled.buildListTile(
-                            title: "账号",
-                            subtitle: account,
-                            isLast: true,
-                            isFirst: true,
-                            context: context
-                          )
+                            constraints: styles.tileWidthConstraint,
+                            child: styled.buildListTile(
+                                title: "账号",
+                                subtitle: account,
+                                isLast: true,
+                                context: context
+                            )
                         ),
+                        styles.spacingSizedBox,
                         // 移除数字
                         ConstrainedBox(
                           constraints: styles.tileWidthConstraint,
@@ -221,7 +212,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               appLogger.logger.d("Current digit removal state: $removeDigits");
                             },
                             title: const Text("移除数字"),
-                            shape: styles.roundedBorder,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: styles.radius)
+                            ),
                             tileColor: ColorScheme.of(context).surfaceContainerLow,
                           ),
                         ),
@@ -237,7 +230,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               appLogger.logger.d("Current alphabet removal state: $removeAlpha");
                             },
                             title: const Text("移除字母"),
-                            shape: styles.roundedBorder,
                             tileColor: ColorScheme.of(context).surfaceContainerLow,
                           ),
                         ),
@@ -253,65 +245,67 @@ class _PwdViewPageState extends State<PwdViewPage> {
                               appLogger.logger.d("Current special char removal state: $removeSp");
                             },
                             title: const Text("移除特殊字符"),
-                            shape: styles.roundedBorder,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(bottom: styles.radius)
+                            ),
                             tileColor: ColorScheme.of(context).surfaceContainerLow,
                           ),
                         )
                       ]
+                  ),
+                  styles.spacingSizedBox,
+                  // 生成预设
+                  styled.buildListTile(
+                    context: context,
+                    title: "生成预设",
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(_preset.displayName, style: Theme.of(context).textTheme.bodyLarge),
+                        Icon(Icons.arrow_drop_down)
+                      ],
                     ),
-                    styles.spacingSizedBox,
-                    // 生成预设
-                    styled.buildListTile(
-                      context: context,
-                      title: "生成预设",
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_preset.displayName, style: Theme.of(context).textTheme.bodyLarge),
-                          Icon(Icons.arrow_drop_down)
-                        ],
-                      ),
-                      isFirst: true,
-                      isLast: _preset == Presets.custom ? false : true,
-                      onTapped: (){
-                        ui.showAlertDialogQuick(
+                    isFirst: true,
+                    isLast: _preset == Presets.custom ? false : true,
+                    onTapped: (){
+                      ui.showAlertDialogQuick(
                           title: "选择预设",
                           content: RadioGroup(
-                            groupValue: _preset,
-                            onChanged: (value){
-                              appLogger.logger.i("Setting preset to ${value?.name}");
-                              setState(() {_preset = value ?? Presets.simple;});
-                              Navigator.of(context, rootNavigator: true).pop();
-                            },
-                            child: Column(
-                              children: [
-                                for (var item in Presets.values) RadioListTile(
-                                  value: item,
-                                  subtitle: Text(item.desc),
-                                  shape: styles.roundedBorder,
-                                  title: Text(item.displayName)
-                                )
-                              ],
-                            )
+                              groupValue: _preset,
+                              onChanged: (value){
+                                appLogger.logger.i("Setting preset to ${value?.name}");
+                                setState(() {_preset = value ?? Presets.simple;});
+                                Navigator.of(context, rootNavigator: true).pop();
+                              },
+                              child: Column(
+                                children: [
+                                  for (var item in Presets.values) RadioListTile(
+                                      value: item,
+                                      subtitle: Text(item.desc),
+                                      shape: styles.roundedBorder,
+                                      title: Text(item.displayName)
+                                  )
+                                ],
+                              )
                           ),
                           actionText: "取消",
                           action: (){Navigator.of(context, rootNavigator: true).pop();},
                           context: context
-                        );
-                      },
-                    ),
-                    // 视情况选择是否显示配置编辑页面
-                    ?_showConfigEdit(),
-                    styles.spacingSizedBox,
-                    // 按钮
-                    Row(
-                      spacing: styles.layoutSpacing,
-                      children: [
-                        // 查看密码
-                        Expanded(
-                          child: styled.buildTextButton(
-                            onPressed: isGenerating ? null : () async {
-                              ui.showConfirmDialogQuick(
+                      );
+                    },
+                  ),
+                  // 视情况选择是否显示配置编辑页面
+                  ?_showConfigEdit(),
+                  styles.spacingSizedBox,
+                  // 按钮
+                  Row(
+                    spacing: styles.layoutSpacing,
+                    children: [
+                      // 查看密码
+                      Expanded(
+                        child: styled.buildTextButton(
+                          onPressed: isGenerating ? null : () async {
+                            ui.showConfirmDialogQuick(
                                 context: context,
                                 function: () async {
                                   appLogger.logger.i("Generating password for viewing");
@@ -321,7 +315,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                                     if (stat == ErrorCode.success) {
                                       appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
                                       Navigator.push(
-                                        context, MaterialPageRoute(builder: (context) => FullscreenPwd(res))
+                                          context, MaterialPageRoute(builder: (context) => FullscreenPwd(res))
                                       );
                                     } else {
                                       appLogger.logger.e("Can not generate password: ${stat.code}");
@@ -332,33 +326,31 @@ class _PwdViewPageState extends State<PwdViewPage> {
                                 },
                                 title: "危险操作",
                                 info: "此操作将会显示你的密码，以便于你的记忆。\n请确保周围没有人能够窥视到你的屏幕。"
-                              );
-                            },
-                            context: context,
-                            child: const Text("查看密码"),
-                          ),
+                            );
+                          },
+                          context: context,
+                          child: const Text("查看密码"),
                         ),
-                        // 复制密码
-                        Expanded(
-                          child: styled.buildTextButton(
-                            onPressed: isGenerating ? null : () async {
-                              // 开始生成
-                              appLogger.logger.i("Generating password for copying");
-                              await genPwd(context, true, identifier, userName, account);
-                              // 启用按钮
-                              setState(() {isGenerating = false;});
-                            },
-                            context: context,
-                            child: const Text("复制密码"),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                )
-              );
-            },
-          ),
+                      ),
+                      // 复制密码
+                      Expanded(
+                        child: styled.buildTextButton(
+                          onPressed: isGenerating ? null : () async {
+                            // 开始生成
+                            appLogger.logger.i("Generating password for copying");
+                            await genPwd(context, true, identifier, userName, account);
+                            // 启用按钮
+                            setState(() {isGenerating = false;});
+                          },
+                          context: context,
+                          child: const Text("复制密码"),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              )
+          )
         ),
       ),
     );
