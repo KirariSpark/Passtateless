@@ -33,21 +33,26 @@ class A11ySettingsPage extends StatelessWidget {
               child: Column(
                 children: [
                   styled.buildListTile(
-                    title: "字体",
-                    leading: Icons.text_format,
-                    trailing: Icon(Icons.arrow_forward),
-                    isFirst: true,
-                    onTapped: () {},
-                    context: context
-                  ),
-                  styled.buildListTile(
                     title: "对比度",
                     leading: Icons.contrast,
                     trailing: Icon(Icons.arrow_forward),
-                    isLast: true,
+                    isFirst: true,
                     titleTag: isWide ? null : "contrast",
                     active: isSelected(("a11y", "contrast")),
                     onTapped: () => onItemTapped(("a11y", "contrast")),
+                    context: context
+                  ),
+                  styled.buildListTile(
+                    title: "TalkBack",
+                    subtitle: "TalkBack 将跟随系统设置",
+                    leading: Icons.volume_up_outlined,
+                    context: context
+                  ),
+                  styled.buildListTile(
+                    title: "字体大小",
+                    subtitle: "字体大小将跟随系统设置",
+                    leading: Icons.text_format,
+                    isLast: true,
                     context: context
                   )
                 ],

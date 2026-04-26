@@ -55,69 +55,67 @@ class _CfgEditPageState extends State<CfgEditPage> {
       title: "选择帮助",
       content: ConstrainedBox(
         constraints: styles.tileWidthConstraint,
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              styled.buildListTile(
-                title: "JSON 语法基础",
-                onTapped: () {
-                  appLogger.logger.i("Pushing to help page json");
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DocViewPage(title: "JSON 语法", mode: "json"),
-                    ),
-                  );
-                },
-                isFirst: true,
-                context: context,
-              ),
-              styled.buildListTile(
-                title: "生成配置",
-                onTapped: () {
-                  appLogger.logger.i("Pushing to help page cfg");
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DocViewPage(title: "生成配置", mode: "cfg"),
-                    ),
-                  );
-                },
-                context: context,
-              ),
-              styled.buildListTile(
-                title: "生成规则提示",
-                onTapped: () {
-                  appLogger.logger.i("Pushing to help page cfg_tips");
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DocViewPage(title: "提示", mode: "cfg_tips"),
-                    ),
-                  );
-                },
-                context: context,
-              ),
-              styled.buildListTile(
-                title: "格式化与可读性",
-                onTapped: () {
-                  appLogger.logger.i("Pushing to help page formatting");
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DocViewPage(title: "格式化与可读性", mode: "formatting")
-                    )
-                  );
-                },
-                isLast: true,
-                context: context,
-              ),
-            ],
-          ),
+        child: Column(
+          children: <Widget>[
+            styled.buildListTile(
+              title: "JSON 语法基础",
+              onTapped: () {
+                appLogger.logger.i("Pushing to help page json");
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DocViewPage(title: "JSON 语法", mode: "json"),
+                  ),
+                );
+              },
+              isFirst: true,
+              context: context,
+            ),
+            styled.buildListTile(
+              title: "生成配置",
+              onTapped: () {
+                appLogger.logger.i("Pushing to help page cfg");
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DocViewPage(title: "生成配置", mode: "cfg"),
+                  ),
+                );
+              },
+              context: context,
+            ),
+            styled.buildListTile(
+              title: "生成规则提示",
+              onTapped: () {
+                appLogger.logger.i("Pushing to help page cfg_tips");
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DocViewPage(title: "提示", mode: "cfg_tips"),
+                  ),
+                );
+              },
+              context: context,
+            ),
+            styled.buildListTile(
+              title: "格式化与可读性",
+              onTapped: () {
+                appLogger.logger.i("Pushing to help page formatting");
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DocViewPage(title: "格式化与可读性", mode: "formatting")
+                  )
+                );
+              },
+              isLast: true,
+              context: context,
+            ),
+          ],
         ),
       ),
       actionText: "取消",
@@ -160,7 +158,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                   fontSize: 14,
                   backgroundColor: ColorScheme.of(
                     context,
-                  ).surfaceContainerLowest.withAlpha(styles.alphaSemitransparent),
+                  ).surfaceContainerLow.withAlpha(styles.alphaSemitransparent),
                 ),
                 borderRadius: styles.borderRadius,
                 indicatorBuilder: (context, editingController, chunkController, notifier) {
@@ -180,7 +178,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 Expanded(
                   child: TextButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaOpaque),
+                      backgroundColor: ColorScheme.of(context).surfaceContainerLow.withAlpha(styles.alphaOpaque),
                       shape: styles.roundedBorder,
                     ),
                     onPressed: _formatJSON,
@@ -190,7 +188,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 Expanded(
                   child: TextButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorScheme.of(context).surfaceContainerLowest.withAlpha(styles.alphaOpaque),
+                      backgroundColor: ColorScheme.of(context).surfaceContainerLow.withAlpha(styles.alphaOpaque),
                       shape: styles.roundedBorder,
                     ),
                     onPressed: _showHelp,
