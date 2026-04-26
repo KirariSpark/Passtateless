@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/pages/settings/contrast.dart';
+import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class A11ySettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画

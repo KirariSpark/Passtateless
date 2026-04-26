@@ -46,3 +46,28 @@ String toSHA256(String text) {
   var digest = sha256.convert(bytes);
   return digest.toString();
 }
+
+/// 从 Map 中恢复枚举配置项
+T restoreEnumSetting<T>({
+  required Map<dynamic, dynamic> jsonMap,
+  required String key,
+  required List<T> enumValues,
+  required T defaultValue,
+  required String settingName,
+}) {
+  if (jsonMap.containsKey(key) && jsonMap[key] is String) {
+    appLogger.logger.i("Restoring $settingName settings");
+    final String targetName = jsonMap[key] as String;
+
+    for (final value in enumValues) {
+      // 通过枚举的 name 属性进行匹配
+      if ((value as Enum).name == targetName) {
+        return value;
+      }
+    }
+
+    // 如果遍历完没找到，记录警告并返回默认值
+    appLogger.logger.w("Invalid $settingName setting, falling back to default");
+  }
+  return defaultValue;
+}

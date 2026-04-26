@@ -92,43 +92,45 @@ class AppProvider extends ChangeNotifier {
     appLogger.logger.i("Stat: ${stat.code}");
 
     if (stat == ErrorCode.success && res != null && res is Map) {
-      // 读取并还原提醒时间配置
-      if (res.containsKey('remindMe') && res['remindMe'] is String) {
-        appLogger.logger.i("Restoring remind settings");
-        remindMe = RemindDays.values.firstWhere(
-          (e) => e.name == res['remindMe'],
-          // 如果名称没找到对应的枚举，保持默认值
-          orElse: () {
-            appLogger.logger.w("Invalid remind setting, falling back to default");
-            return _remindMe;
-          },
-        );
-      }
+      remindMe = utils.restoreEnumSetting<RemindDays>(
+        jsonMap: res,
+        key: 'remindMe',
+        enumValues: RemindDays.values,
+        defaultValue: _remindMe,
+        settingName: 'remind',
+      );
 
-      // 读取并还原主题颜色配置
-      if (res.containsKey('currentColor') && res['currentColor'] is String) {
-        appLogger.logger.i("Restoring color settings");
-        color = AvailableColors.values.firstWhere(
-          (e) => e.name == res['currentColor'],
-          // 如果名称没找到对应的枚举，保持默认值
-          orElse: () {
-            appLogger.logger.w("Invalid theme setting, falling back to default");
-            return _currentColor;
-          },
-        );
-      }
+      color = utils.restoreEnumSetting<AvailableColors>(
+        jsonMap: res,
+        key: 'currentColor',
+        enumValues: AvailableColors.values,
+        defaultValue: _currentColor,
+        settingName: 'color',
+      );
 
-      // 读取并还原动画速度设置
-      if (res.containsKey('currentDilation') && res['currentDilation'] is String) {
-        appLogger.logger.i("Restoring time dilation settings");
-        currentDilation = AnimationDilation.values.firstWhere(
-            (e) => e.name == res['currentDilation'],
-          orElse: () {
-            appLogger.logger.w("Invalid time dilation setting, falling back to default");
-            return _currentDilation;
-          }
-        );
-      }
+      currentDilation = utils.restoreEnumSetting<AnimationDilation>(
+        jsonMap: res,
+        key: 'currentDilation',
+        enumValues: AnimationDilation.values,
+        defaultValue: _currentDilation,
+        settingName: 'time dilation',
+      );
+
+      contrast = utils.restoreEnumSetting<ContrastLevels>(
+        jsonMap: res,
+        key: 'currentContrast',
+        enumValues: ContrastLevels.values,
+        defaultValue: _currentContrast,
+        settingName: 'contrast',
+      );
+
+      currentLogLevel = utils.restoreEnumSetting<LogLevels>(
+        jsonMap: res,
+        key: 'currentLogLevel',
+        enumValues: LogLevels.values,
+        defaultValue: _currentLogLevel,
+        settingName: 'log level',
+      );
 
       // 检查是否要更改主密码
       appLogger.logger.i("Checking if master password needs to be changed");
@@ -159,7 +161,9 @@ class AppProvider extends ChangeNotifier {
     final configMap = {
       'remindMe': _remindMe.name,
       'currentColor': _currentColor.name,
-      'currentDilation': _currentDilation.name
+      'currentDilation': _currentDilation.name,
+      'currentContrast': _currentContrast.name,
+      'currentLogLevel': _currentLogLevel.name,
     };
     return await json_mgr.writeJsonFile(Paths.config.toString(), configMap);
   }

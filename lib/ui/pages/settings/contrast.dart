@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:provider/provider.dart';
 
 class ContrastSettingsPage extends StatelessWidget {
@@ -39,6 +39,7 @@ class ContrastSettingsPage extends StatelessWidget {
                   groupValue: Provider.of<AppProvider>(context).currentContrast,
                   onChanged: (value) {
                     Provider.of<AppProvider>(context, listen: false).contrast = value!;
+                    Provider.of<AppProvider>(context, listen: false).saveConfig();
                   },
                   child: Column(
                     children: [
@@ -68,25 +69,25 @@ class ContrastSettingsPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Container(
-                              color: ColorScheme.of(context).primary,
+                              color: ColorScheme.of(context).primaryContainer,
                               constraints: BoxConstraints(minHeight: 100),
                             ),
                           ),
                           Expanded(
                             child: Container(
-                              color: ColorScheme.of(context).onPrimary,
+                              color: ColorScheme.of(context).onPrimaryContainer,
                               constraints: BoxConstraints(minHeight: 100),
                             ),
                           ),
                           ? constraints.maxWidth > 200 ? Expanded(
                             child: Container(
-                              color: ColorScheme.of(context).secondary,
+                              color: ColorScheme.of(context).secondaryContainer,
                               constraints: BoxConstraints(minHeight: 100),
                             ),
                           ) : null,
                           ? constraints.maxWidth > 200 ? Expanded(
                             child: Container(
-                              color: ColorScheme.of(context).onSecondary,
+                              color: ColorScheme.of(context).onSecondaryContainer,
                               constraints: BoxConstraints(minHeight: 100),
                             ),
                           ) : null
