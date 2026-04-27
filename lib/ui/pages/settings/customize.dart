@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/settings/animations.dart';
 import 'package:passtateless/ui/pages/settings/themes.dart';
