@@ -51,7 +51,7 @@ class ThemeSettingsPage extends StatelessWidget {
                   for (final (index, item) in AvailableColors.values.indexed) RadioListTile(
                     value: item,
                     shape: RoundedRectangleBorder(
-                      borderRadius: ui.calcRadius(isFirst: index == 0, isLast: index == AvailableColors.values.length)
+                      borderRadius: ui.calcRadius(isFirst: index == 0, isLast: index == AvailableColors.values.length - 1)
                     ),
                     title: Container(
                       constraints: BoxConstraints(minHeight: 50),

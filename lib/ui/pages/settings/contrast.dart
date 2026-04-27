@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
@@ -44,12 +45,9 @@ class ContrastSettingsPage extends StatelessWidget {
                   child: Column(
                     children: [
                       for (final (index, value) in ContrastLevels.values.indexed) RadioListTile(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: index == 0 ? styles.radius : Radius.zero,
-                            bottom: index == ContrastLevels.values.length - 1 ? styles.radius : Radius.zero
-                          )
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(
+                          isFirst: index == 0, isLast: index == ContrastLevels.values.length - 1
+                        )),
                         value: value,
                         title: Text(value.displayName),
                         tileColor: ColorScheme.of(context).surfaceContainerLow,
