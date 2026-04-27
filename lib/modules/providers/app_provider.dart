@@ -94,46 +94,13 @@ class AppProvider extends ChangeNotifier {
     appLogger.logger.i("Stat: ${stat.code}");
 
     if (stat == ErrorCode.success && res != null && res is Map) {
-      remindMe = utils.restoreEnumSetting<RemindDays>(
-        jsonMap: res,
-        key: 'remindMe',
-        enumValues: RemindDays.values,
-        defaultValue: _remindMe,
-        settingName: 'remind',
-      );
-
-      color = utils.restoreEnumSetting<AvailableColors>(
-        jsonMap: res,
-        key: 'currentColor',
-        enumValues: AvailableColors.values,
-        defaultValue: _currentColor,
-        settingName: 'color',
-      );
-
-      currentDilation = utils.restoreEnumSetting<AnimationDilation>(
-        jsonMap: res,
-        key: 'currentDilation',
-        enumValues: AnimationDilation.values,
-        defaultValue: _currentDilation,
-        settingName: 'time dilation',
-      );
-
-      contrast = utils.restoreEnumSetting<ContrastLevels>(
-        jsonMap: res,
-        key: 'currentContrast',
-        enumValues: ContrastLevels.values,
-        defaultValue: _currentContrast,
-        settingName: 'contrast',
-      );
-
-      currentLogLevel = utils.restoreEnumSetting<LogLevels>(
-        jsonMap: res,
-        key: 'currentLogLevel',
-        enumValues: LogLevels.values,
-        defaultValue: _currentLogLevel,
-        settingName: 'log level',
-      );
-
+      try {
+        appLogger.logger.i("Restoring config");
+        _restoreConfig(res);
+      } catch (e) {
+        appLogger.logger.e("Restoring failed, config may be broken: ${e.toString()}");
+        return ErrorCode.brokenConfig;
+      }
       // 检查是否要更改主密码
       appLogger.logger.i("Checking if master password needs to be changed");
       final lastChange = await masterLastChanged();
@@ -157,30 +124,83 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
-  /// 保存配置文件
-  Future<ErrorCode> saveConfig() async {
-    appLogger.logger.i("Saving config");
-    final configMap = {
+  /// 从文本恢复配置
+  ErrorCode restoreConfigFromText(String text, {bool fallback = true}) {
+    try {
+      appLogger.logger.i("Restoring config from text");
+      final res = json.decode(text);
+      _restoreConfig(res, fallback: fallback);
+      return ErrorCode.success;
+    } catch (e) {
+      appLogger.logger.e("Can not restore config fron text: ${e.toString()}");
+      return ErrorCode.brokenConfig;
+    }
+  }
+
+  /// 获取当前配置对应的字典
+  Map<String, String> _getConfigMap() {
+    return {
       'remindMe': _remindMe.name,
       'currentColor': _currentColor.name,
       'currentDilation': _currentDilation.name,
       'currentContrast': _currentContrast.name,
       'currentLogLevel': _currentLogLevel.name,
     };
-    return await json_mgr.writeJsonFile(Paths.config.toString(), configMap);
+  }
+
+  /// 恢复配置项的值
+  void _restoreConfig(Map res, {bool fallback = true}) {
+    remindMe = utils.restoreEnumSetting<RemindDays>(
+      jsonMap: res,
+      key: 'remindMe',
+      enumValues: RemindDays.values,
+      defaultValue: _remindMe,
+      fallback: fallback
+    );
+
+    color = utils.restoreEnumSetting<AvailableColors>(
+      jsonMap: res,
+      key: 'currentColor',
+      enumValues: AvailableColors.values,
+      defaultValue: _currentColor,
+      fallback: fallback
+    );
+
+    currentDilation = utils.restoreEnumSetting<AnimationDilation>(
+      jsonMap: res,
+      key: 'currentDilation',
+      enumValues: AnimationDilation.values,
+      defaultValue: _currentDilation,
+      fallback: fallback
+    );
+
+    contrast = utils.restoreEnumSetting<ContrastLevels>(
+      jsonMap: res,
+      key: 'currentContrast',
+      enumValues: ContrastLevels.values,
+      defaultValue: _currentContrast,
+      fallback: fallback
+    );
+
+    currentLogLevel = utils.restoreEnumSetting<LogLevels>(
+      jsonMap: res,
+      key: 'currentLogLevel',
+      enumValues: LogLevels.values,
+      defaultValue: _currentLogLevel,
+      fallback: fallback
+    );
+  }
+
+  /// 保存配置文件
+  Future<ErrorCode> saveConfig() async {
+    appLogger.logger.i("Saving config");
+    return await json_mgr.writeJsonFile(Paths.config.toString(), _getConfigMap());
   }
 
   /// 获取配置文件的JSON字符串
   String getSettingsJson() {
     appLogger.logger.i("Getting settings JSON");
-    final configMap = {
-      'remindMe': _remindMe.name,
-      'currentColor': _currentColor.name,
-      'currentDilation': _currentDilation.name,
-      'currentContrast': _currentContrast.name,
-      'currentLogLevel': _currentLogLevel.name,
-    };
-    final (stat, res) = utils.formatJSON(json.encode(configMap));
+    final (stat, res) = utils.formatJSON(json.encode(_getConfigMap()));
     if (stat == ErrorCode.success) {
       appLogger.logger.i("Successfully got settings JSON");
       return res;

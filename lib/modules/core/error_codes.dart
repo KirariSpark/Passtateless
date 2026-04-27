@@ -15,7 +15,8 @@ enum ErrorCode {
   wrongPwd(13, "密码错误"),
   emptyPwd(14, "密码为空"),
   noSuchId(15, "无效 ID", "无效 ID：{item}"),
-  noSuchLoc(16, "无效位置");
+  noSuchLoc(16, "无效位置"),
+  brokenConfig(17, "配置文件损坏");
 
   final int code;
   final String _messageTemplate;

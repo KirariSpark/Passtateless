@@ -53,11 +53,12 @@ T restoreEnumSetting<T>({
   required String key,
   required List<T> enumValues,
   required T defaultValue,
-  required String settingName,
+  bool fallback = true
 }) {
   if (jsonMap.containsKey(key) && jsonMap[key] is String) {
-    appLogger.logger.i("Restoring $settingName settings");
+    appLogger.logger.i("Restoring $key settings");
     final String targetName = jsonMap[key] as String;
+    appLogger.logger.d("Value: $targetName");
 
     for (final value in enumValues) {
       // 通过枚举的 name 属性进行匹配
@@ -66,8 +67,10 @@ T restoreEnumSetting<T>({
       }
     }
 
-    // 如果遍历完没找到，记录警告并返回默认值
-    appLogger.logger.w("Invalid $settingName setting, falling back to default");
+    // 遍历完没找到，视情况使用默认值还是报错
+    fallback
+      ? appLogger.logger.w("Invalid $key setting, falling back to default")
+      : throw ArgumentError("No such value for $key setting");
   }
   return defaultValue;
 }
