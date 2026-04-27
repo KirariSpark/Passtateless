@@ -5,6 +5,7 @@ import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/pages/settings/export.dart';
 import 'package:passtateless/ui/pages/settings/log_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -75,6 +76,7 @@ class AdvancedSettingsPage extends StatelessWidget {
                     appLogger.logger.i("Loading log");
                     final (stat, res) = await readTextFile(Paths.log.path);
                     if (context.mounted && stat == ErrorCode.success) {
+                      appLogger.logger.i("Log loaded");
                       Navigator.push(context, MaterialPageRoute(builder: (_) => LogViewPage(log: res)));
                     } else {
                       appLogger.logger.e("Can not load log: ${stat.code}");
@@ -85,7 +87,16 @@ class AdvancedSettingsPage extends StatelessWidget {
                 ),
                 styled.buildListTile(
                   title: "导出设置",
+                  titleTag: "setting_export",
                   trailing: Icon(Icons.arrow_forward),
+                  onTapped: () {
+                    appLogger.logger.i("Generating settings JSON");
+                    final text = Provider.of<AppProvider>(context, listen: false).getSettingsJson();
+                    appLogger.logger.i("JSON generated");
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsExportPage(
+                      settingsJson: text,
+                    )));
+                  },
                   context: context
                 ),
                 styled.buildListTile(

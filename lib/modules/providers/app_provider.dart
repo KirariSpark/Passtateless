@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:passtateless/modules/core/enums.dart';
@@ -166,6 +168,26 @@ class AppProvider extends ChangeNotifier {
       'currentLogLevel': _currentLogLevel.name,
     };
     return await json_mgr.writeJsonFile(Paths.config.toString(), configMap);
+  }
+
+  /// 获取配置文件的JSON字符串
+  String getSettingsJson() {
+    appLogger.logger.i("Getting settings JSON");
+    final configMap = {
+      'remindMe': _remindMe.name,
+      'currentColor': _currentColor.name,
+      'currentDilation': _currentDilation.name,
+      'currentContrast': _currentContrast.name,
+      'currentLogLevel': _currentLogLevel.name,
+    };
+    final (stat, res) = utils.formatJSON(json.encode(configMap));
+    if (stat == ErrorCode.success) {
+      appLogger.logger.i("Successfully got settings JSON");
+      return res;
+    } else {
+      appLogger.logger.e("Can not get settings JSON: ${stat.code}");
+      return "";
+    }
   }
 
   Future<(ErrorCode, DateTime)> masterLastChanged() async {

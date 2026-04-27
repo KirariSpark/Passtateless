@@ -1,5 +1,9 @@
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
+import 'package:re_editor/re_editor.dart';
+import 'package:re_highlight/languages/json.dart';
+import 'package:re_highlight/styles/a11y-dark.dart';
+import 'package:re_highlight/styles/a11y-light.dart';
 
 /// 构建预定义了风格的ListTile
 ///
@@ -149,6 +153,7 @@ AppBar buildAppBarWidget({
   );
 }
 
+/// 构建一个预定义了风格的TextButton
 TextButton buildTextButton({
   required Widget child,
   required BuildContext context,
@@ -162,5 +167,34 @@ TextButton buildTextButton({
       foregroundColor: ColorScheme.of(context).onSecondaryContainer
     ),
     child: child,
+  );
+}
+
+/// 构建一个代码编辑器，包含高亮和行指示器，配置为JSON格式
+CodeEditor buildJsonEditor({
+  required BuildContext context,
+  CodeLineEditingController? controller,
+  bool readOnly = false
+}) {
+  return CodeEditor(
+    readOnly: readOnly,
+    wordWrap: false,
+    controller: controller,
+    style: CodeEditorStyle(
+    codeTheme: CodeHighlightTheme(
+      languages: {'json': CodeHighlightThemeMode(mode: langJson)},
+      theme: ColorScheme.of(context).brightness == Brightness.light ? a11YLightTheme : a11YDarkTheme),
+      fontSize: 14,
+      backgroundColor: ColorScheme.of(context).surfaceContainerLow
+    ),
+    borderRadius: styles.borderRadius,
+      indicatorBuilder: (context, editingController, chunkController, notifier) {
+      return Row(
+        children: [
+          DefaultCodeLineNumber(controller: editingController, notifier: notifier),
+          DefaultCodeChunkIndicator(width: 20, controller: chunkController, notifier: notifier),
+        ],
+      );
+    },
   );
 }

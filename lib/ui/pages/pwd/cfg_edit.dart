@@ -7,9 +7,6 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:re_editor/re_editor.dart';
-import 'package:re_highlight/languages/json.dart';
-import 'package:re_highlight/styles/a11y-dark.dart';
-import 'package:re_highlight/styles/a11y-light.dart';
 
 class CfgEditPage extends StatefulWidget {
   final String initialText;
@@ -143,35 +140,11 @@ class _CfgEditPageState extends State<CfgEditPage> {
         ],
       ),
       body: Padding(
-        padding: styles.uniInsetsSmall,
+        padding: styles.pagePadding,
         child: Column(
           children: [
-            Expanded(
-              child: CodeEditor(
-                wordWrap: false,
-                controller: _configController,
-                style: CodeEditorStyle(
-                  codeTheme: CodeHighlightTheme(
-                    languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-                    theme: ColorScheme.of(context).brightness == Brightness.light ? a11YLightTheme : a11YDarkTheme,
-                  ),
-                  fontSize: 14,
-                  backgroundColor: ColorScheme.of(
-                    context,
-                  ).surfaceContainerLow.withAlpha(styles.alphaSemitransparent),
-                ),
-                borderRadius: styles.borderRadius,
-                indicatorBuilder: (context, editingController, chunkController, notifier) {
-                  return Row(
-                    children: [
-                      DefaultCodeLineNumber(controller: editingController, notifier: notifier),
-                      DefaultCodeChunkIndicator(width: 20, controller: chunkController, notifier: notifier),
-                    ],
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: styles.layoutSpacing),
+            Expanded(child: styled.buildJsonEditor(controller: _configController, context: context)),
+            styles.spacingSizedBox,
             Row(
               spacing: styles.layoutSpacing,
               children: <Widget>[
