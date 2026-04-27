@@ -36,7 +36,7 @@ class AboutPage extends StatelessWidget {
                   onPressed: () {
                     ui.showAlertDialogQuick(
                       title: "Passtateless",
-                      content: Text("Passtateless 是一个无状态密码管理器\n使用 Apache 2.0 许可证"),
+                      content: Text("Passtateless 是一个无状态密码管理器\n使用 MIT 许可证"),
                       action: () => Navigator.of(context, rootNavigator: true).pop(),
                       actionText: "确定",
                       action2: () {
