@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
+import 'package:provider/provider.dart';
 
 class HelpOverviewPage extends StatefulWidget {
   const HelpOverviewPage({super.key});
@@ -68,6 +70,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
           ),
         );
       },
+      navMode: context.watch<AppProvider>().currentNavMode,
       padding: styles.pagePaddingAll,
     );
   }

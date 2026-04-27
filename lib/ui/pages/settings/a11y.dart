@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/settings/contrast.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:provider/provider.dart';
 
 class A11ySettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
@@ -68,6 +70,7 @@ class A11ySettingsPage extends StatelessWidget {
               return SizedBox.shrink();
           }
         },
+        navMode: context.watch<AppProvider>().currentNavMode,
         widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
             styles.layoutSpacing,
       ),

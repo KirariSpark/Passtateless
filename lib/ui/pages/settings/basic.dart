@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/master.dart';
 import 'package:passtateless/ui/pages/settings/advanced.dart';
@@ -7,6 +8,7 @@ import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/pages/settings/customize.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:provider/provider.dart';
 
 // 基础设置页面
 class BasicSettingsPage extends StatefulWidget {
@@ -77,6 +79,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         );
       },
       padding: styles.pagePaddingAll,
+      navMode: context.watch<AppProvider>().currentNavMode,
       widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
           styles.layoutSpacing,
     );

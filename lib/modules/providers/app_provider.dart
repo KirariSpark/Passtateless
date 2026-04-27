@@ -62,6 +62,15 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 路由动画
+  NavigatorMode _currentNavMode = NavigatorMode.material;
+  NavigatorMode get currentNavMode => _currentNavMode;
+  set currentNavMode(NavigatorMode value) {
+    appLogger.logger.i("Setting navigator mode to ${value.name}");
+    _currentNavMode = value;
+    notifyListeners();
+  }
+
   // 日志等级
   LogLevels _currentLogLevel = LogLevels.debug;
   LogLevels get currentLogLevel => _currentLogLevel;

@@ -113,6 +113,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
             return styled.buildPlaceHolder(text: "未选择项目", context: context);
           }
         },
+        navMode: context.watch<AppProvider>().currentNavMode,
         widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth + styles.layoutSpacing,
       )
     );

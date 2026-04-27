@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
@@ -7,6 +8,7 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/widgets/stars.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -147,6 +149,7 @@ class _HomePageState extends State<HomePage> {
       leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
         return _buildLeftContent(context, isWide, onItemTapped, isSelected);
       },
+      navMode: context.watch<AppProvider>().currentNavMode,
       pageBuilder: _buildPage,
       placeholderText: "未选择项目",
       rightPaneConstraints: styles.tileWidthConstraint,

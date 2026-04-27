@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -31,6 +33,9 @@ class AdaptiveView extends StatefulWidget {
   /// 内边距值
   final EdgeInsets padding;
 
+  /// 路由动画模式
+  final NavigatorMode navMode;
+
   const AdaptiveView({
     super.key,
     required this.leftPaneBuilder,
@@ -38,7 +43,8 @@ class AdaptiveView extends StatefulWidget {
     this.placeholderText = "未选择项目",
     this.rightPaneConstraints,
     this.padding = EdgeInsets.zero,
-    this.widthThreshold
+    this.widthThreshold,
+    this.navMode = NavigatorMode.material
   });
 
   @override
@@ -57,10 +63,18 @@ class _AdaptiveViewState extends State<AdaptiveView> {
         _selectedTag = tag;
       });
       _rightNavigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)), (route) => false,
+        widget.navMode == NavigatorMode.material
+          ? MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide))
+          : CupertinoPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)),
+        (route) => false,
       );
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)));
+      Navigator.push(
+        context,
+        widget.navMode == NavigatorMode.material
+          ? MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide))
+          : CupertinoPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)),
+      );
     }
   }
 

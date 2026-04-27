@@ -43,9 +43,9 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
                       context: context,
                       title: "动画风格",
                       content: RadioGroup(
-                        groupValue: NavigatorMode.material,
-                        onChanged: (_) {
-                          ui.showSnackBarQuick("Coming s∞n", context);
+                        groupValue: Provider.of<AppProvider>(context, listen: false).currentNavMode,
+                        onChanged: (value) {
+                          Provider.of<AppProvider>(context, listen: false).currentNavMode = value!;
                           Navigator.of(context, rootNavigator: true).pop();
                         },
                         child: Column(
@@ -68,7 +68,7 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
                   title: "动画速度",
                   trailing: Icon(Icons.arrow_drop_down),
                   isLast: true,
-                    onTapped: () {
+                  onTapped: () {
                       ui.showAlertDialogQuick(
                         context: context,
                         title: "动画速度",
