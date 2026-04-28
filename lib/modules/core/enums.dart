@@ -28,10 +28,10 @@ enum Presets {
 }
 
 enum RemindDays {
-  debugAlways(Duration(milliseconds: 0), "(Debug) 总是"),
-  days60(Duration(days: 60), '60天'),
-  days90(Duration(days: 90), '90天'),
-  days180(Duration(days: 180), '180天'),
+  debugAlways(Duration(milliseconds: 0), "每次启动"),
+  days60(Duration(days: 60), '每 60 天'),
+  days90(Duration(days: 90), '每 90 天'),
+  days180(Duration(days: 180), '每 180 天'),
   never(Duration(days: 2147483647), '从不');
 
   final Duration value;

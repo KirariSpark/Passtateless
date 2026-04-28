@@ -33,6 +33,8 @@ class MasterPwdSettingsPage extends StatelessWidget {
             constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: styles.layoutSpacing,
                 children: [
                   // 更改主密码
                   ConstrainedBox(
@@ -40,65 +42,39 @@ class MasterPwdSettingsPage extends StatelessWidget {
                     child: styled.buildListTile(
                       active: isSelected(("master","change")),
                       isFirst: true,
+                      isLast: true,
                       leading: Icons.edit_outlined,
                       trailing: Icon(Icons.arrow_forward),
                       title: "更改主密码",
                       titleTag: "pages/settings/change_master",
-                      onTapped: () {
-                        onItemTapped(("master", "change"));
-                      },
+                      onTapped: () => onItemTapped(("master", "change")),
                       context: context
                     ),
                   ),
+                  Divider(),
                   // 提醒我更改密码
-                  ConstrainedBox(
-                    constraints: styles.tileWidthConstraint,
-                    child: styled.buildListTile(
-                      active: isSelected(("master","remind")),
-                      isLast: true,
-                      leading: Icons.lock_clock_outlined,
-                      title: "提醒我更改主密码",
-                      trailing: Icon(Icons.arrow_forward),
-                      onTapped: () {
-                        ui.showAlertDialogQuick(
-                          title: "选择时间",
-                          content: Column(
-                            spacing: styles.layoutSpacing,
-                            children: <Widget>[
-                              Text("定期提醒你更改你的主密码，助你保持良好的安全习惯\n此行为可以增强你的档案的安全性，也能降低数据泄漏的风险"),
-                              RadioGroup(
-                                groupValue: appProvider.remindMe,
-                                onChanged: (value) async {
-                                  appProvider.remindMe = value!;
-                                  appLogger.logger.i("Remind settings updated to ${value.name}");
-                                  await appProvider.saveConfig();
-                                  if (context.mounted) {
-                                    appLogger.logger.i("Changes in settings saved");
-                                    Navigator.of(context, rootNavigator: true).pop(context);
-                                  }
-                                },
-                                child: Column(
-                                  children: <Widget>[
-                                    for (var item in RemindDays.values) RadioListTile(
-                                      value: item,
-                                      title: Text(item.displayName),
-                                      shape: styles.roundedBorder,
-                                    )
-                                  ],
-                                ),
+                  Text("提醒我", style: Theme.of(context).textTheme.titleLarge),
+                  RadioGroup(
+                    groupValue: appProvider.remindMe,
+                    onChanged: (value) async {
+                      appProvider.remindMe = value!;
+                      appLogger.logger.i("Remind settings updated to ${value.name}");
+                      await appProvider.saveConfig();
+                      if (context.mounted) {appLogger.logger.i("Changes in settings saved");}
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        for (final (index, item) in RemindDays.values.indexed) RadioListTile(
+                          value: item,
+                          title: Text(item.displayName),
+                          tileColor: ColorScheme.of(context).surfaceContainerLow,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: ui.calcRadius(
+                                isFirst: index == 0, isLast: index == RemindDays.values.length - 1
                               ),
-                            ],
-                          ),
-                          context: context,
-                          action: () {
-                            if (context.mounted) {
-                              Navigator.of(context, rootNavigator: true).pop(context);
-                            }
-                          },
-                          actionText: '取消',
-                        );
-                      },
-                      context: context,
+                            )
+                        )
+                      ],
                     ),
                   ),
                 ]
