@@ -1,5 +1,4 @@
 import 'package:passtateless/modules/providers/pwd_provider.dart';
-import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:passtateless/ui/pages/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +21,6 @@ class _TestAppState extends State<TestApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => PwdProvider()),
-        ChangeNotifierProvider(create: (context) => DocProvider())
       ],
       child: MaterialApp(
         theme: ThemeData(

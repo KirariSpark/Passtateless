@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/providers/doc_provider.dart';
 import 'package:provider/provider.dart';
 import 'modules/core/logger.dart';
 import 'modules/providers/app_provider.dart';
@@ -21,8 +20,7 @@ class Passtateless extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AppProvider()),
-        ChangeNotifierProvider(create: (context) => PwdProvider()),
-        ChangeNotifierProvider(create: (context) => DocProvider()),
+        ChangeNotifierProvider(create: (context) => PwdProvider())
       ],
       child: _AppContent()
     );

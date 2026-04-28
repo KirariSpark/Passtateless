@@ -28,7 +28,8 @@ ListTile buildListTile({
   void Function()? onTapped,
   bool isFirst = false,
   bool isLast = false,
-  bool active = false
+  bool active = false,
+  bool enabled = true
 }) {
   return ListTile(
     onTap: onTapped,
@@ -40,6 +41,7 @@ ListTile buildListTile({
       top: isFirst ? styles.radius : Radius.zero,
       bottom: isLast ? styles.radius : Radius.zero
     )),
+    enabled: enabled,
     iconColor: active ? ColorScheme.of(context).onSecondaryContainer : ColorScheme.of(context).onSurface,
     textColor: active ? ColorScheme.of(context).onSecondaryContainer : ColorScheme.of(context).onSurface,
     tileColor: active ? ColorScheme.of(context).secondaryContainer : ColorScheme.of(context).surfaceContainerLow,

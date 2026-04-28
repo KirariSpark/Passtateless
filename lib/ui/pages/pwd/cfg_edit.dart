@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
@@ -22,6 +23,7 @@ class CfgEditPage extends StatefulWidget {
 
 class _CfgEditPageState extends State<CfgEditPage> {
   late final CodeLineEditingController _configController;
+  DocItems? _currentLoadingItem;
 
   @override
   void initState() {
@@ -58,19 +60,25 @@ class _CfgEditPageState extends State<CfgEditPage> {
         child: Column(
           children: [
             for (final (index, item) in editorHelpItems.indexed) styled.buildListTile(
+              enabled: _currentLoadingItem == null,
               title: item.displayName,
               isFirst: index == 0,
               isLast: index == editorHelpItems.length - 1,
-              onTapped: () {
-                appLogger.logger.i("Pushing to help page ${item.name}");
-                Navigator.of(context, rootNavigator: true).pop();
-                Navigator.push(
-                  context,
-                  ui.switchRoute(
-                    provider.currentNavMode,
-                    builder: (context) => DocViewPage(title: item.displayName, mode: item.mode)
-                  )
-                );
+              onTapped: () async {
+                appLogger.logger.i("Loading doc ${item.name}");
+                setState(() => _currentLoadingItem = item);
+                final res = await rootBundle.loadString(item.path);
+                setState(() => _currentLoadingItem = null);
+                if (mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.push(
+                    context,
+                    ui.switchRoute(
+                      provider.currentNavMode,
+                      builder: (context) => DocViewPage(title: item.displayName, docText: res)
+                    )
+                  );
+                }
               },
               context: context
             )
