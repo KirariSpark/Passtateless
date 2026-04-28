@@ -103,3 +103,21 @@ enum ContrastLevels {
 
   const ContrastLevels(this.contrast, this.displayName);
 }
+
+enum DocItems {
+  basic("基本信息", "basic"),
+  getStarted("开始使用", "get_started"),
+  faq("常见问题", "faq"),
+  jsonBasic("JSON 基础", "json_basic"),
+  cfg("配置生成器", "cfg"),
+  cfgTips("生成器提示", "cfg_tips"),
+  formatting("格式化代码", "formatting");
+
+
+  final String displayName;
+  final String mode;
+
+  const DocItems(this.displayName, this.mode);
+}
+
+List<DocItems> editorHelpItems = [DocItems.jsonBasic, DocItems.cfg, DocItems.cfgTips, DocItems.formatting];

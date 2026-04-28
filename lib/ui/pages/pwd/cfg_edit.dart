@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/core/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 
 class CfgEditPage extends StatefulWidget {
@@ -47,71 +50,30 @@ class _CfgEditPageState extends State<CfgEditPage> {
     }
   }
 
-  void _showHelp() {
+  void _showHelp(AppProvider provider) {
     ui.showAlertDialogQuick(
       title: "选择帮助",
       content: ConstrainedBox(
         constraints: styles.tileWidthConstraint,
         child: Column(
-          children: <Widget>[
-            styled.buildListTile(
-              title: "JSON 语法基础",
+          children: [
+            for (final (index, item) in editorHelpItems.indexed) styled.buildListTile(
+              title: item.displayName,
+              isFirst: index == 0,
+              isLast: index == editorHelpItems.length - 1,
               onTapped: () {
-                appLogger.logger.i("Pushing to help page json");
+                appLogger.logger.i("Pushing to help page ${item.name}");
                 Navigator.of(context, rootNavigator: true).pop();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => DocViewPage(title: "JSON 语法", mode: "json"),
-                  ),
-                );
-              },
-              isFirst: true,
-              context: context,
-            ),
-            styled.buildListTile(
-              title: "生成配置",
-              onTapped: () {
-                appLogger.logger.i("Pushing to help page cfg");
-                Navigator.of(context, rootNavigator: true).pop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DocViewPage(title: "生成配置", mode: "cfg"),
-                  ),
-                );
-              },
-              context: context,
-            ),
-            styled.buildListTile(
-              title: "生成规则提示",
-              onTapped: () {
-                appLogger.logger.i("Pushing to help page cfg_tips");
-                Navigator.of(context, rootNavigator: true).pop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DocViewPage(title: "提示", mode: "cfg_tips"),
-                  ),
-                );
-              },
-              context: context,
-            ),
-            styled.buildListTile(
-              title: "格式化与可读性",
-              onTapped: () {
-                appLogger.logger.i("Pushing to help page formatting");
-                Navigator.of(context, rootNavigator: true).pop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DocViewPage(title: "格式化与可读性", mode: "formatting")
+                  ui.switchRoute(
+                    provider.currentNavMode,
+                    builder: (context) => DocViewPage(title: item.displayName, mode: item.mode)
                   )
                 );
               },
-              isLast: true,
-              context: context,
-            ),
+              context: context
+            )
           ],
         ),
       ),
@@ -123,6 +85,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
     return Scaffold(
       appBar: styled.buildAppBar(
         title: "自定义规则",
@@ -164,7 +127,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                       backgroundColor: ColorScheme.of(context).surfaceContainerLow.withAlpha(styles.alphaOpaque),
                       shape: styles.roundedBorder,
                     ),
-                    onPressed: _showHelp,
+                    onPressed: () => _showHelp(appProvider),
                     child: const Text("帮助"),
                   ),
                 ),

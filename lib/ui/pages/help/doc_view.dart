@@ -30,7 +30,7 @@ class DocViewPage extends StatelessWidget {
     final docProvider = Provider.of<DocProvider>(context);
     late final String doc;
 
-    if (mode == "json") {
+    if (mode == "json_basic") {
       doc = docProvider.jsonDoc;
     } else if (mode == "formatting") {
       doc = docProvider.formattingDoc;
