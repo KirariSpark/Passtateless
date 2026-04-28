@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -63,17 +63,13 @@ class _AdaptiveViewState extends State<AdaptiveView> {
         _selectedTag = tag;
       });
       _rightNavigatorKey.currentState?.pushAndRemoveUntil(
-        widget.navMode == NavigatorMode.material
-          ? MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide))
-          : CupertinoPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)),
+        ui.switchRoute(widget.navMode, builder: (_) => widget.pageBuilder(tag, isWide)),
         (route) => false,
       );
     } else {
       Navigator.push(
         context,
-        widget.navMode == NavigatorMode.material
-          ? MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide))
-          : CupertinoPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)),
+        ui.switchRoute(widget.navMode, builder: (_) => widget.pageBuilder(tag, isWide)),
       );
     }
   }

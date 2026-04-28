@@ -24,6 +24,8 @@ class AdvancedSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final notListen = Provider.of<AppProvider>(context, listen: false);
+
     return Scaffold(
       appBar: hasAppBar
         ? styled.buildAppBar(title: "高级设置", titleTag: useHero ? "advanced" : null, context: context)
@@ -44,10 +46,10 @@ class AdvancedSettingsPage extends StatelessWidget {
                     ui.showAlertDialogQuick(
                       title: "日志等级",
                       content: RadioGroup(
-                        groupValue: Provider.of<AppProvider>(context, listen: false).currentLogLevel,
+                        groupValue: notListen.currentLogLevel,
                         onChanged: (value) {
-                          Provider.of<AppProvider>(context, listen: false).currentLogLevel = value!;
-                          Provider.of<AppProvider>(context, listen: false).saveConfig();
+                          notListen.currentLogLevel = value!;
+                          notListen.saveConfig();
                           Navigator.of(context, rootNavigator: true).pop();
                         },
                         child: Column(
@@ -79,7 +81,9 @@ class AdvancedSettingsPage extends StatelessWidget {
                     final (stat, res) = await readTextFile(Paths.log.path);
                     if (context.mounted && stat == ErrorCode.success) {
                       appLogger.logger.i("Log loaded");
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => LogViewPage(log: res)));
+                      Navigator.push(
+                        context, ui.switchRoute(notListen.currentNavMode, builder: (_) => LogViewPage(log: res))
+                      );
                     } else {
                       appLogger.logger.e("Can not load log: ${stat.code}");
                       ui.showSnackBarQuick(stat.generic, context);
@@ -97,9 +101,10 @@ class AdvancedSettingsPage extends StatelessWidget {
                     appLogger.logger.i("Generating settings JSON");
                     final text = Provider.of<AppProvider>(context, listen: false).getSettingsJson();
                     appLogger.logger.i("JSON generated");
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsExportPage(
-                      settingsJson: text,
-                    )));
+                    Navigator.push(
+                      context,
+                      ui.switchRoute(notListen.currentNavMode, builder: (_) => SettingsExportPage(settingsJson: text))
+                    );
                   },
                   context: context
                 ),
@@ -108,7 +113,9 @@ class AdvancedSettingsPage extends StatelessWidget {
                   title: "导入设置",
                   titleTag: "setting_import",
                   trailing: Icon(Icons.arrow_forward),
-                  onTapped:  () => Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsImportPage())),
+                  onTapped:  () => Navigator.push(
+                    context, ui.switchRoute(notListen.currentNavMode, builder: (_) => SettingsImportPage())
+                  ),
                   context: context
                 )
               ],

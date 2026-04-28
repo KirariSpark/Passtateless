@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/app.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/core/logger.dart';
 import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
@@ -30,9 +30,16 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   @override
+  void dispose() {
+    _pwdController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final pwdProvider = context.watch<PwdProvider>();
-    
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
+
     if (isDecrypting) {
       // 正在解密
       btnChild = Row(
@@ -109,7 +116,9 @@ class _SplashPageState extends State<SplashPage> {
                           ui.showSnackBarQuick(stat.generic, context);
                         } else {
                           appLogger.logger.i("Archive decrypted, pushing to main app");
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp()));
+                          Navigator.pushReplacement(
+                            context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => MainApp())
+                          );
                         }
                       }
                     }
