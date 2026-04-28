@@ -23,7 +23,6 @@ class CfgEditPage extends StatefulWidget {
 
 class _CfgEditPageState extends State<CfgEditPage> {
   late final CodeLineEditingController _configController;
-  DocItems? _currentLoadingItem;
 
   @override
   void initState() {
@@ -60,25 +59,19 @@ class _CfgEditPageState extends State<CfgEditPage> {
         child: Column(
           children: [
             for (final (index, item) in editorHelpItems.indexed) styled.buildListTile(
-              enabled: _currentLoadingItem == null,
               title: item.displayName,
               isFirst: index == 0,
               isLast: index == editorHelpItems.length - 1,
-              onTapped: () async {
+              onTapped: () {
                 appLogger.logger.i("Loading doc ${item.name}");
-                setState(() => _currentLoadingItem = item);
-                final res = await rootBundle.loadString(item.path);
-                setState(() => _currentLoadingItem = null);
-                if (mounted) {
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.push(
-                    context,
-                    ui.switchRoute(
-                      provider.currentNavMode,
-                      builder: (context) => DocViewPage(title: item.displayName, docText: res)
-                    )
-                  );
-                }
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.push(
+                  context,
+                  ui.switchRoute(
+                    provider.currentNavMode,
+                    builder: (context) => DocViewPage(title: item.displayName, docItem: item)
+                  )
+                );
               },
               context: context
             )

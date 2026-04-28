@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
@@ -9,24 +8,15 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:provider/provider.dart';
 
-class HelpOverviewPage extends StatefulWidget {
+class HelpOverviewPage extends StatelessWidget {
   const HelpOverviewPage({super.key});
 
-  @override
-  State<HelpOverviewPage> createState() => _HelpOverviewPageState();
-}
-
-class _HelpOverviewPageState extends State<HelpOverviewPage> {
-  DocItems? _currentLoadingItem;
-  String _currentDocText = "正在加载";
-
-  // 根据选中的 tag 构建对应的右侧页面
   Widget _loadDoc((String, String) tag, bool isWide) {
     final mode = tag.$2;
     final docItem = DocItems.values.firstWhere((d) => d.mode == mode);
     return DocViewPage(
       title: docItem.displayName,
-      docText: _currentDocText,
+      docItem: docItem,
       key: ValueKey(tag),
       hasPadding: !isWide,
       hasAppBar: !isWide,
@@ -54,28 +44,15 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
                   key: selected ? const ValueKey("selected") : const ValueKey("notSelected"),
                   constraints: styles.tileWidthConstraint,
                   child: styled.buildListTile(
-                    enabled: _currentLoadingItem == null,
                     active: selected,
                     isFirst: index == 0,
                     isLast: index == items.length - 1,
                     title: item.displayName,
                     titleTag: isWide ? null : item.mode,
                     subtitle: item.desc,
-                    trailing: _currentLoadingItem == item
-                      ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
-                      : Icon(Icons.arrow_forward),
-                    onTapped: () async {
-                      appLogger.logger.i("Loading doc ${item.name}");
-                      setState(() {
-                        _currentLoadingItem = item;
-                        _currentDocText = "正在加载";
-                      });
-                      final res = await rootBundle.loadString(item.path);
-                      setState(() {
-                        _currentLoadingItem = null;
-                        _currentDocText = res;
-                      });
-                      appLogger.logger.i("Successfully loaded doc");
+                    trailing: const Icon(Icons.arrow_forward),
+                    onTapped: () {
+                      appLogger.logger.i("Opening doc ${item.name}");
                       onItemTapped(tag);
                     },
                     context: context,
