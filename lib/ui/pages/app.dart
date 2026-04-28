@@ -50,26 +50,12 @@ class _MainAppState extends State<MainApp> {
 
         void onNavigate(int index) {
           appProvider.currentIndex = index;
-          appProvider.pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOutCubic,
-          );
         }
 
         // 滚动方向改变时，重新布局前要做的事
         if (_lastScrollDirection != null && _lastScrollDirection != currentAxis) {
           appLogger.logger.d("Layout direction changed, recovering page index");
           appLogger.logger.d("Current direction is ${currentAxis.name}");
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (appProvider.pageController.hasClients) {
-              appProvider.pageController.animateToPage(
-                appProvider.currentIndex,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-              );
-            }
-          });
         }
         _lastScrollDirection = currentAxis;
 
@@ -78,6 +64,7 @@ class _MainAppState extends State<MainApp> {
           return Scaffold(
             body: SafeArea(child: _buildBodyContent(currentAxis, appProvider)),
             bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               currentIndex: appProvider.currentIndex,
               onTap: onNavigate,
               items: const [
@@ -95,6 +82,11 @@ class _MainAppState extends State<MainApp> {
                   icon: Icon(Icons.help_outline),
                   activeIcon: Icon(Icons.help),
                   label: "帮助",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.coffee_outlined),
+                  activeIcon: Icon(Icons.coffee),
+                  label: "支持我们",
                 ),
               ],
               showUnselectedLabels: false,
@@ -130,6 +122,11 @@ class _MainAppState extends State<MainApp> {
                         selectedIcon: Icon(Icons.help),
                         label: Text("帮助"),
                       ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.coffee_outlined),
+                        selectedIcon: Icon(Icons.coffee),
+                        label: Text("支持我们"),
+                      ),
                     ],
                   ),
                   Expanded(child: _buildBodyContent(currentAxis, appProvider)),
@@ -143,16 +140,18 @@ class _MainAppState extends State<MainApp> {
   }
 
   Widget _buildBodyContent(Axis scrollDirection, AppProvider appProvider) {
-    return PageView(
-      key: ValueKey(scrollDirection),
-      controller: appProvider.pageController,
-      physics: NeverScrollableScrollPhysics(),
-      scrollDirection: scrollDirection,
-      children: [
-        HomePage(),
-        BasicSettingsPage(),
-        HelpOverviewPage(),
-      ],
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 300),
+      child: IndexedStack(
+        key: ValueKey(appProvider.currentIndex),
+        index: appProvider.currentIndex,
+        children: [
+          HomePage(),
+          BasicSettingsPage(),
+          HelpOverviewPage(),
+          Center(child: Text("Coming s∞n"),)
+        ],
+      ),
     );
   }
 }

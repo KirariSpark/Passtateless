@@ -20,10 +20,6 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ————控制器————
-  final PageController _pageController = PageController();
-  PageController get pageController => _pageController;
-
   // ————设置项————
   // 提醒我更改主密码
   var _remindMe = RemindDays.days180;
@@ -236,11 +232,5 @@ class AppProvider extends ChangeNotifier {
     } else {
       return (res.$1, DateTime.now());
     }
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 }
