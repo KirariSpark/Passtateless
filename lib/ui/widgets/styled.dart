@@ -172,6 +172,24 @@ TextButton buildTextButton({
   );
 }
 
+/// 构建一个预定义了风格的ElevatedButton
+ElevatedButton buildElevatedButton({
+  required Widget child,
+  required BuildContext context,
+  required void Function()? onPressed
+}) {
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: ColorScheme.of(context).secondaryContainer,
+      foregroundColor: ColorScheme.of(context).onSecondaryContainer,
+      shape: styles.roundedBorder,
+      padding: styles.pagePaddingAll
+    ),
+    child: child
+  );
+}
+
 /// 构建一个代码编辑器，包含高亮和行指示器，配置为JSON格式
 CodeEditor buildJsonEditor({
   required BuildContext context,

@@ -4,6 +4,7 @@ import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/expandable_fab.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
@@ -98,67 +99,49 @@ class PwdListPage extends StatelessWidget {
           ),
         )
       ),
-      floatingActionButton: PopupMenuButton(
-        popUpAnimationStyle: AnimationStyle(
-          curve: Curves.easeInOut,
-          duration: Duration(milliseconds: 300),
-          reverseCurve: Curves.easeInOut,
-          reverseDuration: Duration(milliseconds: 300)
-        ),
-        tooltip: "更多功能",
-        iconSize: 30,
-        child: Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: ColorScheme.of(context).primaryContainer,
-            borderRadius: styles.borderRadius
-          ),
-          child: Icon(Icons.menu)
-        ),
-        itemBuilder: (_) {
-          return [
-            // 保存更改
-            PopupMenuItem(
-              child: Row(
-                spacing: styles.layoutSpacing,
-                children: [Icon(Icons.save_outlined), Text("保存更改")],
-              ),
-              onTap: () async {
-                appLogger.logger.i("Saving changes in password archive");
-                ui.showSnackBarQuick("正在保存", context);
-                var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                  Provider.of<AppProvider>(context, listen: false).masterPwd
-                );
-                if (context.mounted) {
-                  if (stat == ErrorCode.success) {
-                    appLogger.logger.i("Saved successfully");
-                    ui.showSnackBarQuick("你的档案已保存", context);
-                  } else {
-                    appLogger.logger.e("Can not save: ${stat.code}");
-                    ui.showSnackBarQuick(stat.generic, context);
-                  }
-                }
-              },
+      floatingActionButton: ExpandableFab(
+        distance: 64,
+        children: [
+          styled.buildElevatedButton(
+            child: Row(
+              spacing: styles.layoutSpacing,
+              mainAxisSize: MainAxisSize.min,
+              children: [Icon(Icons.save_outlined), Text("保存更改")],
             ),
-            // 新建记录
-            PopupMenuItem(
-              child: Row(
-                spacing: styles.layoutSpacing,
-                children: [
-                  Icon(Icons.add),
-                  Text("新建记录")
-                ],
-              ),
-              onTap: (){
-                appLogger.logger.i("Adding empty record to folder $folder");
-                final newId = Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
-                appLogger.logger.i("Record added, pushing to edit page for new record $newId");
-                Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId)));
-              },
-            )
-          ];
-        }
-      ),
+            context: context,
+            onPressed: () async {
+              appLogger.logger.i("Saving changes in password archive");
+              ui.showSnackBarQuick("正在保存", context);
+              var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+                  Provider.of<AppProvider>(context, listen: false).masterPwd
+              );
+              if (context.mounted) {
+                if (stat == ErrorCode.success) {
+                  appLogger.logger.i("Saved successfully");
+                  ui.showSnackBarQuick("你的档案已保存", context);
+                } else {
+                  appLogger.logger.i("Can not save archive: ${stat.code}");
+                  ui.showSnackBarQuick(stat.generic, context);
+                }
+              }
+            }
+          ),
+          styled.buildElevatedButton(
+            child: Row(
+              spacing: styles.layoutSpacing,
+              mainAxisSize: MainAxisSize.min,
+              children: [Icon(Icons.add), Text("新档案")],
+            ),
+            context: context,
+            onPressed: (){
+              appLogger.logger.i("Adding empty record to folder $folder");
+              final newId = Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
+              appLogger.logger.i("Record added, pushing to edit page for new record $newId");
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId)));
+            }
+          ),
+        ]
+      )
     );
   }
 
