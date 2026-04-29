@@ -201,14 +201,16 @@ CodeEditor buildJsonEditor({
     wordWrap: false,
     controller: controller,
     style: CodeEditorStyle(
-    codeTheme: CodeHighlightTheme(
-      languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-      theme: ColorScheme.of(context).brightness == Brightness.light ? a11YLightTheme : a11YDarkTheme),
-      fontSize: 14,
+      codeTheme: CodeHighlightTheme(
+        languages: {'json': CodeHighlightThemeMode(mode: langJson)},
+        theme: ColorScheme.of(context).brightness == Brightness.light ? a11YLightTheme : a11YDarkTheme
+      ),
+      fontFamily: "SourceCodePro",
+      fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
       backgroundColor: ColorScheme.of(context).surfaceContainerLow
     ),
     borderRadius: styles.borderRadius,
-      indicatorBuilder: (context, editingController, chunkController, notifier) {
+    indicatorBuilder: (context, editingController, chunkController, notifier) {
       return Row(
         children: [
           DefaultCodeLineNumber(controller: editingController, notifier: notifier),

@@ -23,6 +23,8 @@ class PwdListPage extends StatelessWidget {
   final bool hasAppBar;
   /// 页面是否有内边距
   final bool hasPadding;
+  /// 是否要显示Fab
+  final bool hasFab;
 
   const PwdListPage({
     super.key,
@@ -30,6 +32,7 @@ class PwdListPage extends StatelessWidget {
     required this.useHero,
     this.hasAppBar = true,
     this.hasPadding = true,
+    this.hasFab = true
   });
 
   List<Widget> _buildList(List<Map<String, dynamic>> pwdList, BuildContext context){
@@ -74,12 +77,19 @@ class PwdListPage extends StatelessWidget {
     }
   }
 
-  Scaffold _buildUi(List<Map<String, dynamic>> pwdList, BuildContext context, {required bool useHero, required bool hasAppBar, required bool hasPadding}) {
+  Scaffold _buildUi(
+    List<Map<String, dynamic>> pwdList,
+    BuildContext context, {
+      required bool useHero,
+      required bool hasAppBar,
+      required bool hasPadding,
+      required bool hasFab
+    }
+  ) {
     return Scaffold(
-      appBar: hasAppBar
-        ? styled.buildAppBar(
-          title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: useHero ? folder : null
-        ) : null,
+      appBar: hasAppBar ? styled.buildAppBar(
+        title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: useHero ? folder : null
+      ) : null,
       body: Container(
         padding: hasPadding ? styles.uniInsetsSmall : EdgeInsets.zero,
         child: SingleChildScrollView(
@@ -99,7 +109,7 @@ class PwdListPage extends StatelessWidget {
           ),
         )
       ),
-      floatingActionButton: ExpandableFab(
+      floatingActionButton: hasFab ? ExpandableFab(
         distance: 64,
         children: [
           styled.buildElevatedButton(
@@ -141,13 +151,13 @@ class PwdListPage extends StatelessWidget {
             }
           ),
         ]
-      )
+      ) : null
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final pwdList = context.watch<PwdProvider>().getPwdList(folder);
-    return _buildUi(pwdList, context, useHero: useHero, hasAppBar: hasAppBar, hasPadding: hasPadding);
+    return _buildUi(pwdList, context, useHero: useHero, hasAppBar: hasAppBar, hasPadding: hasPadding, hasFab: hasFab);
   }
 }

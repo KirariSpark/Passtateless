@@ -196,24 +196,24 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             context: context,
             onPressed: (){
               ui.showAlertDialogQuick(
-                  title: "新建文件夹",
-                  content: styled.buildTextField(label: "文件夹名", controller: folderName, context: context),
-                  action: () => Navigator.of(context, rootNavigator: true).pop(),
-                  actionText: "取消",
-                  action2: () {
-                    appLogger.logger.i("Add folder ${folderName.text}");
-                    var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
-                    if (stat == ErrorCode.success) {
-                      appLogger.logger.i("Added successfully");
-                      Navigator.of(context, rootNavigator: true).pop();
-                      ui.showSnackBarQuick("文件夹已建立", context);
-                    } else {
-                      appLogger.logger.e("Can not add folder: ${stat.code}");
-                      ui.showSnackBarQuick(stat.generic, context);
-                    }
-                  },
-                  action2Text: "确定",
-                  context: context
+                title: "新建文件夹",
+                content: styled.buildTextField(label: "文件夹名", controller: folderName, context: context),
+                action: () => Navigator.of(context, rootNavigator: true).pop(),
+                actionText: "取消",
+                action2: () {
+                  appLogger.logger.i("Add folder ${folderName.text}");
+                  var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
+                  if (stat == ErrorCode.success) {
+                    appLogger.logger.i("Added successfully");
+                    Navigator.of(context, rootNavigator: true).pop();
+                    ui.showSnackBarQuick("文件夹已建立", context);
+                  } else {
+                    appLogger.logger.e("Can not add folder: ${stat.code}");
+                    ui.showSnackBarQuick(stat.generic, context);
+                  }
+                },
+                action2Text: "确定",
+                context: context
               );
             }
           ),

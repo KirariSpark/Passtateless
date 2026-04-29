@@ -119,7 +119,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           widget.leftPaneBuilder(context, isWide, (tag) => _onItemTapped(tag, isWide), (tag) => _isSelected(tag, isWide)),
-          const VerticalDivider(width: 1, thickness: 1),
+          const VerticalDivider(width: 1),
           Expanded(
             child: widget.rightPaneConstraints != null
               ? ConstrainedBox(constraints: widget.rightPaneConstraints!, child: _buildRightContent(context))

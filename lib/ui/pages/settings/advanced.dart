@@ -4,6 +4,7 @@ import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/settings/export.dart';
 import 'package:passtateless/ui/pages/settings/import.dart';
@@ -24,7 +25,9 @@ class AdvancedSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notListen = Provider.of<AppProvider>(context, listen: false);
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
+    final pwdProvider = Provider.of<PwdProvider>(context, listen: false);
+    final TextEditingController masterController = TextEditingController();
 
     return Scaffold(
       appBar: hasAppBar
@@ -34,7 +37,7 @@ class AdvancedSettingsPage extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Container(
           constraints: styles.tileWidthConstraint,
-          padding: hasPadding ? styles.pagePaddingAll : null,
+          padding: hasPadding ? styles.pagePadding : null,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -46,10 +49,10 @@ class AdvancedSettingsPage extends StatelessWidget {
                     ui.showAlertDialogQuick(
                       title: "日志等级",
                       content: RadioGroup(
-                        groupValue: notListen.currentLogLevel,
+                        groupValue: appProvider.currentLogLevel,
                         onChanged: (value) {
-                          notListen.currentLogLevel = value!;
-                          notListen.saveConfig();
+                          appProvider.currentLogLevel = value!;
+                          appProvider.saveConfig();
                           Navigator.of(context, rootNavigator: true).pop();
                         },
                         child: Column(
@@ -82,7 +85,7 @@ class AdvancedSettingsPage extends StatelessWidget {
                     if (context.mounted && stat == ErrorCode.success) {
                       appLogger.logger.i("Log loaded");
                       Navigator.push(
-                        context, ui.switchRoute(notListen.currentNavMode, builder: (_) => LogViewPage(log: res))
+                        context, ui.switchRoute(appProvider.currentNavMode, builder: (_) => LogViewPage(log: res))
                       );
                     } else {
                       appLogger.logger.e("Can not load log: ${stat.code}");
@@ -103,19 +106,75 @@ class AdvancedSettingsPage extends StatelessWidget {
                     appLogger.logger.i("JSON generated");
                     Navigator.push(
                       context,
-                      ui.switchRoute(notListen.currentNavMode, builder: (_) => SettingsExportPage(settingsJson: text))
+                      ui.switchRoute(
+                        appProvider.currentNavMode,
+                        builder: (_) => JsonExportPage(jsonText: text, title: "导出设置", titleTag: "setting_export")
+                      )
                     );
                   },
                   context: context
                 ),
                 styled.buildListTile(
-                  isLast: true,
+                  title: "导出密码",
+                  titleTag: "pwd_export",
+                  trailing: Icon(Icons.arrow_forward),
+                  onTapped: () {
+                    ui.showAlertDialogQuick(
+                      title: "危险操作",
+                      content: Column(
+                        spacing: styles.layoutSpacing,
+                        children: [
+                          Text("此操作会明文展示你的所有密码档案，需要先验证主密码"),
+                          styled.buildTextField(
+                            context: context,
+                            controller: masterController,
+                            passwordMode: true
+                          )
+                        ],
+                      ),
+                      action: () {Navigator.of(context, rootNavigator: true).pop();},
+                      actionText: "取消",
+                      action2: () {
+                        final res = pwdProvider.getPwdJson(masterController.text, appProvider.masterPwd);
+                        if (res.$1 == ErrorCode.success) {
+                          appLogger.logger.i("Got JSON");
+                          masterController.text = "";
+                          Navigator.of(context, rootNavigator: true).pop();
+                          Navigator.push(
+                            context, ui.switchRoute(
+                              appProvider.currentNavMode,
+                              builder: (_) => JsonExportPage(jsonText: res.$2, title: "导出密码", titleTag: "pwd_export")
+                            )
+                          );
+                        } else {
+                          appLogger.logger.e("Can not get password map json: ${res.$1.code}");
+                          Navigator.of(context, rootNavigator: true).pop();
+                          ui.showSnackBarQuick(res.$1.generic, context);
+                        }
+                      },
+                      action2Text: "确定",
+                      context: context
+                    );
+                  },
+                  context: context
+                ),
+                styled.buildListTile(
                   title: "导入设置",
                   titleTag: "setting_import",
+                  subtitle: "此行为会覆盖你现有的设置",
                   trailing: Icon(Icons.arrow_forward),
                   onTapped:  () => Navigator.push(
-                    context, ui.switchRoute(notListen.currentNavMode, builder: (_) => SettingsImportPage())
+                    context, ui.switchRoute(appProvider.currentNavMode, builder: (_) => SettingsImportPage())
                   ),
+                  context: context
+                ),
+                styled.buildListTile(
+                  isLast: true,
+                  title: "导入密码",
+                  subtitle: "此行为会覆盖你现有的密码档案",
+                  titleTag: "pwd_import",
+                  trailing: Icon(Icons.arrow_forward),
+                  onTapped: () {},
                   context: context
                 )
               ],

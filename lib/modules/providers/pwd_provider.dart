@@ -5,6 +5,7 @@ import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
 import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:uuid/uuid.dart';
+import 'dart:convert';
 
 const _uuid = Uuid();
 
@@ -190,6 +191,20 @@ class PwdProvider extends ChangeNotifier {
     }
   }
 
+  /// 获取当前密码的 JSON 字符串
+  /// [master] 用户输入的主密码明文
+  /// [masterSHA] 来自 Provider 的主密码哈希
+  (ErrorCode, String) getPwdJson(String master, String masterSHA) {
+    appLogger.logger.i("Getting JSON text of current password map");
+    if (utils.toSHA256(master) == masterSHA) {
+      appLogger.logger.i("Correct password, getting JSON");
+      return (ErrorCode.success, utils.formatJSON(json.encode(_pwdMap)).$2);
+    } else {
+      appLogger.logger.e("Wrong password");
+      return (ErrorCode.wrongPwd, "");
+    }
+  }
+
   /// 读取加密的归档文件
   Future<ErrorCode> readArchive(String masterPwd) async {
     appLogger.logger.i("Reading password archive");
@@ -206,10 +221,8 @@ class PwdProvider extends ChangeNotifier {
           if (value is List) {
             final processedList = value.map<Map<String, dynamic>>((item) {
               final map = Map<String, dynamic>.from(item as Map);
-              if (!map.containsKey("id") ||
-                  map["id"] == null ||
-                  map["id"].toString().isEmpty) {
-                map["id"] = _uuid.v4(); // 兼容老版本数据
+              if (!map.containsKey("id") || map["id"] == null || map["id"].toString().isEmpty) {
+                map["id"] = _uuid.v4();
               }
               return map;
             }).toList();
