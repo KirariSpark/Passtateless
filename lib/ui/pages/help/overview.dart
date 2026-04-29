@@ -48,7 +48,7 @@ class HelpOverviewPage extends StatelessWidget {
                     isFirst: index == 0,
                     isLast: index == items.length - 1,
                     title: item.displayName,
-                    titleTag: isWide ? null : item.mode,
+                    titleTag: isWide ? null : item.displayName,
                     subtitle: item.desc,
                     trailing: const Icon(Icons.arrow_forward),
                     onTapped: () {

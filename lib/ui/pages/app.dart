@@ -142,6 +142,8 @@ class _MainAppState extends State<MainApp> {
   Widget _buildBodyContent(Axis scrollDirection, AppProvider appProvider) {
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
       child: IndexedStack(
         key: ValueKey(appProvider.currentIndex),
         index: appProvider.currentIndex,

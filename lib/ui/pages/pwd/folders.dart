@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
@@ -7,6 +6,7 @@ import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/list.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/expandable_fab.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
@@ -150,88 +150,103 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
+  Widget _buildLeftPage({
+    required List<String> folders,
+    required BuildContext context
+  }) {
+    return Scaffold(
+      appBar: widget.hasAppBar
+        ? styled.buildAppBar(title: "资料夹", context: context, titleTag: widget.useHero ? "folders" : null) : null,
+      body: _buildMainBody(folders),
+      floatingActionButton: ExpandableFab(
+        distance: 64,
+        children: [
+          ElevatedButton(
+            onPressed: () async {
+              appLogger.logger.i("Saving changes in password archive");
+              ui.showSnackBarQuick("正在保存", context);
+              var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+                  Provider.of<AppProvider>(context, listen: false).masterPwd
+              );
+              if (context.mounted) {
+                if (stat == ErrorCode.success) {
+                  appLogger.logger.i("Saved successfully");
+                  ui.showSnackBarQuick("你的档案已保存", context);
+                } else {
+                  appLogger.logger.i("Can not save archive: ${stat.code}");
+                  ui.showSnackBarQuick(stat.generic, context);
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorScheme.of(context).secondaryContainer,
+              foregroundColor: ColorScheme.of(context).onSecondaryContainer,
+              shape: styles.roundedBorder,
+              padding: styles.pagePaddingAll
+            ),
+            child: Row(
+              spacing: styles.layoutSpacing,
+              mainAxisSize: MainAxisSize.min,
+              children: [Icon(Icons.save_outlined), Text("保存更改")],
+            )
+          ),
+          ElevatedButton(
+            onPressed: (){
+              ui.showAlertDialogQuick(
+                title: "新建文件夹",
+                content: styled.buildTextField(label: "文件夹名", controller: folderName, context: context),
+                action: () => Navigator.of(context, rootNavigator: true).pop(),
+                actionText: "取消",
+                action2: () {
+                  appLogger.logger.i("Add folder ${folderName.text}");
+                  var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
+                  if (stat == ErrorCode.success) {
+                    appLogger.logger.i("Added successfully");
+                    Navigator.of(context, rootNavigator: true).pop();
+                    ui.showSnackBarQuick("文件夹已建立", context);
+                  } else {
+                    appLogger.logger.e("Can not add folder: ${stat.code}");
+                    ui.showSnackBarQuick(stat.generic, context);
+                  }
+                },
+                action2Text: "确定",
+                context: context
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorScheme.of(context).secondaryContainer,
+              foregroundColor: ColorScheme.of(context).onSecondaryContainer,
+              shape: styles.roundedBorder,
+              padding: styles.pagePaddingAll
+            ),
+            child: Row(
+              spacing: styles.layoutSpacing,
+              mainAxisSize: MainAxisSize.min,
+              children: [Icon(Icons.create_new_folder_outlined), Text("新资料夹")],
+            )
+          ),
+          ElevatedButton(
+            onPressed: (){},
+            style: ElevatedButton.styleFrom(
+                backgroundColor: ColorScheme.of(context).secondaryContainer,
+                foregroundColor: ColorScheme.of(context).onSecondaryContainer,
+                shape: styles.roundedBorder,
+                padding: styles.pagePaddingAll
+            ),
+            child: Row(
+              spacing: styles.layoutSpacing,
+              mainAxisSize: MainAxisSize.min,
+              children: [Icon(Icons.file_upload_outlined), Text("导出")],
+            )
+          ),
+        ]
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
-    return Scaffold(
-      appBar: widget.hasAppBar
-        ? styled.buildAppBar(title: "资料夹", context: context, titleTag: widget.useHero ? "folders" : null)
-        : null,
-      body: _buildMainBody(folders),
-      floatingActionButton: PopupMenuButton(
-        popUpAnimationStyle: AnimationStyle(
-          curve: Curves.easeInOut,
-          duration: Duration(milliseconds: 300),
-          reverseCurve: Curves.easeInOut,
-          reverseDuration: Duration(milliseconds: 300)
-        ),
-        tooltip: "更多功能",
-        iconSize: 30,
-        itemBuilder: (_) {
-          return [
-            // 保存更改
-            PopupMenuItem(
-              child: Row(
-                spacing: styles.layoutSpacing,
-                children: [Icon(Icons.save_outlined), Text("保存更改")],
-              ),
-              onTap: () async {
-                appLogger.logger.i("Saving changes in password archive");
-                ui.showSnackBarQuick("正在保存", context);
-                var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                  Provider.of<AppProvider>(context, listen: false).masterPwd
-                );
-                if (context.mounted) {
-                  if (stat == ErrorCode.success) {
-                    appLogger.logger.i("Saved successfully");
-                    ui.showSnackBarQuick("你的档案已保存", context);
-                  } else {
-                    appLogger.logger.i("Can not save archive: ${stat.code}");
-                    ui.showSnackBarQuick(stat.generic, context);
-                  }
-                }
-              },
-            ),
-            // 新建资料夹
-            PopupMenuItem(
-              child: Row(
-                spacing: styles.layoutSpacing,
-                children: [Icon(Icons.create_new_folder_outlined), Text("新建资料夹")],
-              ),
-              onTap: (){
-                ui.showAlertDialogQuick(
-                  title: "新建文件夹",
-                  content: styled.buildTextField(label: "文件夹名", controller: folderName, context: context),
-                  action: () => Navigator.of(context, rootNavigator: true).pop(),
-                  actionText: "取消",
-                  action2: () {
-                    appLogger.logger.i("Add folder ${folderName.text}");
-                    var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
-                    if (stat == ErrorCode.success) {
-                      appLogger.logger.i("Added successfully");
-                      Navigator.of(context, rootNavigator: true).pop();
-                      ui.showSnackBarQuick("文件夹已建立", context);
-                    } else {
-                      appLogger.logger.e("Can not add folder: ${stat.code}");
-                      ui.showSnackBarQuick(stat.generic, context);
-                    }
-                  },
-                  action2Text: "确定",
-                  context: context
-                );
-              }
-            )
-          ];
-        },
-        child: Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: ColorScheme.of(context).primaryContainer,
-            borderRadius: styles.borderRadius
-          ),
-          child: Icon(Icons.menu, color: ColorScheme.of(context).onPrimaryContainer, size: 30)
-        ),
-      ),
-    );
+    return _buildLeftPage(folders: folders, context: context);
   }
 }
