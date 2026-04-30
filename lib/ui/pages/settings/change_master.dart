@@ -31,6 +31,14 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
   final TextEditingController _pwdConfirmController = TextEditingController();
 
   @override
+  void dispose() {
+    _pwdConfirmController.dispose();
+    _pwdNewController.dispose();
+    _pwdOldController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: ValueKey("change_master"),

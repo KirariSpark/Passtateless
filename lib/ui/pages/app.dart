@@ -5,6 +5,7 @@ import 'package:passtateless/ui/pages/help/overview.dart';
 import 'package:passtateless/ui/pages/pwd/home.dart';
 import 'package:passtateless/ui/pages/settings/basic.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui ;
+import 'package:passtateless/ui/pages/support/support_options.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:provider/provider.dart';
 
@@ -86,7 +87,7 @@ class _MainAppState extends State<MainApp> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.coffee_outlined),
                   activeIcon: Icon(Icons.coffee),
-                  label: "支持我们",
+                  label: "支持我",
                 ),
               ],
               showUnselectedLabels: false,
@@ -125,7 +126,7 @@ class _MainAppState extends State<MainApp> {
                       NavigationRailDestination(
                         icon: Icon(Icons.coffee_outlined),
                         selectedIcon: Icon(Icons.coffee),
-                        label: Text("支持我们"),
+                        label: Text("支持我"),
                       ),
                     ],
                   ),
@@ -151,7 +152,7 @@ class _MainAppState extends State<MainApp> {
           HomePage(),
           BasicSettingsPage(),
           HelpOverviewPage(),
-          Center(child: Text("Coming s∞n"),)
+          SupportOptionsPage()
         ],
       ),
     );
