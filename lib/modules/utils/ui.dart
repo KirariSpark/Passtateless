@@ -70,7 +70,7 @@ void showConfirmDialogQuick({
   required String title, required String info
 }) {
   showAlertDialogQuick(
-    title: title, content: Text(info), action: (){Navigator.of(context, rootNavigator: true).pop();},
+    title: title, content: Text(info), action: (){Navigator.of(context).pop();},
     actionText: "取消", context: context, action2: function, action2Text: "确定"
   );
 }

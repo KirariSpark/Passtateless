@@ -21,13 +21,13 @@ class _PwdEditPageState extends State<PwdEditPage> {
   late TextEditingController _identifierController;
   late TextEditingController _userNameController;
   late TextEditingController _accountController;
-  bool _isDeleting = false;
 
   @override
   void initState() {
     appLogger.logger.i("Editing password id ${widget.id}");
     super.initState();
-    final data = Provider.of<PwdProvider>(context, listen: false).getItemById(widget.id);
+    final pwdProvider = Provider.of<PwdProvider>(context, listen: false);
+    final data = pwdProvider.getItemById(widget.id);
     _identifierController = TextEditingController(text: data["identifier"]);
     _userNameController = TextEditingController(text: data["userName"]);
     _accountController = TextEditingController(text: data["account"]);
@@ -43,12 +43,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isDeleting) {
-      return Scaffold(
-        appBar: AppBar(title: const Text("正在删除...")),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    final pwdProvider = Provider.of<PwdProvider>(context, listen: false);
 
     return Scaffold(
       appBar: styled.buildAppBar(
@@ -63,9 +58,8 @@ class _PwdEditPageState extends State<PwdEditPage> {
             spacing: 8,
             children: <Widget>[
               // 文本框区域
-              Wrap(
+              Column(
                 spacing: styles.layoutSpacing,
-                runSpacing: styles.layoutSpacing,
                 children: [
                   // 档案名
                   ConstrainedBox(
@@ -74,11 +68,9 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       context: context,
                       controller: _identifierController,
                       onChanged: (value) {
-                        var res = Provider.of<PwdProvider>(
-                          context, listen: false
-                        ).setValueById(widget.id, "identifier", value);
+                        final res = pwdProvider.setValueById(widget.id, "identifier", value);
                         if (res != ErrorCode.success) {
-                          appLogger.logger.e("Failed to rename: ${res.code}");
+                          appLogger.logger.e("Failed to rename: $res");
                           ui.showSnackBarQuick(res.generic, context);
                         }
                       },
@@ -92,11 +84,9 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       context: context,
                       controller: _userNameController,
                       onChanged: (value) {
-                        var res = Provider.of<PwdProvider>(
-                          context, listen: false,
-                        ).setValueById(widget.id, "userName", value);
+                        final res = pwdProvider.setValueById(widget.id, "userName", value);
                         if (res != ErrorCode.success) {
-                          appLogger.logger.e("Cannot change userName: ${res.code}");
+                          appLogger.logger.e("Cannot change userName: $res");
                           ui.showSnackBarQuick(res.generic, context);
                         }
                       },
@@ -110,11 +100,9 @@ class _PwdEditPageState extends State<PwdEditPage> {
                       context: context,
                       controller: _accountController,
                       onChanged: (value) {
-                        var res = Provider.of<PwdProvider>(
-                          context, listen: false,
-                        ).setValueById(widget.id, "account", value);
+                        var res = pwdProvider.setValueById(widget.id, "account", value);
                         if (res != ErrorCode.success) {
-                          appLogger.logger.e("Cannot change account: ${res.code}");
+                          appLogger.logger.e("Cannot change account: $res");
                           ui.showSnackBarQuick(res.generic, context);
                         }
                       },
@@ -122,42 +110,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                     ),
                   ),
                 ],
-              ),
-              // 删除按钮
-              TextButton(
-                onPressed: () {
-                  ui.showConfirmDialogQuick(
-                    context: context,
-                    function: () {
-                      appLogger.logger.i("Deleting password archive");
-                      setState(() {
-                        _isDeleting = true;
-                      });
-                      final res = Provider.of<PwdProvider>(context, listen: false).removeRecordById(widget.id);
-                      if (res != ErrorCode.success) {
-                        appLogger.logger.e("Can not delete archive: ${res.code}");
-                        ui.showSnackBarQuick(res.generic, context);
-                      }
-                      appLogger.logger.i("Archive deleted");
-                      Navigator.of(context).pop();
-                      Navigator.pop(context);
-                    },
-                    title: "确认删除",
-                    info: "你无法撤销此操作",
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: styles.roundedBorder,
-                  backgroundColor: ColorScheme.of(context).errorContainer,
-                ),
-                child: Text(
-                  "删除这条记录",
-                  style: TextStyle(
-                    color: ColorScheme.of(context).error,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
+              )
             ],
           ),
         ),

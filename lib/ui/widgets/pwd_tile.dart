@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:provider/provider.dart';
 
 class PwdTile extends StatelessWidget {
   /// 单个密码记录条目
   final Map<String, dynamic> pwdRecord;
 
   /// 收藏键点击时，应该做的事
-  final void Function()? _onStarPressed;
+  final void Function()? onStarPressed;
 
   /// 编辑键点击时，应该做的事
-  final void Function()? _onEditPressed;
+  final void Function()? onEditPressed;
 
   /// 组件本身被点击时，应该做的事
-  final void Function()? _onTapped;
+  final void Function()? onTapped;
 
   /// 是否是第一项
   final bool isFirst;
@@ -33,16 +36,14 @@ class PwdTile extends StatelessWidget {
   const PwdTile({
     super.key,
     required this.pwdRecord,
-    required void Function()? onStarPressed,
-    void Function()? onEditPressed,
-    void Function()? onTapped,
+    required this.onStarPressed,
+    this.onEditPressed,
+    this.onTapped,
     this.isFirst = false,
     this.isLast = false,
     this.isActive = false,
     this.useHero = true,
-  }) : _onStarPressed = onStarPressed,
-       _onEditPressed = onEditPressed,
-       _onTapped = onTapped;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +81,7 @@ class PwdTile extends StatelessWidget {
                   leading: Icons.edit_outlined,
                   title: "编辑",
                   isFirst: true,
-                  onTapped: _onEditPressed,
+                  onTapped: onEditPressed,
                   context: context
                 ),
                 styled.buildListTile(
@@ -97,6 +98,24 @@ class PwdTile extends StatelessWidget {
                   leading: Icons.delete_outline,
                   title: "删除",
                   isLast: true,
+                  onTapped: () {
+                    Navigator.pop(context);
+                    ui.showConfirmDialogQuick(
+                      context: context,
+                      function: () {
+                        appLogger.logger.i("Deleting password archive");
+                        final res = Provider.of<PwdProvider>(context, listen: false).removeRecordById(pwdRecord["id"]);
+                        if (res != ErrorCode.success) {
+                          appLogger.logger.e("Can not delete archive: $res");
+                          ui.showSnackBarQuick(res.generic, context);
+                        }
+                        appLogger.logger.i("Archive deleted");
+                        Navigator.pop(context);
+                      },
+                      title: "确认删除",
+                      info: "你无法撤销此操作",
+                    );
+                  },
                   context: context
                 )
               ]
@@ -110,14 +129,14 @@ class PwdTile extends StatelessWidget {
             children: [
               IconButton(
                 style: styles.buttonStyle,
-                onPressed: _onStarPressed,
+                onPressed: onStarPressed,
                 icon: pwdRecord["starred"]
                   ? Icon(Icons.star, color: ColorScheme.of(context).primary)
                   : Icon(Icons.star_border),
               )
             ],
           ),
-          onTapped: _onTapped,
+          onTapped: onTapped,
           isFirst: isFirst,
           isLast: isLast,
           context: context,
