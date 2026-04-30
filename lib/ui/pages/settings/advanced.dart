@@ -31,11 +31,13 @@ class AdvancedSettingsPage extends StatefulWidget {
 class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
   final TextEditingController masterController = TextEditingController();
   final CodeLineEditingController configController = CodeLineEditingController();
+  final CodeLineEditingController pwdController = CodeLineEditingController();
 
   @override
   void dispose() {
     masterController.dispose();
     configController.dispose();
+    pwdController.dispose();
     super.dispose();
   }
 
@@ -176,14 +178,16 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                 styled.buildListTile(
                   title: "导入设置",
                   titleTag: "setting_import",
-                  subtitle: "此行为会覆盖你现有的设置",
+                  subtitle: "此行为会覆盖现有的设置",
                   trailing: Icon(Icons.arrow_forward),
                   onTapped:  () => Navigator.push(
                     context, ui.switchRoute(
                       appProvider.currentNavMode, builder: (_) => SettingsImportPage(
+                        title: "导入设置",
+                        titleTag: "setting_import",
                         controller: configController,
                         onImport: () {
-                          appLogger.logger.i("Importing setting");
+                          appLogger.logger.i("Importing setting using json");
                           final stat = appProvider.restoreConfigFromText(configController.text, fallback: false);
                           if (stat == ErrorCode.success) {
                             ui.showSnackBarQuick("导入成功", context);
@@ -200,10 +204,28 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                 styled.buildListTile(
                   isLast: true,
                   title: "导入密码",
-                  subtitle: "此行为会覆盖你现有的密码档案",
+                  subtitle: "此行为会覆盖部分现有的密码档案",
                   titleTag: "pwd_import",
                   trailing: Icon(Icons.arrow_forward),
-                  onTapped: () {},
+                  onTapped: () {
+                    Navigator.push(
+                      context, ui.switchRoute(
+                        appProvider.currentNavMode, builder: (_) => SettingsImportPage(
+                          title: "导入密码",
+                          titleTag: "pwd_import",
+                          onImport: () {
+                            appLogger.logger.i("Importing password using json");
+                            final stat = pwdProvider.setPwdByJson(pwdController.text);
+                            stat == ErrorCode.success
+                              ? appLogger.logger.i("Password imported successfully")
+                              : appLogger.logger.e("Can not import password: $stat");
+                            ui.showSnackBarQuick(stat.generic, context);
+                          },
+                          controller: pwdController
+                        )
+                      )
+                    );
+                  },
                   context: context
                 )
               ],

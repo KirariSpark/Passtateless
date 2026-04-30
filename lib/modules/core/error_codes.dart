@@ -16,7 +16,9 @@ enum ErrorCode {
   emptyPwd(14, "密码为空"),
   noSuchId(15, "无效 ID", "无效 ID：{item}"),
   noSuchLoc(16, "无效位置"),
-  brokenConfig(17, "配置文件损坏");
+  brokenConfig(17, "配置文件损坏"),
+  isNotMap(18, "输入数据类型不是字典"),
+  existingUuid(19, "发现了已存在（且不应存在）的UUID");
 
   final int code;
   final String _messageTemplate;

@@ -75,24 +75,46 @@ class PwdProvider extends ChangeNotifier {
     return null;
   }
 
-  void _parsePwdMap(Map map) {
-    // 为没有 id 的数据补上 id
-    map.forEach((key, value) {
+  /// 解析字典，补上UUID，并设置自身的_pwdMap
+  ErrorCode _parsePwdMap(Map map, {bool allowExistingUuid = true}) {
+    final newPwdMap = <String, List<Map<String, dynamic>>>{};
+
+    for (final entry in map.entries) {
+      final key = entry.key.toString();
+      final value = entry.value;
       if (value is List) {
-        final processedList = value.map<Map<String, dynamic>>((item) {
-          final map = Map<String, dynamic>.from(item as Map);
-          if (!map.containsKey("id") || map["id"] == null || map["id"].toString().isEmpty) {
-            map["id"] = _uuid.v4();
+        final processedList = <Map<String, dynamic>>[];
+        for (final item in value) {
+          final itemMap = Map<String, dynamic>.from(item as Map);
+          final hasUuid = itemMap.containsKey("id") &&
+              itemMap["id"] != null &&
+              itemMap["id"].toString().isNotEmpty;
+
+          // 不允许已存在的UUID时直接返回错误
+          if (!allowExistingUuid && hasUuid) {
+            return ErrorCode.existingUuid;
           }
-          return map;
-        }).toList();
-        _pwdMap[key.toString()] = processedList;
+
+          // 没有UUID则自动生成
+          if (!hasUuid) {
+            appLogger.logger.d("Generating id for password");
+            itemMap["id"] = _uuid.v4();
+          }
+
+          processedList.add(itemMap);
+        }
+        newPwdMap[key] = processedList;
       }
-    });
+    }
+
+    // 只有全部成功才更新 _pwdMap，并保留原有不相关的键
+    _pwdMap.addAll(newPwdMap);
     if (!_pwdMap.containsKey("")) {
       _pwdMap[""] = [];
     }
+
     notifyListeners();
+    return ErrorCode.success;
   }
 
   /// 使用 id 更新指定项的数据
@@ -222,6 +244,30 @@ class PwdProvider extends ChangeNotifier {
     } else {
       appLogger.logger.e("Wrong password");
       return (ErrorCode.wrongPwd, "");
+    }
+  }
+
+  ErrorCode setPwdByJson(String jsonText) {
+    try {
+      appLogger.logger.i("Setting password by json");
+      final res = json.decode(jsonText);
+      if (res is Map) {
+        appLogger.logger.d("JSON decoded successfully");
+        final stat = _parsePwdMap(res, allowExistingUuid: false);
+        if (stat == ErrorCode.success) {
+          appLogger.logger.i("Password successfully imported");
+          return ErrorCode.success;
+        } else {
+          appLogger.logger.e("Can not import password: $stat");
+          return stat;
+        }
+      } else {
+        appLogger.logger.e("Input data type is not Map");
+        return ErrorCode.isNotMap;
+      }
+    } catch (e) {
+      appLogger.logger.e(ErrorCode.jsonFormatError.format(e.toString()));
+      return ErrorCode.jsonFormatError;
     }
   }
 
