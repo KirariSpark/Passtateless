@@ -82,3 +82,27 @@ PageRoute switchRoute(NavigatorMode mode, {required Widget Function(BuildContext
     return CupertinoPageRoute(builder: builder);
   }
 }
+
+void showBottomSheetQuick ({
+  required BuildContext context,
+  required String title,
+  required List<Widget> children,
+}) {
+  List<Widget> realChildren = [Text(title, style: Theme.of(context).textTheme.titleLarge)];
+  realChildren.add(Divider());
+  realChildren.addAll(children);
+
+  showModalBottomSheet(
+    context: context,
+    shape: RoundedRectangleBorder(borderRadius: calcRadius(isFirst: true)),
+    builder: (_) => Container(
+      constraints: styles.tileWidthConstraintSmall,
+      padding: styles.pagePaddingAll,
+      child: SingleChildScrollView(
+        child: Column(
+          children: realChildren
+        ),
+      ),
+    )
+  );
+}

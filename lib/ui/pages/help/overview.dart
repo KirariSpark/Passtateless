@@ -42,7 +42,7 @@ class HelpOverviewPage extends StatelessWidget {
                 duration: const Duration(milliseconds: 100),
                 child: ConstrainedBox(
                   key: selected ? const ValueKey("selected") : const ValueKey("notSelected"),
-                  constraints: styles.tileWidthConstraint,
+                  constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
                   child: styled.buildListTile(
                     active: selected,
                     isFirst: index == 0,
@@ -65,6 +65,8 @@ class HelpOverviewPage extends StatelessWidget {
       },
       navMode: Provider.of<AppProvider>(context, listen: false).currentNavMode,
       padding: styles.pagePaddingAll,
+      widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
+          styles.layoutSpacing,
     );
   }
 }

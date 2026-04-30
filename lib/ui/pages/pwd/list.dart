@@ -64,6 +64,7 @@ class PwdListPage extends StatelessWidget {
             },
             onEditPressed: (){
               appLogger.logger.i("Pushing to edit page for ${item["id"]}");
+              Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: item["id"])));
             },
             onTapped: (){
