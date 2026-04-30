@@ -111,7 +111,8 @@ enum DocItems {
   jsonBasic("JSON 基础", "json_basic", "了解基础的 JSON 语法", "assets/docs/json_basic.md"),
   cfg("配置生成器", "cfg", "了解生成器的功能及其参数", "assets/docs/cfg.md"),
   cfgTips("生成器提示", "cfg_tips", "在配置生成器时，你应该注意的一些事情", "assets/docs/cfg_tips.md"),
-  features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md");
+  features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md"),
+  importExport("导入导出", "import_export", "备份、恢复和分享你的数据", "assets/docs/import_export.md");
 
 
   final String displayName;

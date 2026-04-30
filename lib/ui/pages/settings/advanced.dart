@@ -213,13 +213,28 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                         appProvider.currentNavMode, builder: (_) => SettingsImportPage(
                           title: "导入密码",
                           titleTag: "pwd_import",
-                          onImport: () {
+                          onImport: () async {
                             appLogger.logger.i("Importing password using json");
                             final stat = pwdProvider.setPwdByJson(pwdController.text);
-                            stat == ErrorCode.success
-                              ? appLogger.logger.i("Password imported successfully")
-                              : appLogger.logger.e("Can not import password: $stat");
-                            ui.showSnackBarQuick(stat.generic, context);
+                            if (stat == ErrorCode.success) {
+                              appLogger.logger.i("Password imported successfully, saving changes");
+                              ui.showSnackBarQuick("导入成功，正在保存", context);
+                              final stat = await pwdProvider.saveArchive(appProvider.masterPwd);
+                              if (stat == ErrorCode.success) {
+                                appLogger.logger.i("Successfully saved passwords");
+                                if (context.mounted) {
+                                  ui.showSnackBarQuick("保存成功", context);
+                                }
+                              } else {
+                                appLogger.logger.e("Failed to save passwords: $stat");
+                                if (context.mounted) {
+                                  ui.showSnackBarQuick(stat.generic, context);
+                                }
+                              }
+                            } else {
+                              appLogger.logger.e("Can not import password: $stat");
+                              ui.showSnackBarQuick(stat.generic, context);
+                            }
                           },
                           controller: pwdController
                         )
