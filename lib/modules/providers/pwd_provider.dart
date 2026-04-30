@@ -61,17 +61,17 @@ class PwdProvider extends ChangeNotifier {
 
   /// 通过 id 查找该记录在 _pwdMap 中的真实位置
   _PwdLocation? _findLocationById(String id) {
-    appLogger.logger.i("Finding password id $id");
+    appLogger.logger.d("Finding password id $id");
     for (var folder in _pwdMap.keys) {
       for (var (index, item) in _pwdMap[folder]!.indexed) {
         if (item["id"] == id) {
           final loc = _PwdLocation(folder: folder, index: index);
-          appLogger.logger.i("Found password id $id at $loc");
+          appLogger.logger.d("Found password id $id at $loc");
           return loc;
         }
       }
     }
-    appLogger.logger.i("No password matching id $id");
+    appLogger.logger.e("No password matching id $id");
     return null;
   }
 
@@ -120,7 +120,7 @@ class PwdProvider extends ChangeNotifier {
   /// 检查 id 对应的记录是否有效
   /// 有效条件：存在 identifier、userName、account、starred 键，且除 identifier 外的键值不为空
   bool isRecordValid(String id) {
-    appLogger.logger.i("Checking validity of password id $id");
+    appLogger.logger.d("Checking validity of password id $id");
     final loc = _findLocationById(id);
     if (loc == null) {
       appLogger.logger.w("No record found for id $id");
@@ -128,10 +128,9 @@ class PwdProvider extends ChangeNotifier {
     }
     final item = _pwdMap[loc.folder]![loc.index];
     // 检查必需的键是否存在
-    if (!item.containsKey("identifier") ||
-        !item.containsKey("userName") ||
-        !item.containsKey("account") ||
-        !item.containsKey("starred")) {
+    if (!item.containsKey("identifier") || !item.containsKey("userName") ||
+        !item.containsKey("account") || !item.containsKey("starred")
+    ) {
       appLogger.logger.w("Record id $id missing required keys");
       return false;
     }
@@ -151,7 +150,7 @@ class PwdProvider extends ChangeNotifier {
       appLogger.logger.w("Record id $id has null starred");
       return false;
     }
-    appLogger.logger.i("Record id $id is valid");
+    appLogger.logger.d("Record id $id is valid");
     return true;
   }
 

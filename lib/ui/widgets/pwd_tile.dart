@@ -56,6 +56,57 @@ class PwdTile extends StatelessWidget {
     );
   }
 
+  /// 显示移动或复制到的文件夹选择对话框
+  void _showMoveCopyDialog(BuildContext context, PwdProvider pwdProvider, bool isMove) {
+    appLogger.logger.i("Showing folder picker for ${isMove ? "move" : "copy"} id: ${pwdRecord["id"]}");
+    final folders = pwdProvider.pwdFolders;
+    final List<Widget> tiles = [];
+
+    for (int i = 0; i < folders.length; i++) {
+      final folder = folders[i];
+      final displayName = folder.isEmpty ? "未分类" : folder;
+      tiles.add(
+        styled.buildListTile(
+          leading: Icons.folder_outlined,
+          title: displayName,
+          isFirst: i == 0,
+          isLast: i == folders.length - 1,
+          onTapped: () {
+            appLogger.logger.i("User selected folder '$folder' for ${isMove ? "moving" : "copying"} id: ${pwdRecord["id"]}");
+            final ErrorCode result;
+            if (isMove) {
+              result = pwdProvider.moveTo(pwdRecord["id"], folder);
+            } else {
+              result = pwdProvider.copyTo(pwdRecord["id"], folder);
+            }
+            // 关闭文件夹选择对话框
+            Navigator.of(context).pop();
+            if (result != ErrorCode.success) {
+              appLogger.logger.e("Operation failed: ${result.generic}");
+              ui.showSnackBarQuick(result.generic, context);
+            } else {
+              appLogger.logger.i("Operation succeeded");
+            }
+          },
+          context: context,
+        ),
+      );
+    }
+
+    ui.showAlertDialogQuick(
+      title: isMove ? "移动到..." : "复制到...",
+      content: SingleChildScrollView(
+        child: Column(children: tiles),
+      ),
+      action: () {
+        appLogger.logger.i("Folder picker cancelled");
+        Navigator.of(context).pop();
+      },
+      actionText: "取消",
+      context: context,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pwdProvider = Provider.of<PwdProvider>(context, listen: false);
@@ -104,11 +155,21 @@ class PwdTile extends StatelessWidget {
                 styled.buildListTile(
                   leading: Icons.cut_outlined,
                   title: "移动到",
+                  onTapped: () {
+                    appLogger.logger.i("User triggered move for password id: ${pwdRecord["id"]}");
+                    Navigator.pop(context);
+                    _showMoveCopyDialog(context, pwdProvider, true);
+                  },
                   context: context
                 ),
                 styled.buildListTile(
                   leading: Icons.file_copy_outlined,
                   title: "复制到",
+                  onTapped: () {
+                    appLogger.logger.i("User triggered copy for password id: ${pwdRecord["id"]}");
+                    Navigator.pop(context);
+                    _showMoveCopyDialog(context, pwdProvider, false);
+                  },
                   context: context
                 ),
                 styled.buildListTile(
