@@ -30,7 +30,7 @@ class AboutPage extends StatelessWidget {
                 styles.spacingSizedBox,
                 styles.spacingSizedBox,
                 Text("Passtateless", style: Theme.of(context).textTheme.bodyLarge),
-                Text("0.1.6 - beta"),
+                Text("0.1.7 - beta"),
                 styles.spacingSizedBox,
                 TextButton(
                   onPressed: () {
