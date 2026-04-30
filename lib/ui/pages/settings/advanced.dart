@@ -12,9 +12,10 @@ import 'package:passtateless/ui/pages/settings/log_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
+import 'package:re_editor/re_editor.dart';
 
 // 高级设置页面
-class AdvancedSettingsPage extends StatelessWidget {
+class AdvancedSettingsPage extends StatefulWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
   /// 是否要包含AppBar
@@ -24,20 +25,34 @@ class AdvancedSettingsPage extends StatelessWidget {
   const AdvancedSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
 
   @override
+  State<AdvancedSettingsPage> createState() => _AdvancedSettingsPageState();
+}
+
+class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
+  final TextEditingController masterController = TextEditingController();
+  final CodeLineEditingController configController = CodeLineEditingController();
+
+  @override
+  void dispose() {
+    masterController.dispose();
+    configController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appProvider = Provider.of<AppProvider>(context, listen: false);
     final pwdProvider = Provider.of<PwdProvider>(context, listen: false);
-    final TextEditingController masterController = TextEditingController();
 
     return Scaffold(
-      appBar: hasAppBar
-        ? styled.buildAppBar(title: "高级设置", titleTag: useHero ? "advanced" : null, context: context)
+      appBar: widget.hasAppBar
+        ? styled.buildAppBar(title: "高级设置", titleTag: widget.useHero ? "advanced" : null, context: context)
         : null,
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
           constraints: styles.tileWidthConstraint,
-          padding: hasPadding ? styles.pagePadding : null,
+          padding: widget.hasPadding ? styles.pagePadding : null,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -164,7 +179,21 @@ class AdvancedSettingsPage extends StatelessWidget {
                   subtitle: "此行为会覆盖你现有的设置",
                   trailing: Icon(Icons.arrow_forward),
                   onTapped:  () => Navigator.push(
-                    context, ui.switchRoute(appProvider.currentNavMode, builder: (_) => SettingsImportPage())
+                    context, ui.switchRoute(
+                      appProvider.currentNavMode, builder: (_) => SettingsImportPage(
+                        controller: configController,
+                        onImport: () {
+                          appLogger.logger.i("Importing setting");
+                          final stat = appProvider.restoreConfigFromText(configController.text, fallback: false);
+                          if (stat == ErrorCode.success) {
+                            ui.showSnackBarQuick("导入成功", context);
+                          } else {
+                            appLogger.logger.e("Can not import settings: ${stat.code}");
+                            ui.showSnackBarQuick(stat.generic, context);
+                          }
+                        },
+                      )
+                    )
                   ),
                   context: context
                 ),

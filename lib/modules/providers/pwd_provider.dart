@@ -75,6 +75,26 @@ class PwdProvider extends ChangeNotifier {
     return null;
   }
 
+  void _parsePwdMap(Map map) {
+    // 为没有 id 的数据补上 id
+    map.forEach((key, value) {
+      if (value is List) {
+        final processedList = value.map<Map<String, dynamic>>((item) {
+          final map = Map<String, dynamic>.from(item as Map);
+          if (!map.containsKey("id") || map["id"] == null || map["id"].toString().isEmpty) {
+            map["id"] = _uuid.v4();
+          }
+          return map;
+        }).toList();
+        _pwdMap[key.toString()] = processedList;
+      }
+    });
+    if (!_pwdMap.containsKey("")) {
+      _pwdMap[""] = [];
+    }
+    notifyListeners();
+  }
+
   /// 使用 id 更新指定项的数据
   ErrorCode setValueById(String id, String key, String value) {
     appLogger.logger.i("Updating password id $id");
@@ -212,27 +232,11 @@ class PwdProvider extends ChangeNotifier {
       enums.Paths.pwdRecord.path,
       masterPwd,
     );
-    appLogger.logger.d("Stat: ${stat.code}");
+    appLogger.logger.d("Read stat: ${stat.code}");
     if (stat == ErrorCode.success) {
       if (res is Map) {
         _pwdMap = {};
-        // 为没有 id 的老数据补上 id
-        res.forEach((key, value) {
-          if (value is List) {
-            final processedList = value.map<Map<String, dynamic>>((item) {
-              final map = Map<String, dynamic>.from(item as Map);
-              if (!map.containsKey("id") || map["id"] == null || map["id"].toString().isEmpty) {
-                map["id"] = _uuid.v4();
-              }
-              return map;
-            }).toList();
-            _pwdMap[key.toString()] = processedList;
-          }
-        });
-        if (!_pwdMap.containsKey("")) {
-          _pwdMap[""] = [];
-        }
-        notifyListeners();
+        _parsePwdMap(res);
         appLogger.logger.i("Successfully read archive");
         return ErrorCode.success;
       } else {

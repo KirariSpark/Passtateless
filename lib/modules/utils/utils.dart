@@ -70,7 +70,7 @@ T restoreEnumSetting<T>({
     // 遍历完没找到，视情况使用默认值还是报错
     fallback
       ? appLogger.logger.w("Invalid $key setting, falling back to default")
-      : throw ArgumentError("No such value for $key setting");
+      : throw ArgumentError("No such value $targetName for $key setting");
   }
   return defaultValue;
 }
