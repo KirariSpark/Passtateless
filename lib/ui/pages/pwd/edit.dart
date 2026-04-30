@@ -139,7 +139,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
                         ui.showSnackBarQuick(res.generic, context);
                       }
                       appLogger.logger.i("Archive deleted");
-                      Navigator.of(context, rootNavigator: true).pop();
+                      Navigator.of(context).pop();
                       Navigator.pop(context);
                     },
                     title: "确认删除",

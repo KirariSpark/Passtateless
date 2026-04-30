@@ -29,6 +29,7 @@ void showAlertDialogQuick({
   String? action2Text,
 }) {
   showDialog(
+    useRootNavigator: false,
     context: context,
     builder: (context) => AlertDialog(
       scrollable: true,

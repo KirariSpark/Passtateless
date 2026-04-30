@@ -48,6 +48,43 @@ ListTile buildListTile({
   );
 }
 
+/// 构建预定义了风格的ListTile（但实际上被GestureDetector包裹），支持右键（长按）操作
+///
+/// 参数同 [buildListTile]，额外增加 [onRightClick] 回调，
+/// 当检测到右键点击（onSecondaryTap）或长按（onLongPress）时触发。
+GestureDetector buildListTileAdvanced({
+  required String title,
+  required BuildContext context,
+  IconData? leading,
+  String? subtitle,
+  Widget? trailing,
+  String? titleTag,
+  void Function()? onTapped,
+  bool isFirst = false,
+  bool isLast = false,
+  bool active = false,
+  bool enabled = true,
+  void Function()? onRightClick,
+}) {
+  return GestureDetector(
+    onSecondaryTap: onRightClick,
+    onLongPress: onRightClick,
+    child: buildListTile(
+      title: title,
+      context: context,
+      leading: leading,
+      subtitle: subtitle,
+      trailing: trailing,
+      titleTag: titleTag,
+      onTapped: onTapped,
+      isFirst: isFirst,
+      isLast: isLast,
+      active: active,
+      enabled: enabled,
+    ),
+  );
+}
+
 /// 构建预定义了风格的TextField
 ///
 /// [context] BuildContext context<br>

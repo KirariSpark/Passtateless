@@ -14,7 +14,6 @@ class SupportOptionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return AdaptiveView(
       leftPaneBuilder: (
         BuildContext context,

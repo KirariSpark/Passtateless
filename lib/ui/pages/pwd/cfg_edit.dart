@@ -63,7 +63,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
               isLast: index == editorHelpItems.length - 1,
               onTapped: () {
                 appLogger.logger.i("Loading doc ${item.name}");
-                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.of(context).pop();
                 Navigator.push(
                   context,
                   ui.switchRoute(

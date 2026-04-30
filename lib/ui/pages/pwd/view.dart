@@ -268,28 +268,28 @@ class _PwdViewPageState extends State<PwdViewPage> {
                     isLast: _preset == Presets.custom ? false : true,
                     onTapped: (){
                       ui.showAlertDialogQuick(
-                          title: "选择预设",
-                          content: RadioGroup(
-                              groupValue: _preset,
-                              onChanged: (value){
-                                appLogger.logger.i("Setting preset to ${value?.name}");
-                                setState(() {_preset = value ?? Presets.simple;});
-                                Navigator.of(context, rootNavigator: true).pop();
-                              },
-                              child: Column(
-                                children: [
-                                  for (var item in Presets.values) RadioListTile(
-                                      value: item,
-                                      subtitle: Text(item.desc),
-                                      shape: styles.roundedBorder,
-                                      title: Text(item.displayName)
-                                  )
-                                ],
+                        title: "选择预设",
+                        content: RadioGroup(
+                          groupValue: _preset,
+                          onChanged: (value){
+                            appLogger.logger.i("Setting preset to ${value?.name}");
+                            setState(() {_preset = value ?? Presets.simple;});
+                            Navigator.of(context).pop();
+                          },
+                          child: Column(
+                            children: [
+                              for (var item in Presets.values) RadioListTile(
+                                value: item,
+                                subtitle: Text(item.desc),
+                                shape: styles.roundedBorder,
+                                title: Text(item.displayName)
                               )
-                          ),
-                          actionText: "取消",
-                          action: (){Navigator.of(context, rootNavigator: true).pop();},
-                          context: context
+                            ],
+                          )
+                        ),
+                        actionText: "取消",
+                        action: (){Navigator.of(context).pop();},
+                        context: context
                       );
                     },
                   ),
@@ -305,26 +305,26 @@ class _PwdViewPageState extends State<PwdViewPage> {
                         child: styled.buildTextButton(
                           onPressed: isGenerating ? null : () async {
                             ui.showConfirmDialogQuick(
-                                context: context,
-                                function: () async {
-                                  appLogger.logger.i("Generating password for viewing");
-                                  Navigator.of(context, rootNavigator: true).pop();
-                                  var (stat, res) = await genPwd(context, false, identifier, userName, account);
-                                  if (context.mounted) {
-                                    if (stat == ErrorCode.success) {
-                                      appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
-                                      Navigator.push(
-                                          context, MaterialPageRoute(builder: (context) => FullscreenPwd(res))
-                                      );
-                                    } else {
-                                      appLogger.logger.e("Can not generate password: ${stat.code}");
-                                    }
+                              context: context,
+                              function: () async {
+                                appLogger.logger.i("Generating password for viewing");
+                                Navigator.of(context).pop();
+                                var (stat, res) = await genPwd(context, false, identifier, userName, account);
+                                if (context.mounted) {
+                                  if (stat == ErrorCode.success) {
+                                    appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
+                                    Navigator.push(
+                                      context, MaterialPageRoute(builder: (context) => FullscreenPwd(res))
+                                    );
+                                  } else {
+                                    appLogger.logger.e("Can not generate password: ${stat.code}");
                                   }
-                                  // 启用按钮
-                                  setState(() {isGenerating = false;});
-                                },
-                                title: "危险操作",
-                                info: "此操作将会显示你的密码，以便于你的记忆。\n请确保周围没有人能够窥视到你的屏幕。"
+                                }
+                                // 启用按钮
+                                setState(() {isGenerating = false;});
+                              },
+                              title: "危险操作",
+                              info: "此操作将会显示你的密码，以便于你的记忆。\n请确保周围没有人能够窥视到你的屏幕。"
                             );
                           },
                           context: context,

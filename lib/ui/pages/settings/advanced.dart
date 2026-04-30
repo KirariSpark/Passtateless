@@ -70,7 +70,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                         onChanged: (value) {
                           appProvider.currentLogLevel = value!;
                           appProvider.saveConfig();
-                          Navigator.of(context, rootNavigator: true).pop();
+                          Navigator.of(context).pop();
                         },
                         child: Column(
                           children: [
@@ -83,7 +83,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                         )
                       ),
                       action: () {
-                        Navigator.of(context, rootNavigator: true).pop();
+                        Navigator.of(context).pop();
                       },
                       actionText: "取消",
                       context: context
@@ -149,14 +149,14 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                           )
                         ],
                       ),
-                      action: () {Navigator.of(context, rootNavigator: true).pop();},
+                      action: () {Navigator.of(context).pop();},
                       actionText: "取消",
                       action2: () {
                         final res = pwdProvider.getPwdJson(masterController.text, appProvider.masterPwd);
                         if (res.$1 == ErrorCode.success) {
                           appLogger.logger.i("Got JSON");
                           masterController.text = "";
-                          Navigator.of(context, rootNavigator: true).pop();
+                          Navigator.of(context).pop();
                           Navigator.push(
                             context, ui.switchRoute(
                               appProvider.currentNavMode,
@@ -165,7 +165,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                           );
                         } else {
                           appLogger.logger.e("Can not get password map json: ${res.$1.code}");
-                          Navigator.of(context, rootNavigator: true).pop();
+                          Navigator.of(context).pop();
                           ui.showSnackBarQuick(res.$1.generic, context);
                         }
                       },
