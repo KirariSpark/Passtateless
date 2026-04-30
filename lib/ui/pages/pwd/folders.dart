@@ -124,7 +124,10 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   appLogger.logger.i("Pushing to page listing items in folder ${folders[index]}");
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PwdListPage(folder: folders[index], useHero: true))
+                    ui.switchRoute(
+                      Provider.of<AppProvider>(context, listen: false).currentNavMode,
+                      builder: (context) => PwdListPage(folder: folders[index], useHero: true)
+                    )
                   );
                 },
                 isFirst: isFirst,

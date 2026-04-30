@@ -35,7 +35,7 @@ class PwdListPage extends StatelessWidget {
     this.hasFab = true
   });
 
-  List<Widget> _buildList(List<Map<String, dynamic>> pwdList, BuildContext context){
+  List<Widget> _buildList(List<Map<String, dynamic>> pwdList, BuildContext context, AppProvider appProvider){
     if (pwdList.isEmpty) {
       return <Widget>[
         ConstrainedBox(
@@ -59,17 +59,13 @@ class PwdListPage extends StatelessWidget {
             pwdRecord: item,
             isFirst: index == 0,
             isLast: index == pwdList.length - 1,
-            onStarPressed: (){
-              Provider.of<PwdProvider>(context, listen: false).switchStarStateById(item["id"]);
-            },
-            onEditPressed: (){
-              appLogger.logger.i("Pushing to edit page for ${item["id"]}");
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: item["id"])));
-            },
             onTapped: (){
               appLogger.logger.i("Pushing to view page for ${item["id"]}");
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdViewPage(id: item["id"], useHero: true)));
+              Navigator.push(
+                context, ui.switchRoute(
+                  appProvider.currentNavMode,
+                  builder: (context) => PwdViewPage(id: item["id"], useHero: true))
+              );
             }
           ),
         );
@@ -84,7 +80,8 @@ class PwdListPage extends StatelessWidget {
       required bool useHero,
       required bool hasAppBar,
       required bool hasPadding,
-      required bool hasFab
+      required bool hasFab,
+      required AppProvider appProvider
     }
   ) {
     return Scaffold(
@@ -97,7 +94,7 @@ class PwdListPage extends StatelessWidget {
           child: Column(
             children: [
               // 主列表区域
-              Column(children: _buildList(pwdList, context)),
+              Column(children: _buildList(pwdList, context, appProvider)),
               // 防止列表被FAB挡住
               SizedBox(height: 25),
               // TODO: 增加实际功能
@@ -159,6 +156,10 @@ class PwdListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pwdList = context.watch<PwdProvider>().getPwdList(folder);
-    return _buildUi(pwdList, context, useHero: useHero, hasAppBar: hasAppBar, hasPadding: hasPadding, hasFab: hasFab);
+    final appProvider = context.watch<AppProvider>();
+    return _buildUi(
+      pwdList, context, useHero: useHero, hasAppBar: hasAppBar, hasPadding: hasPadding,
+      hasFab: hasFab, appProvider: appProvider
+    );
   }
 }

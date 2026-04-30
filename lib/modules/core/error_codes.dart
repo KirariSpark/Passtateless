@@ -18,7 +18,9 @@ enum ErrorCode {
   noSuchLoc(16, "无效位置"),
   brokenConfig(17, "配置文件损坏"),
   isNotMap(18, "输入数据类型不是字典"),
-  existingUuid(19, "发现了已存在（且不应存在）的UUID");
+  existingUuid(19, "发现了已存在（且不应存在）的UUID"),
+  invalidRecord(20, "密码档案无效"),
+  noSuchFolder(21, "不存在的文件夹", "不存在文件夹 {item}");
 
   final int code;
   final String _messageTemplate;

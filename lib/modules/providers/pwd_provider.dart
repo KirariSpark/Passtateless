@@ -28,7 +28,7 @@ class PwdProvider extends ChangeNotifier {
     _stars = [];
     _pwdMap.forEach((folder, items) {
       for (var item in items) {
-        if (item["starred"]) {
+        if (item.containsKey("starred") && item["starred"]) {
           _stars.add(item);
         }
       }
@@ -117,6 +117,44 @@ class PwdProvider extends ChangeNotifier {
     return ErrorCode.success;
   }
 
+  /// 检查 id 对应的记录是否有效
+  /// 有效条件：存在 identifier、userName、account、starred 键，且除 identifier 外的键值不为空
+  bool isRecordValid(String id) {
+    appLogger.logger.i("Checking validity of password id $id");
+    final loc = _findLocationById(id);
+    if (loc == null) {
+      appLogger.logger.w("No record found for id $id");
+      return false;
+    }
+    final item = _pwdMap[loc.folder]![loc.index];
+    // 检查必需的键是否存在
+    if (!item.containsKey("identifier") ||
+        !item.containsKey("userName") ||
+        !item.containsKey("account") ||
+        !item.containsKey("starred")) {
+      appLogger.logger.w("Record id $id missing required keys");
+      return false;
+    }
+    // identifier 允许为空，其他键值不能为空
+    final userName = item["userName"];
+    final account = item["account"];
+    final starred = item["starred"];
+    if (userName == null || userName.toString().isEmpty) {
+      appLogger.logger.w("Record id $id has empty userName");
+      return false;
+    }
+    if (account == null || account.toString().isEmpty) {
+      appLogger.logger.w("Record id $id has empty account");
+      return false;
+    }
+    if (starred == null) {
+      appLogger.logger.w("Record id $id has null starred");
+      return false;
+    }
+    appLogger.logger.i("Record id $id is valid");
+    return true;
+  }
+
   /// 使用 id 更新指定项的数据
   ErrorCode setValueById(String id, String key, String value) {
     appLogger.logger.i("Updating password id $id");
@@ -145,6 +183,53 @@ class PwdProvider extends ChangeNotifier {
       notifyListeners();
       return ErrorCode.success;
     }
+  }
+
+  /// 将有效档案移动到新文件夹
+  ErrorCode moveTo(String id, String target) {
+    appLogger.logger.i("Moving password id $id to folder $target");
+    if (!isRecordValid(id)) {
+      appLogger.logger.e("Record id $id is invalid");
+      return ErrorCode.invalidRecord;
+    }
+    if (!_pwdMap.containsKey(target)) {
+      appLogger.logger.e("Target folder $target does not exist");
+      return ErrorCode.noSuchFolder;
+    }
+    final loc = _findLocationById(id)!;
+    if (loc.folder == target) {
+      appLogger.logger.i("Record already in target folder, no action needed");
+      return ErrorCode.success;
+    }
+    final record = _pwdMap[loc.folder]![loc.index];
+    _pwdMap[loc.folder]!.removeAt(loc.index); // 从原位置移除，不单独通知
+    _pwdMap[target]!.add(record); // 添加到目标文件夹
+    appLogger.logger.i("Successfully moved password id $id to $target");
+    notifyListeners();
+    return ErrorCode.success;
+  }
+
+  /// 将有效档案复制到新文件夹，并生成新 id
+  ErrorCode copyTo(String id, String target) {
+    appLogger.logger.i("Copying password id $id to folder $target");
+    if (!isRecordValid(id)) {
+      appLogger.logger.e("Record id $id is invalid");
+      return ErrorCode.invalidRecord;
+    }
+    if (!_pwdMap.containsKey(target)) {
+      appLogger.logger.e("Target folder $target does not exist");
+      return ErrorCode.noSuchFolder;
+    }
+    final loc = _findLocationById(id)!;
+    final original = _pwdMap[loc.folder]![loc.index];
+    final newRecord = Map<String, dynamic>.from(original);
+    final newId = _uuid.v4();
+    newRecord["id"] = newId;
+    appLogger.logger.d("Generated new id $newId for copy");
+    _pwdMap[target]!.add(newRecord);
+    appLogger.logger.i("Successfully copied password id $id to $target with new id $newId");
+    notifyListeners();
+    return ErrorCode.success;
   }
 
   /// 在指定文件夹中增加一条空记录

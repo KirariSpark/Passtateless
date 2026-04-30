@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
-import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:provider/provider.dart';
@@ -66,15 +65,6 @@ class StarredPasswords extends StatelessWidget {
         temp.add(
           PwdTile(
             pwdRecord: record,
-            onStarPressed: (){
-              appLogger.logger.d("Star button of ${record["id"]} pressed");
-              Provider.of<PwdProvider>(context, listen: false).switchStarStateById(record["id"]);
-            },
-            onEditPressed: (){
-              appLogger.logger.i("Pushing to edit page for ${record["id"]}");
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: record["id"])));
-            },
             onTapped: (){
               // 将点击事件和id传递给父组件
               appLogger.logger.d("Item ${record["id"]} tapped");
