@@ -88,8 +88,8 @@ void showBottomSheetQuick ({
   required String title,
   required List<Widget> children,
 }) {
-  List<Widget> realChildren = [Text(title, style: Theme.of(context).textTheme.titleLarge)];
-  realChildren.add(Divider());
+  List<Widget> realChildren = [styles.spacingSizedBox];
+  realChildren.addAll([Text(title, style: Theme.of(context).textTheme.titleLarge), Divider()]);
   realChildren.addAll(children);
 
   showModalBottomSheet(
@@ -97,7 +97,7 @@ void showBottomSheetQuick ({
     shape: RoundedRectangleBorder(borderRadius: calcRadius(isFirst: true)),
     builder: (_) => Container(
       constraints: styles.tileWidthConstraintSmall,
-      padding: styles.pagePaddingAll,
+      padding: styles.pagePadding,
       child: SingleChildScrollView(
         child: Column(
           children: realChildren

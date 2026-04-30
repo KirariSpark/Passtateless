@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/edit.dart';
+import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/expandable_fab.dart';
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
-import 'package:passtateless/ui/pages/pwd/view.dart';
-import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
 /// 查看资料夹中所有密码的页面
@@ -62,9 +62,11 @@ class PwdListPage extends StatelessWidget {
             onTapped: (){
               appLogger.logger.i("Pushing to view page for ${item["id"]}");
               Navigator.push(
-                context, ui.switchRoute(
+                context,
+                ui.switchRoute(
                   appProvider.currentNavMode,
-                  builder: (context) => PwdViewPage(id: item["id"], useHero: true))
+                  builder: (context) => PwdViewPage(id: item["id"], useHero: true)
+                )
               );
             }
           ),
@@ -89,7 +91,7 @@ class PwdListPage extends StatelessWidget {
         title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: useHero ? folder : null
       ) : null,
       body: Container(
-        padding: hasPadding ? styles.uniInsetsSmall : EdgeInsets.zero,
+        padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
         child: SingleChildScrollView(
           child: Column(
             children: [
