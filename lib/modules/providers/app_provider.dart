@@ -35,8 +35,12 @@ class AppProvider extends ChangeNotifier {
   AvailableColors get currentColor => _currentColor;
   ContrastLevels _currentContrast = ContrastLevels.normal;
   ContrastLevels get currentContrast => _currentContrast;
-  ColorScheme get colorScheme => ColorScheme.fromSeed(seedColor: _currentColor.color, contrastLevel: _currentContrast.contrast);
-  ColorScheme get darkColorScheme => ColorScheme.fromSeed(seedColor: _currentColor.color, brightness: Brightness.dark, contrastLevel: _currentContrast.contrast);
+  ColorScheme get colorScheme => ColorScheme.fromSeed(
+    seedColor: _currentColor.color, contrastLevel: _currentContrast.contrast
+  );
+  ColorScheme get darkColorScheme => ColorScheme.fromSeed(
+    seedColor: _currentColor.color, brightness: Brightness.dark, contrastLevel: _currentContrast.contrast
+  );
   set color(AvailableColors value) {
     appLogger.logger.i("Setting color to ${value.name}");
     _currentColor = value;
