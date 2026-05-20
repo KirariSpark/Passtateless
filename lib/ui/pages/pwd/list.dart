@@ -91,7 +91,7 @@ class PwdListPage extends StatelessWidget {
         title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: useHero ? folder : null
       ) : null,
       body: Container(
-        padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
+        padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: SingleChildScrollView(
           child: Column(
             children: [

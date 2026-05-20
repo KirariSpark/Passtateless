@@ -158,7 +158,7 @@ AppBar buildAppBar({
 }) {
   return buildAppBarWidget(
     title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
-    context: context, exitIcon: exitIcon, actions: actions,
+    context: context, exitIcon: exitIcon, actions: actions
   );
 }
 
@@ -188,6 +188,7 @@ AppBar buildAppBarWidget({
       style: styles.buttonStyle,
     ) : null,
     title: title,
+    backgroundColor: ColorScheme.of(context).surfaceContainer,
     actions: actions,
   );
 }

@@ -35,13 +35,12 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: widget.hasPadding ? styles.pagePadding : null,
+          padding: widget.hasPadding ? styles.pagePaddingAll : null,
           constraints: styles.pageWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
               spacing: styles.layoutSpacing,
               children: <Widget>[
-                SizedBox(), // 这个空盒子用来防止看不到下面的label
                 Row(
                   spacing: styles.layoutSpacing,
                   children: [

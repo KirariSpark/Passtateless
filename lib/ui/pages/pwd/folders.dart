@@ -27,109 +27,151 @@ class PwdFolderPage extends StatefulWidget {
 class _PwdFolderPageState extends State<PwdFolderPage> {
   final TextEditingController folderName = TextEditingController();
 
+  void _showGeneralBottomSheet(String title, String folder) {
+    ui.showBottomSheetQuick(
+      context: context,
+      title: title,
+      children: [
+        styled.buildListTile(
+          title: "重命名",
+          leading: Icons.edit_outlined,
+          isFirst: true,
+          onTapped: () {
+            appLogger.logger.i("Trying to rename folder $folder");
+            Navigator.pop(context);
+            // 内置文件夹 未分类 不能重命名
+            if (folder == "") {
+              appLogger.logger.e("Folder (empty string) is builtin and can not be renamed");
+              ui.showSnackBarQuick("你不能重命名此文件夹", context);
+              return;
+            }
+            ui.showAlertDialogQuick(
+              title: "重命名：$title",
+              content: styled.buildTextField(context: context, controller: folderName, label: "新名称"),
+              action: () => Navigator.of(context).pop(),
+              actionText: "取消",
+              action2: () {
+                appLogger.logger.i("Renaming folder to ${folderName.text}");
+                var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
+                  folder, folderName.text
+                );
+                if (res == ErrorCode.success) {
+                  appLogger.logger.i("Renamed successfully");
+                  Navigator.of(context).pop();
+                } else {
+                  appLogger.logger.e("Can not rename folder: ${res.code}");
+                  ui.showSnackBarQuick(res.generic, context);
+                }
+              },
+              action2Text: "确定",
+              context: context
+            );
+          },
+          context: context
+        ),
+        styled.buildListTile(
+          title: "删除",
+          leading: Icons.delete_outline,
+          isLast: true,
+          onTapped: () {
+            Navigator.pop(context);
+            // 未分类 文件夹是内置文件夹，不能删除
+            if (folder.isEmpty) {
+              appLogger.logger.i("folder (empty string) is builtin and can not be deleted");
+              ui.showSnackBarQuick("你不能删除此文件夹", context);
+            } else {
+              ui.showConfirmDialogQuick(
+                context: context,
+                info: "确定要删除文件夹 $folder 吗？\n你会永远失去它（真的很久）",
+                function: () {
+                  appLogger.logger.i("Trying to delete folder $folder");
+                  Provider.of<PwdProvider>(context, listen: false).removeFolder(folder);
+                  appLogger.logger.i("Folder deleted");
+                  Navigator.of(context).pop();
+                },
+                title: '确认删除'
+              );
+            }
+          },
+          context: context
+        )
+      ]
+    );
+  }
+
+  void _onGeneralTapped(String folder) {
+    appLogger.logger.i("Pushing to page listing items in folder $folder");
+    Navigator.push(
+      context,
+      ui.switchRoute(
+        Provider.of<AppProvider>(context, listen: false).currentNavMode,
+        builder: (context) => PwdListPage(folder: folder, useHero: true)
+      )
+    );
+  }
+
+  void _newFolder() {
+    ui.showAlertDialogQuick(
+        title: "新建资料夹",
+        content: styled.buildTextField(label: "资料夹名", controller: folderName, context: context),
+        action: () => Navigator.of(context).pop(),
+        actionText: "取消",
+        action2: () {
+          appLogger.logger.i("Add folder ${folderName.text}");
+          var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
+          if (stat == ErrorCode.success) {
+            appLogger.logger.i("Added successfully");
+            Navigator.of(context).pop();
+          } else {
+            appLogger.logger.e("Can not add folder: ${stat.code}");
+            ui.showSnackBarQuick(stat.generic, context);
+          }
+        },
+        action2Text: "确定",
+        context: context
+    );
+  }
+
   Widget _buildMainBody(List<String> folders) {
     return Container(
       alignment: Alignment.topCenter,
-      padding: widget.hasPadding ? styles.pagePadding : EdgeInsets.all(0),
+      padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.all(0),
       child: Container(
         constraints: styles.tileWidthConstraint,
-        decoration: BoxDecoration(
-          borderRadius: styles.borderRadius,
-          color: ColorScheme.of(context).surfaceContainerLow
-        ),
-        clipBehavior: Clip.antiAlias,
         child: ListView.builder(
           shrinkWrap: true,
-          itemCount: folders.length,
+          itemCount: folders.length + 1,
           itemBuilder: (BuildContext context, int index) {
-            final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
             final bool isFirst = index == 0;
-            final bool isLast = index == folders.length - 1;
+            final bool isLast = index == folders.length; // 这里比较特殊，因为需要在列表末尾加点东西
+            late final String displayTitle;
+            if (!isLast) {
+              displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
+            } else {
+              displayTitle = "";
+            }
             return Material(
+              // 由于最后一个Index实际上是不存在的，所以都需要特殊处理
               child: styled.buildListTileAdvanced(
                 onRightClick: () {
-                  ui.showBottomSheetQuick(
-                    context: context,
-                    title: displayTitle,
-                    children: [
-                      styled.buildListTile(
-                        title: "重命名",
-                        leading: Icons.edit_outlined,
-                        isFirst: true,
-                        onTapped: () {
-                          appLogger.logger.i("Trying to rename folder ${folders[index]}");
-                          Navigator.pop(context);
-                          // 内置文件夹 未分类 不能重命名
-                          if (folders[index] == "") {
-                            appLogger.logger.e("Folder (empty string) is builtin and can not be renamed");
-                            ui.showSnackBarQuick("你不能重命名此文件夹", context);
-                            return;
-                          }
-                          ui.showAlertDialogQuick(
-                            title: "重命名：$displayTitle",
-                            content: styled.buildTextField(context: context, controller: folderName, label: "新名称"),
-                            action: () => Navigator.of(context).pop(),
-                            actionText: "取消",
-                            action2: () {
-                              appLogger.logger.i("Renaming folder to ${folderName.text}");
-                              var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
-                                folders[index], folderName.text
-                              );
-                              if (res == ErrorCode.success) {
-                                appLogger.logger.i("Renamed successfully");
-                                Navigator.of(context).pop();
-                              } else {
-                                appLogger.logger.e("Can not rename folder: ${res.code}");
-                                ui.showSnackBarQuick(res.generic, context);
-                              }
-                            },
-                            action2Text: "确定",
-                            context: context
-                          );
-                        },
-                        context: context
-                      ),
-                      styled.buildListTile(
-                        title: "删除",
-                        leading: Icons.delete_outline,
-                        isLast: true,
-                        onTapped: () {
-                          Navigator.pop(context);
-                          // 未分类 文件夹是内置文件夹，不能删除
-                          if (folders[index].isEmpty) {
-                            appLogger.logger.i("folder (empty string) is builtin and can not be deleted");
-                            ui.showSnackBarQuick("你不能删除此文件夹", context);
-                          } else {
-                            ui.showConfirmDialogQuick(
-                              context: context,
-                              info: "确定要删除文件夹 ${folders[index]} 吗？\n你会永远失去它（真的很久）",
-                              function: () {
-                                appLogger.logger.i("Trying to delete folder ${folders[index]}");
-                                Provider.of<PwdProvider>(context, listen: false).removeFolder(folders[index]);
-                                appLogger.logger.i("Folder deleted");
-                                Navigator.of(context).pop();
-                              },
-                              title: '确认删除'
-                            );
-                          }
-                        },
-                        context: context
-                      )
-                    ]
-                  );
+                  // 只有不是最后一项时，才能够显示底部菜单
+                  if (!isLast) {
+                    _showGeneralBottomSheet(displayTitle, folders[index]);
+                  }
                 },
-                title: displayTitle,
-                titleTag: folders[index],
-                onTapped: (){
-                  appLogger.logger.i("Pushing to page listing items in folder ${folders[index]}");
-                  Navigator.push(
-                    context,
-                    ui.switchRoute(
-                      Provider.of<AppProvider>(context, listen: false).currentNavMode,
-                      builder: (context) => PwdListPage(folder: folders[index], useHero: true)
-                    )
-                  );
+                title: isLast ? "新建" : displayTitle, // 最后一项是用来新建的，所以显示也不一样
+                // 最后一项根本没有对应的资料夹，就没有tag一说
+                titleTag: isLast ? "This Is A Not-Existing Folder So I Need A Very Long Tag To Prevent Duplicating" : folders[index],
+                onTapped: () {
+                  if (!isLast) {
+                    // 同样的，最后一项根本没有对应的资料夹，因此不应该触发跳转
+                    _onGeneralTapped(folders[index]);
+                  } else {
+                    // 它应该触发新建文件夹
+                    _newFolder();
+                  }
                 },
+                leading: isLast ? Icons.create_new_folder_outlined : null, // 给一个图标以显得特殊一些
                 isFirst: isFirst,
                 isLast: isLast,
                 context: context
@@ -175,36 +217,6 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   ui.showSnackBarQuick(stat.generic, context);
                 }
               }
-            }
-          ),
-          // 新建文件夹
-          styled.buildElevatedButton(
-            child: Row(
-              spacing: styles.layoutSpacing,
-              mainAxisSize: MainAxisSize.min,
-              children: [Icon(Icons.create_new_folder_outlined), Text("新资料夹")],
-            ),
-            context: context,
-            onPressed: (){
-              ui.showAlertDialogQuick(
-                title: "新建文件夹",
-                content: styled.buildTextField(label: "文件夹名", controller: folderName, context: context),
-                action: () => Navigator.of(context).pop(),
-                actionText: "取消",
-                action2: () {
-                  appLogger.logger.i("Add folder ${folderName.text}");
-                  var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
-                  if (stat == ErrorCode.success) {
-                    appLogger.logger.i("Added successfully");
-                    Navigator.of(context).pop();
-                  } else {
-                    appLogger.logger.e("Can not add folder: ${stat.code}");
-                    ui.showSnackBarQuick(stat.generic, context);
-                  }
-                },
-                action2Text: "确定",
-                context: context
-              );
             }
           ),
         ]
