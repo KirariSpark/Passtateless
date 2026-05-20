@@ -144,39 +144,29 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           itemBuilder: (BuildContext context, int index) {
             final bool isFirst = index == 0;
             final bool isLast = index == folders.length; // 这里比较特殊，因为需要在列表末尾加点东西
-            late final String displayTitle;
             if (!isLast) {
-              displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
+              final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
+              return Material(
+                child: styled.buildListTileAdvanced(
+                  onRightClick: () => _showGeneralBottomSheet(displayTitle, folders[index]),
+                  onTapped: () => _onGeneralTapped(folders[index]),
+                  isFirst: isFirst,
+                  title: displayTitle,
+                  titleTag: folders[index],
+                  context: context
+                )
+              );
             } else {
-              displayTitle = "";
+              return Material(
+                child: styled.buildListTile(
+                  title: "新建资料夹",
+                  leading: Icons.create_new_folder_outlined,
+                  isLast: true,
+                  onTapped: _newFolder,
+                  context: context
+                ),
+              );
             }
-            return Material(
-              // 由于最后一个Index实际上是不存在的，所以都需要特殊处理
-              child: styled.buildListTileAdvanced(
-                onRightClick: () {
-                  // 只有不是最后一项时，才能够显示底部菜单
-                  if (!isLast) {
-                    _showGeneralBottomSheet(displayTitle, folders[index]);
-                  }
-                },
-                title: isLast ? "新建" : displayTitle, // 最后一项是用来新建的，所以显示也不一样
-                // 最后一项根本没有对应的资料夹，就没有tag一说
-                titleTag: isLast ? "This Is A Not-Existing Folder So I Need A Very Long Tag To Prevent Duplicating" : folders[index],
-                onTapped: () {
-                  if (!isLast) {
-                    // 同样的，最后一项根本没有对应的资料夹，因此不应该触发跳转
-                    _onGeneralTapped(folders[index]);
-                  } else {
-                    // 它应该触发新建文件夹
-                    _newFolder();
-                  }
-                },
-                leading: isLast ? Icons.create_new_folder_outlined : null, // 给一个图标以显得特殊一些
-                isFirst: isFirst,
-                isLast: isLast,
-                context: context
-              ),
-            );
           }
         ),
       ),
@@ -191,36 +181,26 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       appBar: widget.hasAppBar
         ? styled.buildAppBar(title: "资料夹", context: context, titleTag: widget.useHero ? "folders" : null) : null,
       body: _buildMainBody(folders),
-      floatingActionButton: ExpandableFab(
-        distance: 64,
-        children: [
-          // 保存更改
-          styled.buildElevatedButton(
-            child: Row(
-              spacing: styles.layoutSpacing,
-              mainAxisSize: MainAxisSize.min,
-              children: [Icon(Icons.save_outlined), Text("保存更改")],
-            ),
-            context: context,
-            onPressed: () async {
-              appLogger.logger.i("Saving changes in password archive");
-              ui.showSnackBarQuick("正在保存", context);
-              var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                  Provider.of<AppProvider>(context, listen: false).masterPwd
-              );
-              if (context.mounted) {
-                if (stat == ErrorCode.success) {
-                  appLogger.logger.i("Saved successfully");
-                  ui.showSnackBarQuick("你的档案已保存", context);
-                } else {
-                  appLogger.logger.i("Can not save archive: ${stat.code}");
-                  ui.showSnackBarQuick(stat.generic, context);
-                }
-              }
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          appLogger.logger.i("Saving changes in password archive");
+          ui.showSnackBarQuick("正在保存", context);
+          var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
+            Provider.of<AppProvider>(context, listen: false).masterPwd
+          );
+          if (context.mounted) {
+            if (stat == ErrorCode.success) {
+              appLogger.logger.i("Saved successfully");
+              ui.showSnackBarQuick("你的档案已保存", context);
+            } else {
+              appLogger.logger.i("Can not save archive: ${stat.code}");
+              ui.showSnackBarQuick(stat.generic, context);
             }
-          ),
-        ]
-      ),
+          }
+        },
+        shape: styles.roundedBorder,
+        child: Icon(Icons.save_outlined),
+      )
     );
   }
 
