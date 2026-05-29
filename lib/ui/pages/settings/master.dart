@@ -29,7 +29,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
       body: AdaptiveView(
         leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
           return Container(
-            padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
+            padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
             constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
             child: SingleChildScrollView(
               child: Column(

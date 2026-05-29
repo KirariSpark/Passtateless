@@ -21,7 +21,7 @@ class AboutPage extends StatelessWidget {
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
+            padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
             constraints: styles.pageWidthConstraint,
             child: Column(
               mainAxisSize: MainAxisSize.min,

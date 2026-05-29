@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     switch (tag) {
       case ("pages", "folders"):
         // 宽屏状态下无需使用Scaffold，因为不需要AppBar，也不需要额外的Padding
-        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasHorizontalPadding: !isWide);
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pwd", String id):

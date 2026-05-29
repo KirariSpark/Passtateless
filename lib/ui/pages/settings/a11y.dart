@@ -30,7 +30,7 @@ class A11ySettingsPage extends StatelessWidget {
         ) {
           return Container(
             constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
-            padding: hasPadding ? styles.pagePadding : null,
+            padding: hasPadding ? styles.pagePaddingHorizontal : null,
             child: SingleChildScrollView(
               child: Column(
                 children: [

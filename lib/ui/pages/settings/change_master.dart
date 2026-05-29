@@ -51,7 +51,7 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: widget.hasPadding ? styles.pagePadding : EdgeInsets.zero,
+          padding: widget.hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(

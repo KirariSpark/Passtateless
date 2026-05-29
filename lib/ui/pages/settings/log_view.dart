@@ -11,7 +11,7 @@ class LogViewPage extends StatelessWidget {
     return Scaffold(
       appBar: styled.buildAppBar(title: "查看日志", context: context, titleTag: "log_view"),
       body: Padding(
-        padding: styles.pagePadding,
+        padding: styles.pagePaddingHorizontal,
         child: SingleChildScrollView(child: Text(log, style: TextStyle(fontFamily: "SourceCodePro"))),
       ),
     );

@@ -89,7 +89,7 @@ void showBottomSheetQuick ({
   required List<Widget> children,
 }) {
   List<Widget> realChildren = [];
-  realChildren.addAll([Text("    $title", style: Theme.of(context).textTheme.titleLarge), styles.spacingSizedBox, Divider()]);
+  realChildren.addAll([Text(title, style: Theme.of(context).textTheme.titleLarge), Divider()]);
   realChildren.addAll(children);
 
   showModalBottomSheet(

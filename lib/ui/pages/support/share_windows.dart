@@ -16,7 +16,7 @@ class WindowsShareGuidePage extends StatelessWidget {
         ? styled.buildAppBar(title: "分享 Windows 版本", context: context, titleTag: "share_windows")
         : null,
       body: Padding(
-        padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
+        padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: styles.borderRadius,

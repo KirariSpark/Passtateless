@@ -103,7 +103,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
         ],
       ),
       body: Padding(
-        padding: styles.pagePadding,
+        padding: styles.pagePaddingHorizontal,
         child: Column(
           children: [
             Expanded(child: styled.buildJsonEditor(controller: _configController, context: context)),

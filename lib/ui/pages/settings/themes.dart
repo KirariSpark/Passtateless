@@ -30,7 +30,7 @@ class ThemeSettingsPage extends StatelessWidget {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: hasPadding ? styles.pagePadding : EdgeInsets.zero,
+          padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: RadioGroup(

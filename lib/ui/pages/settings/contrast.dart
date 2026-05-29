@@ -29,7 +29,7 @@ class ContrastSettingsPage extends StatelessWidget {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: hasPadding ? styles.pagePadding : null,
+          padding: hasPadding ? styles.pagePaddingHorizontal : null,
           constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(

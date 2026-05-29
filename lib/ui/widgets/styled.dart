@@ -157,8 +157,12 @@ AppBar buildAppBar({
   IconData exitIcon = Icons.arrow_back
 }) {
   return buildAppBarWidget(
-    title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
-    context: context, exitIcon: exitIcon, actions: actions
+    title: titleTag == null
+      ? Text(title)
+      : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+    context: context,
+    exitIcon: exitIcon,
+    actions: actions
   );
 }
 

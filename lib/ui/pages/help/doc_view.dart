@@ -66,7 +66,7 @@ class _DocViewPageState extends State<DocViewPage> {
           }
           final docText = snapshot.data!;
           return Container(
-            padding: widget.hasPadding ? styles.pagePadding : EdgeInsets.zero,
+            padding: widget.hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
             alignment: Alignment.topCenter,
             child: Container(
               decoration: BoxDecoration(
