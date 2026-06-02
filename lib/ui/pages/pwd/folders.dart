@@ -13,8 +13,10 @@ import 'package:provider/provider.dart';
 class PwdFolderPage extends StatefulWidget {
   /// 有AppBar时，AppBar是否要使用Hero动画
   final bool useHero;
+
   /// 页面是否有横向内边距
   final bool hasHorizontalPadding;
+
   const PwdFolderPage({super.key, required this.useHero, this.hasHorizontalPadding = true});
 
   @override
@@ -181,12 +183,10 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       appBar: styled.buildAppBar(
         title: "资料夹",
         actions: [
-          PopupMenuButton(
-            style: styles.buttonStyle,
-            color: ColorScheme.of(context).secondaryContainer,
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
+          styled.buildPopupMenuButton(
+            context: context,
+            children: [
+              PopupMenuItem(
                   onTap: _newFolder,
                   child: Row(
                     spacing: styles.layoutSpacing,
@@ -195,19 +195,18 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                       Text("新建资料夹")
                     ],
                   )
-                ),
-                PopupMenuItem(
-                    onTap: _save,
-                    child: Row(
-                      spacing: styles.layoutSpacing,
-                      children: [
-                        Icon(Icons.save_outlined),
-                        Text("保存更改")
-                      ],
-                    )
-                )
-              ];
-            }
+              ),
+              PopupMenuItem(
+                  onTap: _save,
+                  child: Row(
+                    spacing: styles.layoutSpacing,
+                    children: [
+                      Icon(Icons.save_outlined),
+                      Text("保存更改")
+                    ],
+                  )
+              )
+            ]
           )
         ],
         context: context,

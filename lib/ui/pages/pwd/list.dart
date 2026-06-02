@@ -20,22 +20,14 @@ class PwdListPage extends StatelessWidget {
   /// 是否使用 Hero 动画
   final bool useHero;
 
-  /// 页面是否有 AppBar
-  final bool hasAppBar;
-
-  /// 页面是否有内边距
-  final bool hasPadding;
-
-  /// 是否要显示Fab
-  final bool hasFab;
+  /// 页面是否有横向内边距
+  final bool hasHorizontalPadding;
 
   const PwdListPage({
     super.key,
     required this.folder,
     required this.useHero,
-    this.hasAppBar = true,
-    this.hasPadding = true,
-    this.hasFab = true,
+    this.hasHorizontalPadding = true
   });
 
   Future<void> _save(BuildContext context, PwdProvider pwdProvider) async {
@@ -62,11 +54,7 @@ class PwdListPage extends StatelessWidget {
     final newId = pwdProvider.addEmptyRecordTo(folder);
     appLogger.logger.i("Record added, pushing to edit page for new record $newId");
     Navigator.push(
-      context,
-      ui.switchRoute(
-        appProvider.currentNavMode,
-        builder: (context) => PwdEditPage(id: newId),
-      ),
+      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: newId))
     );
   }
 
@@ -103,8 +91,7 @@ class PwdListPage extends StatelessWidget {
               Navigator.push(
                 context,
                 ui.switchRoute(
-                  appProvider.currentNavMode,
-                  builder: (context) => PwdViewPage(id: item["id"], useHero: true),
+                  appProvider.currentNavMode, builder: (context) => PwdViewPage(id: item["id"], useHero: true),
                 ),
               );
             },
@@ -119,9 +106,7 @@ class PwdListPage extends StatelessWidget {
     List<Map<String, dynamic>> pwdList,
     BuildContext context, {
     required bool useHero,
-    required bool hasAppBar,
     required bool hasPadding,
-    required bool hasFab,
     required AppProvider appProvider,
     required PwdProvider pwdProvider,
   }) {
@@ -131,14 +116,8 @@ class PwdListPage extends StatelessWidget {
         context: context,
         actions: [
           styled.buildPopupMenuButton(
+            context: context,
             children: [
-              PopupMenuItem(
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [Icon(Icons.save_outlined), Text("保存更改")],
-                ),
-                onTap: () => _save(context, pwdProvider),
-              ),
               PopupMenuItem(
                 child: Row(
                   spacing: styles.layoutSpacing,
@@ -150,6 +129,13 @@ class PwdListPage extends StatelessWidget {
                   appProvider: appProvider
                 ),
               ),
+              PopupMenuItem(
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [Icon(Icons.save_outlined), Text("保存更改")],
+                ),
+                onTap: () => _save(context, pwdProvider),
+              )
             ],
           ),
         ],
@@ -162,8 +148,7 @@ class PwdListPage extends StatelessWidget {
             children: [
               // 主列表区域
               Column(children: _buildList(pwdList, context, appProvider)),
-              // 防止列表被FAB挡住
-              SizedBox(height: 25),
+              styles.spacingSizedBox,
               // TODO: 增加实际功能
               TextField(decoration: InputDecoration(border: InputBorder.none)),
             ],
@@ -182,9 +167,7 @@ class PwdListPage extends StatelessWidget {
       pwdList,
       context,
       useHero: useHero,
-      hasAppBar: hasAppBar,
-      hasPadding: hasPadding,
-      hasFab: hasFab,
+      hasPadding: hasHorizontalPadding,
       appProvider: appProvider,
       pwdProvider: pwdProvider
     );

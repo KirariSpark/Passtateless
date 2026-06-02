@@ -250,11 +250,13 @@ ElevatedButton buildElevatedButton({
 /// 构建一个预定义了风格的PopupMenuButton
 PopupMenuButton buildPopupMenuButton({
   required List<PopupMenuItem> children,
+  required BuildContext context,
   IconData icon = Icons.more_vert
 }) {
   return PopupMenuButton(
     style: styles.buttonStyle,
     icon: Icon(icon),
+    color: ColorScheme.of(context).secondaryContainer,
     itemBuilder: (_) {
       return children;
     },
