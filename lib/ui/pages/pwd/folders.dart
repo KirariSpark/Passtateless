@@ -35,70 +35,21 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           title: "重命名",
           leading: Icons.edit_outlined,
           isFirst: true,
-          onTapped: () {
-            appLogger.logger.i("Trying to rename folder $folder");
-            Navigator.pop(context);
-            // 内置文件夹 未分类 不能重命名
-            if (folder == "") {
-              appLogger.logger.e("Folder (empty string) is builtin and can not be renamed");
-              ui.showSnackBarQuick("你不能重命名此文件夹", context);
-              return;
-            }
-            ui.showAlertDialogQuick(
-              title: "重命名：$title",
-              content: styled.buildTextField(context: context, controller: folderName, label: "新名称"),
-              action: () => Navigator.of(context).pop(),
-              actionText: "取消",
-              action2: () {
-                appLogger.logger.i("Renaming folder to ${folderName.text}");
-                var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
-                  folder, folderName.text
-                );
-                if (res == ErrorCode.success) {
-                  appLogger.logger.i("Renamed successfully");
-                  Navigator.of(context).pop();
-                } else {
-                  appLogger.logger.e("Can not rename folder: ${res.code}");
-                  ui.showSnackBarQuick(res.generic, context);
-                }
-              },
-              action2Text: "确定",
-              context: context
-            );
-          },
+          onTapped: () => _renameFolder(folder, title),
           context: context
         ),
         styled.buildListTile(
           title: "删除",
           leading: Icons.delete_outline,
           isLast: true,
-          onTapped: () {
-            Navigator.pop(context);
-            // 未分类 文件夹是内置文件夹，不能删除
-            if (folder.isEmpty) {
-              appLogger.logger.i("folder (empty string) is builtin and can not be deleted");
-              ui.showSnackBarQuick("你不能删除此文件夹", context);
-            } else {
-              ui.showConfirmDialogQuick(
-                context: context,
-                info: "确定要删除文件夹 “$folder” 吗\n一旦更改被保存，你将永远失去它",
-                function: () {
-                  appLogger.logger.i("Trying to delete folder $folder");
-                  Provider.of<PwdProvider>(context, listen: false).removeFolder(folder);
-                  appLogger.logger.i("Folder deleted");
-                  Navigator.of(context).pop();
-                },
-                title: '确认删除'
-              );
-            }
-          },
+          onTapped: () => _removeFolder(folder, title),
           context: context
         )
       ]
     );
   }
 
-  void _onGeneralTapped(String folder) {
+  void _onItemTapped(String folder) {
     appLogger.logger.i("Pushing to page listing items in folder $folder");
     Navigator.push(
       context,
@@ -131,6 +82,59 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
+  void _renameFolder(String folder, String title) {
+    appLogger.logger.i("Trying to rename folder $folder");
+    Navigator.pop(context);
+    // 内置文件夹 未分类 不能重命名
+    if (folder == "") {
+      appLogger.logger.e("Folder (empty string) is builtin and can not be renamed");
+      ui.showSnackBarQuick("你不能重命名此文件夹", context);
+      return;
+    }
+    ui.showAlertDialogQuick(
+      title: "重命名：$title",
+      content: styled.buildTextField(context: context, controller: folderName, label: "新名称"),
+      action: () => Navigator.of(context).pop(),
+      actionText: "取消",
+      action2: () {
+        appLogger.logger.i("Renaming folder to ${folderName.text}");
+        var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
+            folder, folderName.text
+        );
+        if (res == ErrorCode.success) {
+          appLogger.logger.i("Renamed successfully");
+          Navigator.of(context).pop();
+        } else {
+          appLogger.logger.e("Can not rename folder: ${res.code}");
+          ui.showSnackBarQuick(res.generic, context);
+        }
+      },
+      action2Text: "确定",
+      context: context
+    );
+  }
+
+  void _removeFolder(String folder, String title) {
+    Navigator.pop(context);
+    // 未分类 文件夹是内置文件夹，不能删除
+    if (folder.isEmpty) {
+      appLogger.logger.i("folder (empty string) is builtin and can not be deleted");
+      ui.showSnackBarQuick("你不能删除此文件夹", context);
+    } else {
+      ui.showConfirmDialogQuick(
+        context: context,
+        info: "确定要删除文件夹 “$folder” 吗\n一旦更改被保存，你将永远失去它",
+        function: () {
+          appLogger.logger.i("Trying to delete folder $folder");
+          Provider.of<PwdProvider>(context, listen: false).removeFolder(folder);
+          appLogger.logger.i("Folder deleted");
+          Navigator.of(context).pop();
+        },
+        title: '删除：$title'
+      );
+    }
+  }
+
   Future<void> _save() async {
     appLogger.logger.i("Saving changes in password archive");
     ui.showSnackBarQuick("正在保存", context);
@@ -148,7 +152,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     }
   }
 
-  Widget _buildMainBody(List<String> folders) {
+  Widget _buildFolderList(List<String> folders) {
     return Container(
       alignment: Alignment.topCenter,
       padding: widget.hasHorizontalPadding ? styles.pagePaddingAll : styles.pagePaddingVertical,
@@ -164,7 +168,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             return Material(
               child: styled.buildListTileAdvanced(
                 onRightClick: () => _showBottomSheet(displayTitle, folders[index]),
-                onTapped: () => _onGeneralTapped(folders[index]),
+                onTapped: () => _onItemTapped(folders[index]),
                 isFirst: isFirst,
                 isLast: isLast,
                 title: displayTitle,
@@ -178,7 +182,9 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
-  Widget _buildLeftPage({required List<String> folders, required BuildContext context}) {
+  @override
+  Widget build(BuildContext context) {
+    List<String> folders = context.watch<PwdProvider>().pwdFolders;
     return Scaffold(
       appBar: styled.buildAppBar(
         title: "资料夹",
@@ -187,24 +193,24 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             context: context,
             children: [
               PopupMenuItem(
-                  onTap: _newFolder,
-                  child: Row(
-                    spacing: styles.layoutSpacing,
-                    children: [
-                      Icon(Icons.create_new_folder_outlined),
-                      Text("新建资料夹")
-                    ],
-                  )
+                onTap: _newFolder,
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [
+                    Icon(Icons.create_new_folder_outlined),
+                    Text("新建资料夹")
+                  ],
+                )
               ),
               PopupMenuItem(
-                  onTap: _save,
-                  child: Row(
-                    spacing: styles.layoutSpacing,
-                    children: [
-                      Icon(Icons.save_outlined),
-                      Text("保存更改")
-                    ],
-                  )
+                onTap: _save,
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [
+                    Icon(Icons.save_outlined),
+                    Text("保存更改")
+                  ],
+                )
               )
             ]
           )
@@ -212,13 +218,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
         context: context,
         titleTag: widget.useHero ? "folders" : null
       ),
-      body: _buildMainBody(folders)
+      body: _buildFolderList(folders)
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    List<String> folders = context.watch<PwdProvider>().pwdFolders;
-    return _buildLeftPage(folders: folders, context: context);
   }
 }
