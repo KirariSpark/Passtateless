@@ -7,7 +7,6 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/expandable_fab.dart';
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
@@ -17,12 +16,16 @@ import 'package:provider/provider.dart';
 /// 资料夹名称将会被用于 Hero 动画
 class PwdListPage extends StatelessWidget {
   final String folder;
+
   /// 是否使用 Hero 动画
   final bool useHero;
+
   /// 页面是否有 AppBar
   final bool hasAppBar;
+
   /// 页面是否有内边距
   final bool hasPadding;
+
   /// 是否要显示Fab
   final bool hasFab;
 
@@ -32,10 +35,46 @@ class PwdListPage extends StatelessWidget {
     required this.useHero,
     this.hasAppBar = true,
     this.hasPadding = true,
-    this.hasFab = true
+    this.hasFab = true,
   });
 
-  List<Widget> _buildList(List<Map<String, dynamic>> pwdList, BuildContext context, AppProvider appProvider){
+  Future<void> _save(BuildContext context, PwdProvider pwdProvider) async {
+    appLogger.logger.i("Saving changes in password archive");
+    ui.showSnackBarQuick("正在保存", context);
+    final stat = await pwdProvider.saveArchive(Provider.of<AppProvider>(context, listen: false).masterPwd);
+    if (context.mounted) {
+      if (stat == ErrorCode.success) {
+        appLogger.logger.i("Saved successfully");
+        ui.showSnackBarQuick("你的档案已保存", context);
+      } else {
+        appLogger.logger.i("Can not save archive: ${stat.code}");
+        ui.showSnackBarQuick(stat.generic, context);
+      }
+    }
+  }
+
+  void _newArchive({
+    required BuildContext context, 
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider  
+  }) {
+    appLogger.logger.i("Adding empty record to folder $folder");
+    final newId = pwdProvider.addEmptyRecordTo(folder);
+    appLogger.logger.i("Record added, pushing to edit page for new record $newId");
+    Navigator.push(
+      context,
+      ui.switchRoute(
+        appProvider.currentNavMode,
+        builder: (context) => PwdEditPage(id: newId),
+      ),
+    );
+  }
+
+  List<Widget> _buildList(
+    List<Map<String, dynamic>> pwdList,
+    BuildContext context,
+    AppProvider appProvider,
+  ) {
     if (pwdList.isEmpty) {
       return <Widget>[
         ConstrainedBox(
@@ -46,9 +85,9 @@ class PwdListPage extends StatelessWidget {
             leading: Icons.not_interested,
             isFirst: true,
             isLast: true,
-            context: context
-          )
-        )
+            context: context,
+          ),
+        ),
       ];
     } else {
       List<Widget> temp = [];
@@ -59,16 +98,16 @@ class PwdListPage extends StatelessWidget {
             pwdRecord: item,
             isFirst: index == 0,
             isLast: index == pwdList.length - 1,
-            onTapped: (){
+            onTapped: () {
               appLogger.logger.i("Pushing to view page for ${item["id"]}");
               Navigator.push(
                 context,
                 ui.switchRoute(
                   appProvider.currentNavMode,
-                  builder: (context) => PwdViewPage(id: item["id"], useHero: true)
-                )
+                  builder: (context) => PwdViewPage(id: item["id"], useHero: true),
+                ),
               );
-            }
+            },
           ),
         );
       }
@@ -79,17 +118,43 @@ class PwdListPage extends StatelessWidget {
   Scaffold _buildUi(
     List<Map<String, dynamic>> pwdList,
     BuildContext context, {
-      required bool useHero,
-      required bool hasAppBar,
-      required bool hasPadding,
-      required bool hasFab,
-      required AppProvider appProvider
-    }
-  ) {
+    required bool useHero,
+    required bool hasAppBar,
+    required bool hasPadding,
+    required bool hasFab,
+    required AppProvider appProvider,
+    required PwdProvider pwdProvider,
+  }) {
     return Scaffold(
-      appBar: hasAppBar ? styled.buildAppBar(
-        title: folder.isEmpty ? '未分类' : folder, context: context, titleTag: useHero ? folder : null
-      ) : null,
+      appBar: styled.buildAppBar(
+        title: folder.isEmpty ? '未分类' : folder,
+        context: context,
+        actions: [
+          styled.buildPopupMenuButton(
+            children: [
+              PopupMenuItem(
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [Icon(Icons.save_outlined), Text("保存更改")],
+                ),
+                onTap: () => _save(context, pwdProvider),
+              ),
+              PopupMenuItem(
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [Icon(Icons.add), Text("新建档案")],
+                ),
+                onTap: () => _newArchive(
+                  context: context,
+                  pwdProvider: pwdProvider,
+                  appProvider: appProvider
+                ),
+              ),
+            ],
+          ),
+        ],
+        titleTag: useHero ? folder : null,
+      ),
       body: Container(
         padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: SingleChildScrollView(
@@ -100,68 +165,28 @@ class PwdListPage extends StatelessWidget {
               // 防止列表被FAB挡住
               SizedBox(height: 25),
               // TODO: 增加实际功能
-              TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                ),
-              )
+              TextField(decoration: InputDecoration(border: InputBorder.none)),
             ],
           ),
-        )
+        ),
       ),
-      floatingActionButton: hasFab ? ExpandableFab(
-        distance: 64,
-        children: [
-          styled.buildElevatedButton(
-            child: Row(
-              spacing: styles.layoutSpacing,
-              mainAxisSize: MainAxisSize.min,
-              children: [Icon(Icons.save_outlined), Text("保存更改")],
-            ),
-            context: context,
-            onPressed: () async {
-              appLogger.logger.i("Saving changes in password archive");
-              ui.showSnackBarQuick("正在保存", context);
-              var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-                  Provider.of<AppProvider>(context, listen: false).masterPwd
-              );
-              if (context.mounted) {
-                if (stat == ErrorCode.success) {
-                  appLogger.logger.i("Saved successfully");
-                  ui.showSnackBarQuick("你的档案已保存", context);
-                } else {
-                  appLogger.logger.i("Can not save archive: ${stat.code}");
-                  ui.showSnackBarQuick(stat.generic, context);
-                }
-              }
-            }
-          ),
-          styled.buildElevatedButton(
-            child: Row(
-              spacing: styles.layoutSpacing,
-              mainAxisSize: MainAxisSize.min,
-              children: [Icon(Icons.add), Text("新档案")],
-            ),
-            context: context,
-            onPressed: (){
-              appLogger.logger.i("Adding empty record to folder $folder");
-              final newId = Provider.of<PwdProvider>(context, listen: false).addEmptyRecordTo(folder);
-              appLogger.logger.i("Record added, pushing to edit page for new record $newId");
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId)));
-            }
-          ),
-        ]
-      ) : null
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final pwdList = context.watch<PwdProvider>().getPwdList(folder);
-    final appProvider = context.watch<AppProvider>();
+    final appProvider = context.read<AppProvider>();
+    final pwdProvider = context.read<PwdProvider>();
     return _buildUi(
-      pwdList, context, useHero: useHero, hasAppBar: hasAppBar, hasPadding: hasPadding,
-      hasFab: hasFab, appProvider: appProvider
+      pwdList,
+      context,
+      useHero: useHero,
+      hasAppBar: hasAppBar,
+      hasPadding: hasPadding,
+      hasFab: hasFab,
+      appProvider: appProvider,
+      pwdProvider: pwdProvider
     );
   }
 }
