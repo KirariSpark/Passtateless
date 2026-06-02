@@ -29,22 +29,35 @@ ListTile buildListTile({
   bool isFirst = false,
   bool isLast = false,
   bool active = false,
-  bool enabled = true
+  bool enabled = true,
 }) {
   return ListTile(
     onTap: onTapped,
     leading: leading == null ? null : Icon(leading),
-    title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.bodyLarge)),
+    title: titleTag == null
+        ? Text(title)
+        : Hero(
+            tag: titleTag,
+            child: Text(title, style: Theme.of(context).textTheme.bodyLarge),
+          ),
     subtitle: subtitle == null ? null : Text(subtitle),
     trailing: trailing,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.vertical(
-      top: isFirst ? styles.radius : Radius.zero,
-      bottom: isLast ? styles.radius : Radius.zero
-    )),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadiusGeometry.vertical(
+        top: isFirst ? styles.radius : Radius.zero,
+        bottom: isLast ? styles.radius : Radius.zero,
+      ),
+    ),
     enabled: enabled,
-    iconColor: active ? ColorScheme.of(context).onSecondaryContainer : ColorScheme.of(context).onSurface,
-    textColor: active ? ColorScheme.of(context).onSecondaryContainer : ColorScheme.of(context).onSurface,
-    tileColor: active ? ColorScheme.of(context).secondaryContainer : ColorScheme.of(context).surfaceContainerLow,
+    iconColor: active
+        ? ColorScheme.of(context).onSecondaryContainer
+        : ColorScheme.of(context).onSurface,
+    textColor: active
+        ? ColorScheme.of(context).onSecondaryContainer
+        : ColorScheme.of(context).onSurface,
+    tileColor: active
+        ? ColorScheme.of(context).secondaryContainer
+        : ColorScheme.of(context).surfaceContainerLow,
   );
 }
 
@@ -105,7 +118,7 @@ TextField buildTextField({
   bool passwordMode = false,
   bool multiline = false,
   bool readonly = false,
-  int maxLines = 1
+  int maxLines = 1,
 }) {
   return TextField(
     controller: controller,
@@ -114,7 +127,7 @@ TextField buildTextField({
       filled: true,
       fillColor: ColorScheme.of(context).primaryContainer.withAlpha(alpha),
       label: label == null ? null : Text(label),
-      border: const OutlineInputBorder()
+      border: const OutlineInputBorder(),
     ),
     obscureText: passwordMode,
     keyboardType: multiline ? TextInputType.multiline : null,
@@ -125,17 +138,17 @@ TextField buildTextField({
 }
 
 /// 构建一个占位符，比自带的好看（）
-/// 
+///
 /// [text] 占位符内要显示的内容
 /// [context] 上下文
 Container buildPlaceHolder({
-  required String text, 
-  required BuildContext context
+  required String text,
+  required BuildContext context,
 }) {
   return Container(
     decoration: BoxDecoration(
       borderRadius: styles.borderRadius,
-      color: ColorScheme.of(context).surfaceContainerLow
+      color: ColorScheme.of(context).surfaceContainerLow,
     ),
     alignment: Alignment.center,
     child: Text(text),
@@ -154,11 +167,18 @@ AppBar buildAppBar({
   required BuildContext context,
   String? titleTag,
   List<Widget>? actions,
-  IconData exitIcon = Icons.arrow_back
+  IconData exitIcon = Icons.arrow_back,
 }) {
   return buildAppBarWidget(
-    title: titleTag == null ? Text(title) : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
-    context: context, exitIcon: exitIcon, actions: actions,
+    title: titleTag == null
+        ? Text(title)
+        : Hero(
+            tag: titleTag,
+            child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+          ),
+    context: context,
+    exitIcon: exitIcon,
+    actions: actions,
   );
 }
 
@@ -168,7 +188,7 @@ AppBar buildAppBarWidget({
   required BuildContext context,
   String? titleTag,
   List<Widget>? actions,
-  IconData exitIcon = Icons.arrow_back
+  IconData exitIcon = Icons.arrow_back,
 }) {
   final parentRoute = ModalRoute.of(context);
   bool hasLeading = false;
@@ -180,13 +200,15 @@ AppBar buildAppBarWidget({
   }
   return AppBar(
     shape: styles.roundedBorder,
-    leading: hasLeading ? IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      icon: Icon(exitIcon),
-      style: styles.buttonStyle,
-    ) : null,
+    leading: hasLeading
+        ? IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(exitIcon),
+            style: styles.buttonStyle,
+          )
+        : null,
     title: title,
     actions: actions,
   );
@@ -196,14 +218,14 @@ AppBar buildAppBarWidget({
 TextButton buildTextButton({
   required Widget child,
   required BuildContext context,
-  required void Function()? onPressed
+  required void Function()? onPressed,
 }) {
   return TextButton(
     onPressed: onPressed,
     style: TextButton.styleFrom(
       shape: RoundedRectangleBorder(borderRadius: styles.borderRadius),
       backgroundColor: ColorScheme.of(context).secondaryContainer,
-      foregroundColor: ColorScheme.of(context).onSecondaryContainer
+      foregroundColor: ColorScheme.of(context).onSecondaryContainer,
     ),
     child: child,
   );
@@ -213,7 +235,7 @@ TextButton buildTextButton({
 ElevatedButton buildElevatedButton({
   required Widget child,
   required BuildContext context,
-  required void Function()? onPressed
+  required void Function()? onPressed,
 }) {
   return ElevatedButton(
     onPressed: onPressed,
@@ -221,9 +243,23 @@ ElevatedButton buildElevatedButton({
       backgroundColor: ColorScheme.of(context).secondaryContainer,
       foregroundColor: ColorScheme.of(context).onSecondaryContainer,
       shape: styles.roundedBorder,
-      padding: styles.pagePaddingAll
+      padding: styles.pagePaddingAll,
     ),
-    child: child
+    child: child,
+  );
+}
+
+/// 构建一个预定义了风格的PopupMenuButton
+PopupMenuButton buildPopupMenuButton({
+  required List<PopupMenuItem> children,
+  IconData icon = Icons.more_vert
+}) {
+  return PopupMenuButton(
+    style: styles.buttonStyle,
+    icon: Icon(icon),
+    itemBuilder: (_) {
+      return children;
+    },
   );
 }
 
@@ -231,7 +267,7 @@ ElevatedButton buildElevatedButton({
 CodeEditor buildJsonEditor({
   required BuildContext context,
   CodeLineEditingController? controller,
-  bool readOnly = false
+  bool readOnly = false,
 }) {
   return CodeEditor(
     readOnly: readOnly,
@@ -240,18 +276,27 @@ CodeEditor buildJsonEditor({
     style: CodeEditorStyle(
       codeTheme: CodeHighlightTheme(
         languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-        theme: ColorScheme.of(context).brightness == Brightness.light ? a11YLightTheme : a11YDarkTheme
+        theme: ColorScheme.of(context).brightness == Brightness.light
+            ? a11YLightTheme
+            : a11YDarkTheme,
       ),
       fontFamily: "SourceCodePro",
       fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-      backgroundColor: ColorScheme.of(context).surfaceContainerLow
+      backgroundColor: ColorScheme.of(context).surfaceContainerLow,
     ),
     borderRadius: styles.borderRadius,
     indicatorBuilder: (context, editingController, chunkController, notifier) {
       return Row(
         children: [
-          DefaultCodeLineNumber(controller: editingController, notifier: notifier),
-          DefaultCodeChunkIndicator(width: 20, controller: chunkController, notifier: notifier),
+          DefaultCodeLineNumber(
+            controller: editingController,
+            notifier: notifier,
+          ),
+          DefaultCodeChunkIndicator(
+            width: 20,
+            controller: chunkController,
+            notifier: notifier,
+          ),
         ],
       );
     },
