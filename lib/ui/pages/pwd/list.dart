@@ -23,19 +23,24 @@ class PwdListPage extends StatelessWidget {
   /// 页面是否有横向内边距
   final bool hasHorizontalPadding;
 
+  /// 页面是否有AppBar
+  final bool hasAppBar;
+
   const PwdListPage({
     super.key,
     required this.folder,
     required this.useHero,
-    this.hasHorizontalPadding = true
+    this.hasHorizontalPadding = true,
+    this.hasAppBar = true
   });
 
-  Future<void> _save(BuildContext context, PwdProvider pwdProvider) async {
+  Future<void> _save(BuildContext context, PwdProvider pwdProvider, AppProvider appProvider) async {
     appLogger.logger.i("Saving changes in password archive");
     ui.showSnackBarQuick("正在保存", context);
-    final stat = await pwdProvider.saveArchive(Provider.of<AppProvider>(context, listen: false).masterPwd);
+    final stat = await pwdProvider.saveArchive(appProvider.masterPwd);
     if (context.mounted) {
       if (stat == ErrorCode.success) {
+        appProvider.hasUnsavedChanges = false;
         appLogger.logger.i("Saved successfully");
         ui.showSnackBarQuick("你的档案已保存", context);
       } else {
@@ -52,24 +57,27 @@ class PwdListPage extends StatelessWidget {
   }) {
     appLogger.logger.i("Adding empty record to folder $folder");
     final newId = pwdProvider.addEmptyRecordTo(folder);
+    appProvider.hasUnsavedChanges = true;
     appLogger.logger.i("Record added, pushing to edit page for new record $newId");
     Navigator.push(
       context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: newId))
     );
   }
 
-  List<Widget> _buildList(
-    List<Map<String, dynamic>> pwdList,
-    BuildContext context,
-    AppProvider appProvider,
-  ) {
+  List<Widget> _buildList({
+    required List<Map<String, dynamic>> pwdList,
+    required BuildContext context,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider,
+  }) {
     if (pwdList.isEmpty) {
       return <Widget>[
         ConstrainedBox(
           constraints: styles.tileWidthConstraint,
           child: styled.buildListTile(
             title: "没有密码",
-            subtitle: "点击页面右下角的 + 以新增一条密码",
+            subtitle: "点击新增一条密码",
+            onTapped: () => _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider),
             leading: Icons.not_interested,
             isFirst: true,
             isLast: true,
@@ -102,6 +110,39 @@ class PwdListPage extends StatelessWidget {
     }
   }
 
+  AppBar? _buildAppBar({
+    required BuildContext context,
+    required bool hasAppBar,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider
+  }) {
+    if (hasAppBar) {
+      return styled.buildAppBar(
+        title: folder.isEmpty ? '未分类' : folder,
+        context: context,
+        actions: [
+          styled.buildPopupMenuButton(
+            context: context,
+            children: [
+              styled.buildPopupMenuItem(
+                description: "新建档案",
+                icon: Icons.add,
+                onTap: () => _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider)
+              ),
+              styled.buildPopupMenuItem(
+                description: "保存更改",
+                icon: Icons.save_outlined,
+                onTap: () => _save(context, pwdProvider, appProvider),
+              )
+            ],
+          ),
+        ],
+        titleTag: useHero ? folder : null,
+      );
+    }
+    return null;
+  }
+
   Scaffold _buildUi(
     List<Map<String, dynamic>> pwdList,
     BuildContext context, {
@@ -111,43 +152,21 @@ class PwdListPage extends StatelessWidget {
     required PwdProvider pwdProvider,
   }) {
     return Scaffold(
-      appBar: styled.buildAppBar(
-        title: folder.isEmpty ? '未分类' : folder,
-        context: context,
-        actions: [
-          styled.buildPopupMenuButton(
-            context: context,
-            children: [
-              PopupMenuItem(
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [Icon(Icons.add), Text("新建档案")],
-                ),
-                onTap: () => _newArchive(
-                  context: context,
-                  pwdProvider: pwdProvider,
-                  appProvider: appProvider
-                ),
-              ),
-              PopupMenuItem(
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [Icon(Icons.save_outlined), Text("保存更改")],
-                ),
-                onTap: () => _save(context, pwdProvider),
-              )
-            ],
-          ),
-        ],
-        titleTag: useHero ? folder : null,
-      ),
+      appBar: _buildAppBar(context: context, hasAppBar: hasAppBar, pwdProvider: pwdProvider, appProvider: appProvider),
       body: Container(
         padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: SingleChildScrollView(
           child: Column(
             children: [
               // 主列表区域
-              Column(children: _buildList(pwdList, context, appProvider)),
+              Column(
+                children: _buildList(
+                  pwdList: pwdList,
+                  context: context,
+                  pwdProvider: pwdProvider,
+                  appProvider: appProvider
+                )
+              ),
               styles.spacingSizedBox,
               // TODO: 增加实际功能
               TextField(decoration: InputDecoration(border: InputBorder.none)),
