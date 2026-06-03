@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     switch (tag) {
       case ("pages", "folders"):
         // 宽屏状态下无需使用Scaffold，因为不需要AppBar，也不需要额外的Padding
-        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasHorizontalPadding: !isWide);
+        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pwd", String id):
@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
     required String? titleTag,
     required String subtitle,
     required IconData leading,
+    Widget trailing = const Icon(Icons.arrow_forward),
     required bool isFirst,
     required bool isLast,
     required bool isWide,
@@ -48,7 +49,6 @@ class _HomePageState extends State<HomePage> {
     required void Function((String, String)) onTapped,
     required bool Function((String, String)) isSelectedCallback,
   }) {
-    // 使用 AdaptiveView 传递过来的 isSelected 判断方法
     final isSelected = isSelectedCallback(tag);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 100),
@@ -63,12 +63,10 @@ class _HomePageState extends State<HomePage> {
           titleTag: titleTag,
           subtitle: subtitle,
           leading: leading,
-          trailing: const Icon(Icons.arrow_forward),
+          trailing: trailing,
           onTapped: () {
             appLogger.logger.d("Selected tag: $tag");
-            setState(() {
-              _localSelectedTag = tag;
-            });
+            setState(() {_localSelectedTag = tag;});
             onTapped(tag);
           },
           isFirst: isFirst,
@@ -86,6 +84,7 @@ class _HomePageState extends State<HomePage> {
     void Function((String, String) tag) onItemTapped,
     bool Function((String, String) tag) isSelected,
   ) {
+    bool hasUnsavedChanges = context.watch<AppProvider>().hasUnsavedChanges;
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
       child: Column(
@@ -99,8 +98,9 @@ class _HomePageState extends State<HomePage> {
                 tag: ("pages", "folders"),
                 title: "资料夹",
                 titleTag: isWide ? null : "folders",
-                subtitle: "查看和修改全部密码资料夹",
+                subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
                 leading: Icons.format_list_bulleted,
+                trailing: hasUnsavedChanges ? Icon(Icons.save_outlined) : Icon(Icons.arrow_forward),
                 isFirst: true,
                 isLast: false,
                 isWide: isWide,
@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
       leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
         return _buildLeftContent(context, isWide, onItemTapped, isSelected);
       },
-      navMode: context.watch<AppProvider>().currentNavMode,
+      navMode: context.read<AppProvider>().currentNavMode,
       pageBuilder: _buildPage,
       placeholderText: "未选择项目",
       rightPaneConstraints: styles.tileWidthConstraint,

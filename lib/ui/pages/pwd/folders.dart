@@ -15,9 +15,17 @@ class PwdFolderPage extends StatefulWidget {
   final bool useHero;
 
   /// 页面是否有横向内边距
-  final bool hasHorizontalPadding;
+  final bool hasPadding;
 
-  const PwdFolderPage({super.key, required this.useHero, this.hasHorizontalPadding = true});
+  /// 页面是否有AppBar
+  final bool hasAppBar;
+
+  const PwdFolderPage({
+    super.key,
+    required this.useHero,
+    this.hasPadding = true,
+    this.hasAppBar = true
+  });
 
   @override
   State<PwdFolderPage> createState() => _PwdFolderPageState();
@@ -26,7 +34,12 @@ class PwdFolderPage extends StatefulWidget {
 class _PwdFolderPageState extends State<PwdFolderPage> {
   final TextEditingController folderName = TextEditingController();
 
-  void _showBottomSheet(String title, String folder) {
+  void _showBottomSheet({
+    required String title,
+    required String folder,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider
+  }) {
     ui.showBottomSheetQuick(
       context: context,
       title: title,
@@ -35,14 +48,43 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           title: "重命名",
           leading: Icons.edit_outlined,
           isFirst: true,
-          onTapped: () => _renameFolder(folder, title),
+          onTapped: () => _renameFolder(
+            folder:folder,
+            title: title,
+            pwdProvider: pwdProvider,
+            appProvider: appProvider
+          ),
           context: context
         ),
         styled.buildListTile(
           title: "删除",
           leading: Icons.delete_outline,
+          onTapped: () => _removeFolder(
+            folder: folder,
+            title: title,
+            pwdProvider: pwdProvider,
+            appProvider: appProvider
+          ),
+          context: context
+        ),
+        Divider(height: 1),
+        styled.buildListTile(
+          title: "新建资料夹",
+          leading: Icons.create_new_folder_outlined,
+          onTapped: () {
+            Navigator.pop(context);
+            _newFolder(appProvider);
+          },
+          context: context
+        ),
+        styled.buildListTile(
+          title: "保存更改",
+          leading: Icons.save_outlined,
           isLast: true,
-          onTapped: () => _removeFolder(folder, title),
+          onTapped: () {
+            Navigator.pop(context);
+            _save(pwdProvider, appProvider);
+          },
           context: context
         )
       ]
@@ -60,7 +102,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
-  void _newFolder() {
+  void _newFolder(AppProvider appProvider) {
     ui.showAlertDialogQuick(
       title: "新建资料夹",
       content: styled.buildTextField(label: "资料夹名", controller: folderName, context: context),
@@ -70,6 +112,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
         appLogger.logger.i("Add folder ${folderName.text}");
         var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
         if (stat == ErrorCode.success) {
+          appProvider.hasUnsavedChanges = true;
           appLogger.logger.i("Added successfully");
           Navigator.of(context).pop();
         } else {
@@ -82,7 +125,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
-  void _renameFolder(String folder, String title) {
+  void _renameFolder({
+    required String folder,
+    required String title,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider
+  }) {
     appLogger.logger.i("Trying to rename folder $folder");
     Navigator.pop(context);
     // 内置文件夹 未分类 不能重命名
@@ -98,10 +146,9 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       actionText: "取消",
       action2: () {
         appLogger.logger.i("Renaming folder to ${folderName.text}");
-        var res = Provider.of<PwdProvider>(context, listen: false).renameFolder(
-            folder, folderName.text
-        );
+        var res = pwdProvider.renameFolder(folder, folderName.text);
         if (res == ErrorCode.success) {
+          appProvider.hasUnsavedChanges = true;
           appLogger.logger.i("Renamed successfully");
           Navigator.of(context).pop();
         } else {
@@ -114,7 +161,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
-  void _removeFolder(String folder, String title) {
+  void _removeFolder({
+    required String folder,
+    required String title,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider
+  }) {
     Navigator.pop(context);
     // 未分类 文件夹是内置文件夹，不能删除
     if (folder.isEmpty) {
@@ -126,7 +178,8 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
         info: "确定要删除文件夹 “$folder” 吗\n一旦更改被保存，你将永远失去它",
         function: () {
           appLogger.logger.i("Trying to delete folder $folder");
-          Provider.of<PwdProvider>(context, listen: false).removeFolder(folder);
+          pwdProvider.removeFolder(folder);
+          appProvider.hasUnsavedChanges = true;
           appLogger.logger.i("Folder deleted");
           Navigator.of(context).pop();
         },
@@ -135,14 +188,51 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     }
   }
 
-  Future<void> _save() async {
+  AppBar? _buildAppBar(bool hasAppBar, PwdProvider pwdProvider, AppProvider appProvider) {
+    if (hasAppBar) {
+      return styled.buildAppBar(
+        title: "资料夹",
+        actions: [
+          styled.buildPopupMenuButton(
+            context: context,
+            children: [
+              PopupMenuItem(
+                onTap: () => _newFolder(appProvider),
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [
+                    Icon(Icons.create_new_folder_outlined),
+                    Text("新建资料夹")
+                  ],
+                )
+              ),
+              PopupMenuItem(
+                onTap: () => _save(pwdProvider, appProvider),
+                child: Row(
+                  spacing: styles.layoutSpacing,
+                  children: [
+                    Icon(Icons.save_outlined),
+                    Text("保存更改")
+                  ],
+                )
+              )
+            ]
+          )
+        ],
+        context: context,
+        titleTag: widget.useHero ? "folders" : null
+      );
+    }
+    return null;
+  }
+
+  Future<void> _save(PwdProvider pwdProvider, AppProvider appProvider) async {
     appLogger.logger.i("Saving changes in password archive");
     ui.showSnackBarQuick("正在保存", context);
-    var stat = await Provider.of<PwdProvider>(context, listen: false).saveArchive(
-        Provider.of<AppProvider>(context, listen: false).masterPwd
-    );
+    var stat = await pwdProvider.saveArchive(appProvider.masterPwd);
     if (mounted) {
       if (stat == ErrorCode.success) {
+        appProvider.hasUnsavedChanges = false;
         appLogger.logger.i("Saved successfully");
         ui.showSnackBarQuick("你的档案已保存", context);
       } else {
@@ -152,10 +242,10 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     }
   }
 
-  Widget _buildFolderList(List<String> folders) {
+  Widget _buildFolderList(List<String> folders, PwdProvider pwdProvider, AppProvider appProvider) {
     return Container(
       alignment: Alignment.topCenter,
-      padding: widget.hasHorizontalPadding ? styles.pagePaddingAll : styles.pagePaddingVertical,
+      padding: widget.hasPadding ? styles.pagePaddingAll : null,
       child: Container(
         constraints: styles.tileWidthConstraint,
         child: ListView.builder(
@@ -167,7 +257,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
             return Material(
               child: styled.buildListTileAdvanced(
-                onRightClick: () => _showBottomSheet(displayTitle, folders[index]),
+                onRightClick: () => _showBottomSheet(
+                  title: displayTitle,
+                  folder: folders[index],
+                  pwdProvider: pwdProvider,
+                  appProvider: appProvider
+                ),
                 onTapped: () => _onItemTapped(folders[index]),
                 isFirst: isFirst,
                 isLast: isLast,
@@ -185,40 +280,11 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
   @override
   Widget build(BuildContext context) {
     List<String> folders = context.watch<PwdProvider>().pwdFolders;
+    final appProvider = context.read<AppProvider>();
+    final pwdProvider = context.read<PwdProvider>();
     return Scaffold(
-      appBar: styled.buildAppBar(
-        title: "资料夹",
-        actions: [
-          styled.buildPopupMenuButton(
-            context: context,
-            children: [
-              PopupMenuItem(
-                onTap: _newFolder,
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [
-                    Icon(Icons.create_new_folder_outlined),
-                    Text("新建资料夹")
-                  ],
-                )
-              ),
-              PopupMenuItem(
-                onTap: _save,
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [
-                    Icon(Icons.save_outlined),
-                    Text("保存更改")
-                  ],
-                )
-              )
-            ]
-          )
-        ],
-        context: context,
-        titleTag: widget.useHero ? "folders" : null
-      ),
-      body: _buildFolderList(folders)
+      appBar: _buildAppBar(widget.hasAppBar, pwdProvider, appProvider),
+      body: _buildFolderList(folders, pwdProvider, appProvider)
     );
   }
 }

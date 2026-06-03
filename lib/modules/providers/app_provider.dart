@@ -20,6 +20,14 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 未保存的更改
+  bool _hasUnsavedChanges = false;
+  bool get hasUnsavedChanges => _hasUnsavedChanges;
+  set hasUnsavedChanges(bool stat) {
+    _hasUnsavedChanges = stat;
+    notifyListeners();
+  }
+
   // ————设置项————
   // 提醒我更改主密码
   var _remindMe = RemindDays.days180;
