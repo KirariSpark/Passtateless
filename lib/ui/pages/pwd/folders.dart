@@ -73,7 +73,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           leading: Icons.create_new_folder_outlined,
           onTapped: () {
             Navigator.pop(context);
-            _newFolder(appProvider);
+            _newFolder(pwdProvider, appProvider);
           },
           context: context
         ),
@@ -91,18 +91,15 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
-  void _onItemTapped(String folder) {
+  void _onItemTapped(String folder, AppProvider appProvider) {
     appLogger.logger.i("Pushing to page listing items in folder $folder");
     Navigator.push(
       context,
-      ui.switchRoute(
-        Provider.of<AppProvider>(context, listen: false).currentNavMode,
-        builder: (context) => PwdListPage(folder: folder, useHero: true)
-      )
+      ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdListPage(folder: folder, useHero: true))
     );
   }
 
-  void _newFolder(AppProvider appProvider) {
+  void _newFolder(PwdProvider pwdProvider, AppProvider appProvider) {
     ui.showAlertDialogQuick(
       title: "新建资料夹",
       content: styled.buildTextField(label: "资料夹名", controller: folderName, context: context),
@@ -110,7 +107,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       actionText: "取消",
       action2: () {
         appLogger.logger.i("Add folder ${folderName.text}");
-        var stat = Provider.of<PwdProvider>(context, listen: false).addFolder(folderName.text);
+        final stat = pwdProvider.addFolder(folderName.text);
         if (stat == ErrorCode.success) {
           appProvider.hasUnsavedChanges = true;
           appLogger.logger.i("Added successfully");
@@ -196,25 +193,15 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           styled.buildPopupMenuButton(
             context: context,
             children: [
-              PopupMenuItem(
-                onTap: () => _newFolder(appProvider),
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [
-                    Icon(Icons.create_new_folder_outlined),
-                    Text("新建资料夹")
-                  ],
-                )
+              styled.buildPopupMenuItem(
+                description: "新建资料夹",
+                icon: Icons.create_new_folder_outlined,
+                onTap: () => _newFolder(pwdProvider, appProvider)
               ),
-              PopupMenuItem(
-                onTap: () => _save(pwdProvider, appProvider),
-                child: Row(
-                  spacing: styles.layoutSpacing,
-                  children: [
-                    Icon(Icons.save_outlined),
-                    Text("保存更改")
-                  ],
-                )
+              styled.buildPopupMenuItem(
+                description: "保存更改",
+                icon: Icons.save_outlined,
+                onTap: () => _save(pwdProvider, appProvider)
               )
             ]
           )
@@ -263,7 +250,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   pwdProvider: pwdProvider,
                   appProvider: appProvider
                 ),
-                onTapped: () => _onItemTapped(folders[index]),
+                onTapped: () => _onItemTapped(folders[index], appProvider),
                 isFirst: isFirst,
                 isLast: isLast,
                 title: displayTitle,

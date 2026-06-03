@@ -78,10 +78,10 @@ class PwdListPage extends StatelessWidget {
         ),
       ];
     } else {
-      List<Widget> temp = [];
+      List<Widget> children = [];
       // 构建列表
       for (final (index, item) in pwdList.indexed) {
-        temp.add(
+        children.add(
           PwdTile(
             pwdRecord: item,
             isFirst: index == 0,
@@ -98,7 +98,7 @@ class PwdListPage extends StatelessWidget {
           ),
         );
       }
-      return temp;
+      return children;
     }
   }
 

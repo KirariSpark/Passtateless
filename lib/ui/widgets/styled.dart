@@ -257,9 +257,22 @@ PopupMenuButton buildPopupMenuButton({
     style: styles.buttonStyle,
     icon: Icon(icon),
     color: ColorScheme.of(context).secondaryContainer,
-    itemBuilder: (_) {
-      return children;
-    },
+    itemBuilder: (_) => children,
+  );
+}
+
+/// 构建一个PopupMenuItem，支持显示图标和文字
+PopupMenuItem buildPopupMenuItem({
+  required String description,
+  void Function()? onTap,
+  IconData? icon
+}) {
+  return PopupMenuItem(
+    onTap: onTap,
+    child: Row(
+      spacing: styles.layoutSpacing,
+      children: [Icon(icon), Text(description)],
+    ),
   );
 }
 
