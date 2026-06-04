@@ -6,6 +6,7 @@ import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/list.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,7 @@ class PwdFolderPage extends StatefulWidget {
   /// 有AppBar时，AppBar是否要使用Hero动画
   final bool useHero;
 
-  /// 页面是否有横向内边距
+  /// 页面是否有内边距
   final bool hasPadding;
 
   /// 页面是否有AppBar
@@ -88,14 +89,6 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           context: context
         )
       ]
-    );
-  }
-
-  void _onItemTapped(String folder, AppProvider appProvider) {
-    appLogger.logger.i("Pushing to page listing items in folder $folder");
-    Navigator.push(
-      context,
-      ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdListPage(folder: folder, useHero: true))
     );
   }
 
@@ -229,12 +222,19 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     }
   }
 
-  Widget _buildFolderList(List<String> folders, PwdProvider pwdProvider, AppProvider appProvider) {
+  Widget _buildFolderList({
+    required List<String> folders,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider,
+    required void Function((String, String)) onItemTapped,
+    required bool Function((String, String)) isSelected,
+    required bool isWide
+  }) {
     return Container(
       alignment: Alignment.topCenter,
       padding: widget.hasPadding ? styles.pagePaddingAll : null,
       child: Container(
-        constraints: styles.tileWidthConstraint,
+        constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
         child: ListView.builder(
           shrinkWrap: true,
           itemCount: folders.length,
@@ -250,11 +250,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
                   pwdProvider: pwdProvider,
                   appProvider: appProvider
                 ),
-                onTapped: () => _onItemTapped(folders[index], appProvider),
+                onTapped: () => onItemTapped(("folders", folders[index])),
                 isFirst: isFirst,
                 isLast: isLast,
                 title: displayTitle,
                 titleTag: folders[index],
+                active: isSelected(("folders", folders[index])),
                 context: context
               )
             );
@@ -271,7 +272,32 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     final pwdProvider = context.read<PwdProvider>();
     return Scaffold(
       appBar: _buildAppBar(widget.hasAppBar, pwdProvider, appProvider),
-      body: _buildFolderList(folders, pwdProvider, appProvider)
+      body: AdaptiveView(
+        leftPaneBuilder: (
+          BuildContext context,
+          bool isWide,
+          void Function((String, String)) onItemTapped,
+          bool Function((String, String)) isSelected
+        ) {
+          return _buildFolderList(
+            folders: folders,
+            pwdProvider: pwdProvider,
+            appProvider: appProvider,
+            onItemTapped: onItemTapped,
+            isSelected: isSelected,
+            isWide: isWide
+          );
+        },
+        pageBuilder: ((String, String) tag, bool isWide) {
+          if (tag.$1 == "folders") {
+            return PwdListPage(folder: tag.$2, useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+          } else {
+            return styled.buildPlaceHolder(text: "未选择档案", context: context);
+          }
+        },
+        widthThreshold: styles.tileWidthConstraintSmall.maxWidth
+            + styles.tileWidthConstraint.maxWidth + styles.layoutSpacing * 2
+      )
     );
   }
 }

@@ -21,7 +21,7 @@ class PwdListPage extends StatelessWidget {
   final bool useHero;
 
   /// 页面是否有横向内边距
-  final bool hasHorizontalPadding;
+  final bool hasPadding;
 
   /// 页面是否有AppBar
   final bool hasAppBar;
@@ -30,7 +30,7 @@ class PwdListPage extends StatelessWidget {
     super.key,
     required this.folder,
     required this.useHero,
-    this.hasHorizontalPadding = true,
+    this.hasPadding = true,
     this.hasAppBar = true
   });
 
@@ -210,7 +210,7 @@ class PwdListPage extends StatelessWidget {
       pwdList,
       context,
       useHero: useHero,
-      hasPadding: hasHorizontalPadding,
+      hasPadding: hasPadding,
       appProvider: appProvider,
       pwdProvider: pwdProvider
     );
