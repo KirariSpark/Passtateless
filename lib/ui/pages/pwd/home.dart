@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/eval.dart';
 import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
@@ -18,9 +21,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  (String, String)? _localSelectedTag;
+  (String, String)? _selectedItem;
+  bool _isSaving = false;
 
-  Widget _buildPage((String, String) tag, bool isWide) {
+  Future<void> _save(PwdProvider pwdProvider, AppProvider appProvider) async {
+    appLogger.logger.i("Saving changes in password archive");
+    setState(() => _isSaving = true);
+    ui.showSnackBarQuick("正在保存", context);
+    var stat = await pwdProvider.saveArchive(appProvider.masterPwd);
+    if (mounted) {
+      if (stat == ErrorCode.success) {
+        appProvider.hasUnsavedChanges = false;
+        setState(() => _isSaving = false);
+        appLogger.logger.i("Saved successfully");
+        ui.showSnackBarQuick("你的档案已保存", context);
+      } else {
+        appLogger.logger.i("Can not save archive: ${stat.code}");
+        ui.showSnackBarQuick(stat.generic, context);
+      }
+    }
+  }
+
+  Widget _buildRightPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("pages", "folders"):
         // 宽屏状态下无需使用Scaffold，因为不需要AppBar，也不需要额外的Padding
@@ -32,6 +54,24 @@ class _HomePageState extends State<HomePage> {
       default:
         return styled.buildPlaceHolder(text: "无效选择", context: context);
     }
+  }
+
+  Widget _buildTrailing(bool hasUnsavedChanges, PwdProvider pwdProvider, AppProvider appProvider) {
+    if (!hasUnsavedChanges) {
+      return Icon(Icons.arrow_forward);
+    }
+    if (_isSaving) {
+      return CircularProgressIndicator(
+        constraints: BoxConstraints(
+          maxHeight: 20, maxWidth: 20, minHeight: 20, minWidth: 20
+        ),
+      );
+    }
+    return IconButton(
+      onPressed: () => _save(pwdProvider, appProvider),
+      style: styles.buttonStyle,
+      icon: Icon(Icons.save_outlined)
+    );
   }
 
   // 构建单个瓦片
@@ -66,7 +106,7 @@ class _HomePageState extends State<HomePage> {
           trailing: trailing,
           onTapped: () {
             appLogger.logger.d("Selected tag: $tag");
-            setState(() {_localSelectedTag = tag;});
+            setState(() => _selectedItem = tag);
             onTapped(tag);
           },
           isFirst: isFirst,
@@ -85,6 +125,9 @@ class _HomePageState extends State<HomePage> {
     bool Function((String, String) tag) isSelected,
   ) {
     bool hasUnsavedChanges = context.watch<AppProvider>().hasUnsavedChanges;
+    final pwdProvider = context.read<PwdProvider>();
+    final appProvider = context.read<AppProvider>();
+
     return ConstrainedBox(
       constraints: styles.tileWidthConstraint,
       child: Column(
@@ -100,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                 titleTag: isWide ? null : "folders",
                 subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
                 leading: Icons.format_list_bulleted,
-                trailing: hasUnsavedChanges ? Icon(Icons.save_outlined) : Icon(Icons.arrow_forward),
+                trailing: _buildTrailing(hasUnsavedChanges, pwdProvider, appProvider),
                 isFirst: true,
                 isLast: false,
                 isWide: isWide,
@@ -130,12 +173,10 @@ class _HomePageState extends State<HomePage> {
               isWide: isWide,
               onItemTapped: (id) {
                 appLogger.logger.d("Selected password: $id");
-                setState(() {
-                  _localSelectedTag = ("pwd", id);
-                });
+                setState(() => _selectedItem = ("pwd", id));
                 onItemTapped(("pwd", id));
               },
-              selectedId: _localSelectedTag?.$1 == "pwd" && isWide ? _localSelectedTag?.$2 : null,
+              selectedId: _selectedItem?.$1 == "pwd" && isWide ? _selectedItem?.$2 : null,
             ),
           ),
         ],
@@ -150,7 +191,7 @@ class _HomePageState extends State<HomePage> {
         return _buildLeftContent(context, isWide, onItemTapped, isSelected);
       },
       navMode: context.read<AppProvider>().currentNavMode,
-      pageBuilder: _buildPage,
+      pageBuilder: _buildRightPage,
       placeholderText: "未选择项目",
       rightPaneConstraints: styles.tileWidthConstraint,
       padding: styles.pagePaddingAll,
