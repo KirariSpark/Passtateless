@@ -87,7 +87,6 @@ class PwdListPage extends StatelessWidget {
       ];
     } else {
       List<Widget> children = [];
-      // 构建列表
       for (final (index, item) in pwdList.indexed) {
         children.add(
           PwdTile(
@@ -103,6 +102,27 @@ class PwdListPage extends StatelessWidget {
                 ),
               );
             },
+            extraContextMenuItems: [
+              styled.buildListTile(
+                title: "新建档案",
+                leading: Icons.add,
+                onTapped: () {
+                  Navigator.pop(context);
+                  _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider);
+                },
+                context: context
+              ),
+              styled.buildListTile(
+                title: "保存更改",
+                leading: Icons.save_outlined,
+                isLast: true,
+                onTapped: () {
+                  Navigator.pop(context);
+                  _save(context, pwdProvider, appProvider);
+                },
+                context: context
+              )
+            ],
           ),
         );
       }
@@ -154,23 +174,27 @@ class PwdListPage extends StatelessWidget {
     return Scaffold(
       appBar: _buildAppBar(context: context, hasAppBar: hasAppBar, pwdProvider: pwdProvider, appProvider: appProvider),
       body: Container(
+        alignment: Alignment.topCenter,
         padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // 主列表区域
-              Column(
-                children: _buildList(
-                  pwdList: pwdList,
-                  context: context,
-                  pwdProvider: pwdProvider,
-                  appProvider: appProvider
-                )
-              ),
-              styles.spacingSizedBox,
-              // TODO: 增加实际功能
-              TextField(decoration: InputDecoration(border: InputBorder.none)),
-            ],
+        child: Container(
+          constraints: styles.tileWidthConstraint,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // 主列表区域
+                Column(
+                  children: _buildList(
+                    pwdList: pwdList,
+                    context: context,
+                    pwdProvider: pwdProvider,
+                    appProvider: appProvider
+                  )
+                ),
+                styles.spacingSizedBox,
+                // TODO: 增加实际功能
+                TextField(decoration: InputDecoration(border: InputBorder.none)),
+              ],
+            ),
           ),
         ),
       ),

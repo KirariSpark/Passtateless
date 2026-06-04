@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/edit.dart';
@@ -18,7 +19,7 @@ class PwdTile extends StatelessWidget {
   /// 是否是第一项
   final bool isFirst;
 
-  /// 是否是第二项
+  /// 是否是最后一项
   final bool isLast;
 
   /// 是否是被激活的项
@@ -26,6 +27,9 @@ class PwdTile extends StatelessWidget {
 
   /// 是否使用 Hero 动画
   final bool useHero;
+
+  /// 右键菜单中，要额外添加的项
+  final List<ListTile>? extraContextMenuItems;
 
   /// 用于显示密码的改版ListTile
   const PwdTile({
@@ -36,28 +40,63 @@ class PwdTile extends StatelessWidget {
     this.isLast = false,
     this.isActive = false,
     this.useHero = true,
+    this.extraContextMenuItems
   });
 
-  void _confirmDel(BuildContext context) {
+  void _deleteArchive(BuildContext context, PwdProvider pwdProvider, AppProvider appProvider) {
+    appLogger.logger.i("Deleting password archive");
+    final res = pwdProvider.removeRecordById(pwdRecord["id"]);
+    if (res != ErrorCode.success) {
+      appLogger.logger.e("Can not delete archive: $res");
+      ui.showSnackBarQuick(res.generic, context);
+      return;
+    }
+    appProvider.hasUnsavedChanges = true;
+    appLogger.logger.i("Archive deleted");
+    Navigator.pop(context);
+  }
+
+  void _showDelDialog(BuildContext context, PwdProvider pwdProvider, AppProvider appProvider) {
     ui.showConfirmDialogQuick(
       context: context,
-      function: () {
-        appLogger.logger.i("Deleting password archive");
-        final res = Provider.of<PwdProvider>(context, listen: false).removeRecordById(pwdRecord["id"]);
-        if (res != ErrorCode.success) {
-          appLogger.logger.e("Can not delete archive: $res");
-          ui.showSnackBarQuick(res.generic, context);
-        }
-        appLogger.logger.i("Archive deleted");
-        Navigator.pop(context);
-      },
+      function: () => _deleteArchive(context, pwdProvider, appProvider),
       title: "确认删除",
-      info: "你无法撤销此操作",
+      info: "一旦更改被保存，你将永远失去这条档案",
     );
   }
 
-  /// 显示移动或复制到的文件夹选择对话框
-  void _showMoveCopyDialog(BuildContext context, PwdProvider pwdProvider, bool isMove) {
+  void _moveOrCopy({
+    required String folder,
+    required BuildContext context,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider,
+    required bool isMove
+  }) {
+    appLogger.logger.i("User selected folder '$folder' for ${isMove ? "moving" : "copying"} id: ${pwdRecord["id"]}");
+    final ErrorCode result;
+    if (isMove) {
+      result = pwdProvider.moveTo(pwdRecord["id"], folder);
+    } else {
+      result = pwdProvider.copyTo(pwdRecord["id"], folder);
+    }
+    // 关闭文件夹选择对话框
+    Navigator.of(context).pop();
+    if (result != ErrorCode.success) {
+      appLogger.logger.e("Operation failed: ${result.generic}");
+      ui.showSnackBarQuick(result.generic, context);
+    } else {
+      appProvider.hasUnsavedChanges = true;
+      appLogger.logger.i("Operation succeeded");
+    }
+  }
+
+  void _showMoveCopyDialog({
+    required BuildContext context,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider,
+    required bool isMove
+  }) {
+    Navigator.pop(context);
     appLogger.logger.i("Showing folder picker for ${isMove ? "move" : "copy"} id: ${pwdRecord["id"]}");
     final folders = pwdProvider.pwdFolders;
     final List<Widget> tiles = [];
@@ -71,23 +110,13 @@ class PwdTile extends StatelessWidget {
           title: displayName,
           isFirst: i == 0,
           isLast: i == folders.length - 1,
-          onTapped: () {
-            appLogger.logger.i("User selected folder '$folder' for ${isMove ? "moving" : "copying"} id: ${pwdRecord["id"]}");
-            final ErrorCode result;
-            if (isMove) {
-              result = pwdProvider.moveTo(pwdRecord["id"], folder);
-            } else {
-              result = pwdProvider.copyTo(pwdRecord["id"], folder);
-            }
-            // 关闭文件夹选择对话框
-            Navigator.of(context).pop();
-            if (result != ErrorCode.success) {
-              appLogger.logger.e("Operation failed: ${result.generic}");
-              ui.showSnackBarQuick(result.generic, context);
-            } else {
-              appLogger.logger.i("Operation succeeded");
-            }
-          },
+          onTapped: () => _moveOrCopy(
+            folder: folder,
+            context: context,
+            pwdProvider: pwdProvider,
+            appProvider: appProvider,
+            isMove: isMove
+          ),
           context: context,
         ),
       );
@@ -95,9 +124,7 @@ class PwdTile extends StatelessWidget {
 
     ui.showAlertDialogQuick(
       title: isMove ? "移动到..." : "复制到...",
-      content: SingleChildScrollView(
-        child: Column(children: tiles),
-      ),
+      content: Column(children: tiles),
       action: () {
         appLogger.logger.i("Folder picker cancelled");
         Navigator.of(context).pop();
@@ -107,100 +134,132 @@ class PwdTile extends StatelessWidget {
     );
   }
 
+  void _editArchive(BuildContext context, AppProvider appProvider) {
+    appLogger.logger.i("Pushing to edit page for ${pwdRecord["id"]}");
+    Navigator.pop(context);
+    Navigator.push(
+      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: pwdRecord["id"]))
+    );
+  }
+
+  void _showContextMenu({
+    required BuildContext context,
+    required String displayName,
+    required PwdProvider pwdProvider,
+    required AppProvider appProvider,
+    List<ListTile>? extraMenuItems
+  }) {
+    List<Widget>? realChildren = [
+      styled.buildListTile(
+        leading: Icons.edit_outlined,
+        title: "编辑",
+        isFirst: true,
+        onTapped: () => _editArchive(context, appProvider),
+        context: context
+      ),
+      styled.buildListTile(
+        leading: Icons.cut_outlined,
+        title: "移动到",
+        onTapped: () {
+          appLogger.logger.i("User triggered move for password id: ${pwdRecord["id"]}");
+          _showMoveCopyDialog(
+            context: context,
+            pwdProvider: pwdProvider,
+            appProvider: appProvider,
+            isMove: true
+          );
+        },
+        context: context
+      ),
+      styled.buildListTile(
+        leading: Icons.file_copy_outlined,
+        title: "复制到",
+        onTapped: () {
+          appLogger.logger.i("User triggered copy for password id: ${pwdRecord["id"]}");
+          _showMoveCopyDialog(
+            context: context,
+            pwdProvider: pwdProvider,
+            appProvider: appProvider,
+            isMove: false
+          );
+        },
+        context: context
+      ),
+      styled.buildListTile(
+        leading: Icons.delete_outline,
+        title: "删除",
+        isLast: extraMenuItems == null ? true : false,
+        onTapped: () {
+          Navigator.pop(context);
+          _showDelDialog(context, pwdProvider, appProvider);
+        },
+        context: context
+      )
+    ];
+
+    if (extraMenuItems != null) {
+      realChildren.add(Divider(height: 1));
+      realChildren.addAll(extraMenuItems);
+    }
+
+    ui.showBottomSheetQuick(
+      context: context,
+      title: displayName,
+      children: realChildren
+    );
+  }
+
+  String? _getAltSubtitle() {
+    return pwdRecord.containsKey("identifier") && pwdRecord["identifier"].toString().isNotEmpty
+      ? "原标题：${pwdRecord["identifier"]}" : null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pwdProvider = Provider.of<PwdProvider>(context, listen: false);
-    String subtitleText = "";
     final String displayName = pwdRecord["identifier"] == "" ? "未命名" : pwdRecord["identifier"];
+    final pwdProvider = context.read<PwdProvider>();
+    final appProvider = context.read<AppProvider>();
 
-    if (pwdProvider.isRecordValid(pwdRecord["id"])) {
-      subtitleText = "${pwdRecord["userName"]} @ ${pwdRecord["account"]}";
-    } else {
-      return ConstrainedBox(
-        constraints: styles.tileWidthConstraint,
-        child: Material(
-          child: styled.buildListTile(
-            title: "无效记录",
-            subtitle: pwdRecord.containsKey("identifier") && pwdRecord["identifier"].toString().isNotEmpty
-              ? "原标题：${pwdRecord["identifier"]}" : null,
-            context: context,
-            isFirst: isFirst,
-            isLast: isLast,
-            onTapped: () => _confirmDel(context)
-          ),
+    if (!pwdProvider.isRecordValid(pwdRecord["id"])) {
+      return Material(
+        child: styled.buildListTile(
+          title: "无效记录",
+          subtitle: _getAltSubtitle(),
+          context: context,
+          isFirst: isFirst,
+          isLast: isLast,
+          onTapped: () => _showDelDialog(context, pwdProvider, appProvider)
         ),
       );
     }
 
-    return ConstrainedBox(
-      constraints: styles.tileWidthConstraint,
-      child: Material(
-        child: styled.buildListTileAdvanced(
-          onRightClick: () {
-            ui.showBottomSheetQuick(
-              context: context,
-              title: displayName,
-              children: [
-                styled.buildListTile(
-                  leading: Icons.edit_outlined,
-                  title: "编辑",
-                  isFirst: true,
-                  onTapped: (){
-                    appLogger.logger.i("Pushing to edit page for ${pwdRecord["id"]}");
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PwdEditPage(id: pwdRecord["id"])));
-                  },
-                  context: context
-                ),
-                styled.buildListTile(
-                  leading: Icons.cut_outlined,
-                  title: "移动到",
-                  onTapped: () {
-                    appLogger.logger.i("User triggered move for password id: ${pwdRecord["id"]}");
-                    Navigator.pop(context);
-                    _showMoveCopyDialog(context, pwdProvider, true);
-                  },
-                  context: context
-                ),
-                styled.buildListTile(
-                  leading: Icons.file_copy_outlined,
-                  title: "复制到",
-                  onTapped: () {
-                    appLogger.logger.i("User triggered copy for password id: ${pwdRecord["id"]}");
-                    Navigator.pop(context);
-                    _showMoveCopyDialog(context, pwdProvider, false);
-                  },
-                  context: context
-                ),
-                styled.buildListTile(
-                  leading: Icons.delete_outline,
-                  title: "删除",
-                  isLast: true,
-                  onTapped: () {
-                    Navigator.pop(context);
-                    _confirmDel(context);
-                  },
-                  context: context
-                )
-              ]
-            );
-          },
-          title: displayName,
-          titleTag: useHero ? pwdRecord["id"] : null,
-          subtitle: subtitleText,
-          trailing: IconButton(
-            style: styles.buttonStyle,
-            onPressed: () => pwdProvider.switchStarStateById(pwdRecord["id"]),
-            icon: pwdRecord["starred"]
-              ? Icon(Icons.star, color: ColorScheme.of(context).primary)
-              : Icon(Icons.star_border),
-          ),
-          onTapped: onTapped,
-          isFirst: isFirst,
-          isLast: isLast,
+    return Material(
+      child: styled.buildListTileAdvanced(
+        onRightClick: () => _showContextMenu(
           context: context,
-          active: isActive
+          displayName: displayName,
+          pwdProvider: pwdProvider,
+          appProvider: appProvider,
+          extraMenuItems: extraContextMenuItems
         ),
+        title: displayName,
+        titleTag: useHero ? pwdRecord["id"] : null,
+        subtitle: "${pwdRecord["userName"]} @ ${pwdRecord["account"]}",
+        trailing: IconButton(
+          style: styles.buttonStyle,
+          onPressed: () {
+            appProvider.hasUnsavedChanges = true;
+            pwdProvider.switchStarStateById(pwdRecord["id"]);
+          },
+          icon: pwdRecord["starred"]
+            ? Icon(Icons.star, color: ColorScheme.of(context).primary)
+            : Icon(Icons.star_border),
+        ),
+        onTapped: onTapped,
+        isFirst: isFirst,
+        isLast: isLast,
+        context: context,
+        active: isActive
       ),
     );
   }
