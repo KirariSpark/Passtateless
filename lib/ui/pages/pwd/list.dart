@@ -181,18 +181,17 @@ class PwdListPage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // 主列表区域
-                Column(
-                  children: _buildList(
-                    pwdList: pwdList,
-                    context: context,
-                    pwdProvider: pwdProvider,
-                    appProvider: appProvider
-                  )
+                ..._buildList(
+                  pwdList: pwdList,
+                  context: context,
+                  pwdProvider: pwdProvider,
+                  appProvider: appProvider
                 ),
-                styles.spacingSizedBox,
-                // TODO: 增加实际功能
-                TextField(decoration: InputDecoration(border: InputBorder.none)),
+                // TODO: 彩蛋
+                TextField(
+                  decoration: InputDecoration(border: InputBorder.none),
+                  style: TextStyle(color: Colors.transparent)
+                ),
               ],
             ),
           ),
