@@ -23,12 +23,14 @@ class CfgEditPage extends StatefulWidget {
 
 class _CfgEditPageState extends State<CfgEditPage> {
   late final CodeLineEditingController _configController;
+  late final AppProvider _appProvider;
 
   @override
   void initState() {
     super.initState();
     appLogger.logger.i("Showing generator config edit page with ${widget.initialText.length} characters");
     _configController = CodeLineEditingController.fromText(widget.initialText);
+    _appProvider = context.read<AppProvider>();
   }
 
   @override
@@ -48,7 +50,18 @@ class _CfgEditPageState extends State<CfgEditPage> {
     }
   }
 
-  void _showHelp(AppProvider appProvider) {
+  void _showDoc(DocItems item) {
+    appLogger.logger.i("Showing doc ${item.name}");
+    Navigator.of(context).pop();
+    Navigator.push(
+      context,
+      ui.switchRoute(
+        _appProvider.currentNavMode, builder: (context) => DocViewPage(title: item.displayName, docItem: item)
+      )
+    );
+  }
+
+  void _showHelp() {
     ui.showAlertDialogQuick(
       title: "选择帮助",
       content: Column(
@@ -57,17 +70,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
             title: item.displayName,
             isFirst: index == 0,
             isLast: index == editorHelpItems.length - 1,
-            onTapped: () {
-              appLogger.logger.i("Showing doc ${item.name}");
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                ui.switchRoute(
-                  appProvider.currentNavMode,
-                  builder: (context) => DocViewPage(title: item.displayName, docItem: item)
-                )
-              );
-            },
+            onTapped: () => _showDoc(item),
             context: context
           )
         ],
@@ -80,7 +83,6 @@ class _CfgEditPageState extends State<CfgEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final appProvider = Provider.of<AppProvider>(context, listen: false);
     return Scaffold(
       appBar: styled.buildAppBar(
         title: "自定义规则",
@@ -105,7 +107,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
             Expanded(child: styled.buildJsonEditor(controller: _configController, context: context)),
             Row(
               spacing: styles.layoutSpacing,
-              children: <Widget>[
+              children: [
                 Expanded(
                   child: styled.buildTextButton(
                     onPressed: _formatJSON,
@@ -116,7 +118,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
                 ),
                 Expanded(
                   child: styled.buildTextButton(
-                    onPressed: () => _showHelp(appProvider),
+                    onPressed: _showHelp,
                     child: const Text("帮助"),
                     context: context,
                     highlighted: false
