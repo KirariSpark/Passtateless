@@ -21,17 +21,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  (String, String)? _selectedItem;
+  bool _isPwdSelected = false;
+  String? _selectedPwdId;
   bool _isSaving = false;
+  late final AppProvider _appProvider;
+  late final PwdProvider _pwdProvider;
 
-  Future<void> _save(PwdProvider pwdProvider, AppProvider appProvider) async {
+  @override
+  void initState() {
+    super.initState();
+    _appProvider = context.read<AppProvider>();
+    _pwdProvider = context.read<PwdProvider>();
+  }
+
+  Future<void> _save() async {
     appLogger.logger.i("Saving changes in password archive");
     setState(() => _isSaving = true);
     ui.showSnackBarQuick("正在保存", context);
-    var stat = await pwdProvider.saveArchive(appProvider.masterPwd);
+    var stat = await _pwdProvider.saveArchive(_appProvider.masterPwd);
     if (mounted) {
       if (stat == ErrorCode.success) {
-        appProvider.hasUnsavedChanges = false;
+        _appProvider.hasUnsavedChanges = false;
         setState(() => _isSaving = false);
         appLogger.logger.i("Saved successfully");
         ui.showSnackBarQuick("你的档案已保存", context);
@@ -42,10 +52,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _buildRightPage((String, String) tag, bool isWide) {
+  Widget _switchPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("pages", "folders"):
-        // 宽屏状态下无需使用Scaffold，因为不需要AppBar，也不需要额外的Padding
+        // 宽屏状态下不需要这些东西，父级页面已经做好了
         return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
@@ -56,7 +66,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _buildTrailing(bool hasUnsavedChanges, PwdProvider pwdProvider, AppProvider appProvider) {
+  Widget _buildTrailing(bool hasUnsavedChanges) {
     if (!hasUnsavedChanges) {
       return Icon(Icons.arrow_forward);
     }
@@ -68,52 +78,9 @@ class _HomePageState extends State<HomePage> {
       );
     }
     return IconButton(
-      onPressed: () => _save(pwdProvider, appProvider),
+      onPressed: _save,
       style: styles.buttonStyle,
       icon: Icon(Icons.save_outlined)
-    );
-  }
-
-  // 构建单个瓦片
-  Widget _buildTile({
-    required (String, String) tag,
-    required String title,
-    required String? titleTag,
-    required String subtitle,
-    required IconData leading,
-    Widget trailing = const Icon(Icons.arrow_forward),
-    required bool isFirst,
-    required bool isLast,
-    required bool isWide,
-    required BuildContext context,
-    required void Function((String, String)) onTapped,
-    required bool Function((String, String)) isSelectedCallback,
-  }) {
-    final isSelected = isSelectedCallback(tag);
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 100),
-      switchOutCurve: Curves.easeOutCubic,
-      switchInCurve: Curves.easeOutCubic,
-      child: ConstrainedBox(
-        constraints: styles.tileWidthConstraint,
-        key: isSelected ? const ValueKey("selected") : const ValueKey("notSelected"),
-        child: styled.buildListTile(
-          active: isSelected,
-          title: title,
-          titleTag: titleTag,
-          subtitle: subtitle,
-          leading: leading,
-          trailing: trailing,
-          onTapped: () {
-            appLogger.logger.d("Selected tag: $tag");
-            setState(() => _selectedItem = tag);
-            onTapped(tag);
-          },
-          isFirst: isFirst,
-          isLast: isLast,
-          context: context,
-        ),
-      ),
     );
   }
 
@@ -125,11 +92,9 @@ class _HomePageState extends State<HomePage> {
     bool Function((String, String) tag) isSelected,
   ) {
     bool hasUnsavedChanges = context.watch<AppProvider>().hasUnsavedChanges;
-    final pwdProvider = context.read<PwdProvider>();
-    final appProvider = context.read<AppProvider>();
 
     return ConstrainedBox(
-      constraints: styles.tileWidthConstraint,
+      constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
       child: Column(
         spacing: styles.layoutSpacing,
         children: [
@@ -137,33 +102,34 @@ class _HomePageState extends State<HomePage> {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildTile(
-                tag: ("pages", "folders"),
+              styled.buildListTile(
                 title: "资料夹",
-                titleTag: isWide ? null : "folders",
                 subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
                 leading: Icons.format_list_bulleted,
-                trailing: _buildTrailing(hasUnsavedChanges, pwdProvider, appProvider),
+                trailing: _buildTrailing(hasUnsavedChanges),
                 isFirst: true,
-                isLast: false,
-                isWide: isWide,
-                context: context,
-                onTapped: onItemTapped,
-                isSelectedCallback: isSelected,
+                onTapped: () {
+                  setState(() => _isPwdSelected = false);
+                  appLogger.logger.d("Selected: ('pages', 'folders')");
+                  onItemTapped(("pages", "folders"));
+                },
+                active: isSelected(("pages", "folders")),
+                context: context
               ),
-              _buildTile(
-                tag: ("pages", "pwdEval"),
+              styled.buildListTile(
                 title: "密码强度",
-                titleTag: isWide ? null : "pwdEval",
-                subtitle: "评估密码强度，并获取相关建议",
+                subtitle: "评估密码强度，获取相关建议",
                 leading: Icons.checklist,
-                isFirst: false,
+                trailing: Icon(Icons.arrow_forward),
                 isLast: true,
-                isWide: isWide,
-                context: context,
-                onTapped: onItemTapped,
-                isSelectedCallback: isSelected,
-              ),
+                onTapped: () {
+                  setState(() => _isPwdSelected = false);
+                  appLogger.logger.d("Selected: ('pages', 'pwdEval')");
+                  onItemTapped(("pages", "pwdEval"));
+                },
+                active: isSelected(("pages", "pwdEval")),
+                context: context
+              )
             ],
           ),
           // 收藏夹
@@ -172,11 +138,14 @@ class _HomePageState extends State<HomePage> {
               hasConstraint: false,
               isWide: isWide,
               onItemTapped: (id) {
-                appLogger.logger.d("Selected password: $id");
-                setState(() => _selectedItem = ("pwd", id));
+                appLogger.logger.d("Selected password from home page: $id");
+                setState(() {
+                  _selectedPwdId = id;
+                  _isPwdSelected = true;
+                });
                 onItemTapped(("pwd", id));
               },
-              selectedId: _selectedItem?.$1 == "pwd" && isWide ? _selectedItem?.$2 : null,
+              selectedId: _isPwdSelected && isWide ? _selectedPwdId : null,
             ),
           ),
         ],
@@ -187,14 +156,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveView(
-      leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
-        return _buildLeftContent(context, isWide, onItemTapped, isSelected);
-      },
+      leftPaneBuilder: _buildLeftContent,
+      pageBuilder: _switchPage,
       navMode: context.read<AppProvider>().currentNavMode,
-      pageBuilder: _buildRightPage,
-      placeholderText: "未选择项目",
-      rightPaneConstraints: styles.tileWidthConstraint,
       padding: styles.pagePaddingAll,
+      widthThreshold: styles.tileWidthConstraintSmall.maxWidth
+          + styles.tileWidthConstraint.maxWidth + styles.layoutSpacing * 2
     );
   }
 }

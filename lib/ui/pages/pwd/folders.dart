@@ -39,9 +39,9 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
 
   @override
   void initState() {
+    super.initState();
     _appProvider = context.read<AppProvider>();
     _pwdProvider = context.read<PwdProvider>();
-    super.initState();
   }
 
   @override
