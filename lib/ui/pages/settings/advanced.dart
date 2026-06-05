@@ -54,7 +54,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
         alignment: Alignment.topCenter,
         child: Container(
           constraints: styles.tileWidthConstraint,
-          padding: widget.hasPadding ? styles.pagePaddingHorizontal : null,
+          padding: widget.hasPadding ? styles.pagePaddingAll : null,
           child: SingleChildScrollView(
             child: Column(
               children: [

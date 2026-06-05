@@ -51,13 +51,12 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: widget.hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
+          padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
               spacing: styles.layoutSpacing,
               children: [
-                styles.spacingSizedBox,
                 // 旧密码
                 Row(
                   spacing: styles.layoutSpacing,

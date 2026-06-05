@@ -30,7 +30,7 @@ class CustomizeSettingsPage extends StatelessWidget {
           bool Function((String, String)) isSelected
         ) {
           return Container(
-            padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
+            padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
             constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
             child: SingleChildScrollView(
               child: Column(

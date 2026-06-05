@@ -35,21 +35,21 @@ class _DocViewPageState extends State<DocViewPage> {
     _docFuture = rootBundle.loadString(widget.docItem.path);
   }
 
+  AppBar? _buildAppBar() {
+    if (widget.hasAppBar) {
+      return styled.buildAppBar(
+        title: widget.title,
+        titleTag: widget.useHero ? widget.title : null,
+        context: context
+      );
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: widget.hasAppBar ? styled.buildAppBarWidget(
-        title: Row(
-          children: [
-            const Text("帮助："),
-            widget.useHero ? Hero(
-              tag: widget.title,
-              child: Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
-            ) : Text(widget.title),
-          ],
-        ),
-        context: context,
-      ) : null,
+      appBar: _buildAppBar(),
       body: FutureBuilder<String>(
         future: _docFuture,
         builder: (context, snapshot) {
@@ -57,16 +57,10 @@ class _DocViewPageState extends State<DocViewPage> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                '文档加载失败',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            );
+            return Center(child: Text('文档加载失败', style: Theme.of(context).textTheme.bodyMedium));
           }
-          final docText = snapshot.data!;
           return Container(
-            padding: widget.hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
+            padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
             alignment: Alignment.topCenter,
             child: Container(
               decoration: BoxDecoration(
@@ -74,7 +68,7 @@ class _DocViewPageState extends State<DocViewPage> {
                 borderRadius: styles.borderRadius,
               ),
               constraints: styles.pageWidthConstraint,
-              child: Markdown(data: docText),
+              child: Markdown(data: snapshot.data!),
             ),
           );
         },

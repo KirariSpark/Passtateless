@@ -16,7 +16,7 @@ class AndroidShareGuidePage extends StatelessWidget {
         ? styled.buildAppBar(title: "分享 Android 版本", context: context, titleTag: "share_android")
         : null,
       body: Padding(
-        padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
+        padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: styles.borderRadius,

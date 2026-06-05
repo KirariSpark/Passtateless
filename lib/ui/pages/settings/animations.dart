@@ -33,7 +33,7 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(
-          padding: widget.hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
+          padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(

@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 
 class CfgEditPage extends StatefulWidget {
+  /// 一开始要显示的内容
   final String initialText;
 
   const CfgEditPage({super.key, required this.initialText});
@@ -26,7 +27,6 @@ class _CfgEditPageState extends State<CfgEditPage> {
   @override
   void initState() {
     super.initState();
-    // 初始化时填入父页面传来的数据
     appLogger.logger.i("Showing generator config edit page with ${widget.initialText.length} characters");
     _configController = CodeLineEditingController.fromText(widget.initialText);
   }
@@ -39,46 +39,41 @@ class _CfgEditPageState extends State<CfgEditPage> {
 
   void _formatJSON() {
     appLogger.logger.i("Formatting generator config JSON");
-    var res = utils.formatJSON(_configController.text);
-    if (res.$1 == ErrorCode.success) {
-      setState(() {
-        _configController.text = res.$2;
-      });
+    final (code, json) = utils.formatJSON(_configController.text);
+    if (code == ErrorCode.success) {
+      setState(() => _configController.text = json);
     } else {
-      appLogger.logger.e("Formatting failed: ${res.$1.code}");
-      ui.showSnackBarQuick("JSON 格式错误", context);
+      appLogger.logger.e("Formatting failed: ${code.code}");
+      ui.showSnackBarQuick(code.generic, context);
     }
   }
 
-  void _showHelp(AppProvider provider) {
+  void _showHelp(AppProvider appProvider) {
     ui.showAlertDialogQuick(
       title: "选择帮助",
-      content: ConstrainedBox(
-        constraints: styles.tileWidthConstraint,
-        child: Column(
-          children: [
-            for (final (index, item) in editorHelpItems.indexed) styled.buildListTile(
-              title: item.displayName,
-              isFirst: index == 0,
-              isLast: index == editorHelpItems.length - 1,
-              onTapped: () {
-                appLogger.logger.i("Loading doc ${item.name}");
-                Navigator.of(context).pop();
-                Navigator.push(
-                  context,
-                  ui.switchRoute(
-                    provider.currentNavMode,
-                    builder: (context) => DocViewPage(title: item.displayName, docItem: item)
-                  )
-                );
-              },
-              context: context
-            )
-          ],
-        ),
+      content: Column(
+        children: [
+          for (final (index, item) in editorHelpItems.indexed) styled.buildListTile(
+            title: item.displayName,
+            isFirst: index == 0,
+            isLast: index == editorHelpItems.length - 1,
+            onTapped: () {
+              appLogger.logger.i("Showing doc ${item.name}");
+              Navigator.of(context).pop();
+              Navigator.push(
+                context,
+                ui.switchRoute(
+                  appProvider.currentNavMode,
+                  builder: (context) => DocViewPage(title: item.displayName, docItem: item)
+                )
+              );
+            },
+            context: context
+          )
+        ],
       ),
       actionText: "取消",
-      action: () {Navigator.of(context, rootNavigator: true).pop();},
+      action: () => Navigator.pop(context),
       context: context,
     );
   }
@@ -103,32 +98,28 @@ class _CfgEditPageState extends State<CfgEditPage> {
         ],
       ),
       body: Padding(
-        padding: styles.pagePaddingHorizontal,
+        padding: styles.pagePaddingAll,
         child: Column(
+          spacing: styles.layoutSpacing,
           children: [
             Expanded(child: styled.buildJsonEditor(controller: _configController, context: context)),
-            styles.spacingSizedBox,
             Row(
               spacing: styles.layoutSpacing,
               children: <Widget>[
                 Expanded(
-                  child: TextButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorScheme.of(context).surfaceContainerLow.withAlpha(styles.alphaOpaque),
-                      shape: styles.roundedBorder,
-                    ),
+                  child: styled.buildTextButton(
                     onPressed: _formatJSON,
                     child: const Text("格式化"),
+                    context: context,
+                    highlighted: false
                   ),
                 ),
                 Expanded(
-                  child: TextButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorScheme.of(context).surfaceContainerLow.withAlpha(styles.alphaOpaque),
-                      shape: styles.roundedBorder,
-                    ),
+                  child: styled.buildTextButton(
                     onPressed: () => _showHelp(appProvider),
                     child: const Text("帮助"),
+                    context: context,
+                    highlighted: false
                   ),
                 ),
               ],

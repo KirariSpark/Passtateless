@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/styles.dart' as styles;
 
 class FullscreenPwd extends StatelessWidget {
   final String pwd;
@@ -9,13 +10,16 @@ class FullscreenPwd extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: styled.buildAppBar(title: "查看密码", context: context),
-      body: Center(
-        child: Text(
-          pwd,
-          style: TextStyle(
-            fontFamily: "SourceCodePro",
-            fontSize: 24,
-            fontWeight: FontWeight.w700
+      body: Padding(
+        padding: styles.pagePaddingAll,
+        child: Center(
+          child: Text(
+            pwd,
+            style: TextStyle(
+              fontFamily: "SourceCodePro",
+              fontSize: 24,
+              fontWeight: FontWeight.w700
+            ),
           ),
         ),
       )

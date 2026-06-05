@@ -29,7 +29,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
       body: AdaptiveView(
         leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
           return Container(
-            padding: hasPadding ? styles.pagePaddingHorizontal : EdgeInsets.zero,
+            padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
             constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
             child: SingleChildScrollView(
               child: Column(
@@ -68,11 +68,11 @@ class MasterPwdSettingsPage extends StatelessWidget {
                           value: item,
                           title: Text(item.displayName),
                           tileColor: ColorScheme.of(context).surfaceContainerLow,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: ui.calcRadius(
-                                isFirst: index == 0, isLast: index == RemindDays.values.length - 1
-                              ),
-                            )
+                          shape: RoundedRectangleBorder(
+                            borderRadius: ui.calcRadius(
+                              isFirst: index == 0, isLast: index == RemindDays.values.length - 1
+                            ),
+                          )
                         )
                       ],
                     ),
@@ -89,7 +89,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
             return styled.buildPlaceHolder(text: "未选择项目", context: context);
           }
         },
-        navMode: context.watch<AppProvider>().currentNavMode,
+        navMode: context.read<AppProvider>().currentNavMode,
         widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth + styles.layoutSpacing,
       )
     );

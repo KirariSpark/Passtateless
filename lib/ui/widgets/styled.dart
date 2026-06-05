@@ -198,14 +198,12 @@ AppBar buildAppBarWidget({
   return AppBar(
     shape: styles.roundedBorder,
     leading: hasLeading
-        ? IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(exitIcon),
-            style: styles.buttonStyle,
-          )
-        : null,
+      ? IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: Icon(exitIcon),
+        style: styles.buttonStyle,
+      )
+      : null,
     title: title,
     backgroundColor: ColorScheme.of(context).surfaceContainer,
     actions: actions,
@@ -217,13 +215,17 @@ TextButton buildTextButton({
   required Widget child,
   required BuildContext context,
   required void Function()? onPressed,
+  bool highlighted = true
 }) {
+  final currentScheme = ColorScheme.of(context);
+  final backgroundColor = highlighted ? currentScheme.secondaryContainer : currentScheme.surfaceContainerLow;
+  final foregroundColor = highlighted ? currentScheme.onSecondaryContainer : currentScheme.onSurface;
   return TextButton(
     onPressed: onPressed,
     style: TextButton.styleFrom(
       shape: RoundedRectangleBorder(borderRadius: styles.borderRadius),
-      backgroundColor: ColorScheme.of(context).secondaryContainer,
-      foregroundColor: ColorScheme.of(context).onSecondaryContainer,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
     ),
     child: child,
   );

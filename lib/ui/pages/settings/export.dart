@@ -32,7 +32,7 @@ class JsonExportPage extends StatelessWidget {
         context: context
       ),
       body: Padding(
-        padding: styles.pagePaddingHorizontal,
+        padding: styles.pagePaddingAll,
         child: styled.buildJsonEditor(
           context: context,
           readOnly: true,
