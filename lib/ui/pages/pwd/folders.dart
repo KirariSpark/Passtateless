@@ -117,6 +117,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
+  // TODO: 重命名文件夹后，应该重新选择
   void _renameFolder(String folder) {
     appLogger.logger.i("Renaming folder to ${_folderNameController.text}");
     var res = _pwdProvider.renameFolder(folder, _folderNameController.text);
@@ -150,6 +151,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
+  // TODO: 删除文件夹后，应该清空选择
   void _delFolder(String folder) {
     appLogger.logger.i("Trying to delete folder $folder");
     _pwdProvider.removeFolder(folder);
@@ -256,7 +258,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> folders = context.watch<PwdProvider>().pwdFolders;
+    List<String> folders = _pwdProvider.pwdFolders;
     return Scaffold(
       appBar: _buildAppBar(widget.hasAppBar),
       body: AdaptiveView(

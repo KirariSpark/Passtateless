@@ -19,30 +19,108 @@ class BasicSettingsPage extends StatefulWidget {
 }
 
 class _BasicSettingsPageState extends State<BasicSettingsPage> {
-  // 设置项列表
   final List<_SettingItem> _settingItems = const [
-    _SettingItem(tag: ("basic", "masterPwd"), icon: Icons.key, title: "主密码", isFirst: true),
-    _SettingItem(tag: ("basic", "customize"), icon: Icons.color_lens_outlined, title: "个性化"),
-    _SettingItem(tag: ("basic", "a11y"), icon: Icons.accessibility_new, title: "可访问性"),
+    _SettingItem(
+      tag: ("basic", "masterPwd"),
+      icon: Icons.key,
+      title: "主密码",
+      isFirst: true,
+    ),
+    _SettingItem(
+      tag: ("basic", "customize"),
+      icon: Icons.color_lens_outlined,
+      title: "个性化",
+    ),
+    _SettingItem(
+      tag: ("basic", "a11y"),
+      icon: Icons.accessibility_new,
+      title: "可访问性",
+    ),
     _SettingItem(tag: ("basic", "advanced"), icon: Icons.code, title: "高级设置"),
-    _SettingItem(tag: ("basic", "about"), icon: Icons.info_outlined, title: "关于", isLast: true),
+    _SettingItem(
+      tag: ("basic", "about"),
+      icon: Icons.info_outlined,
+      title: "关于",
+      isLast: true,
+    ),
   ];
+  late final AppProvider _appProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _appProvider = context.read<AppProvider>();
+  }
 
   Widget _buildPage((String, String) tag, bool isWide) {
     switch (tag) {
       case ("basic", "masterPwd"):
-        return MasterPwdSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
+        return MasterPwdSettingsPage(
+          useHero: !isWide,
+          key: ValueKey(tag.$2),
+          hasAppBar: !isWide,
+          hasPadding: !isWide,
+        );
       case ("basic", "customize"):
-        return CustomizeSettingsPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
+        return CustomizeSettingsPage(
+          useHero: !isWide,
+          key: ValueKey(tag.$2),
+          hasAppBar: !isWide,
+          hasPadding: !isWide,
+        );
       case ("basic", "advanced"):
-        return AdvancedSettingsPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+        return AdvancedSettingsPage(
+          key: ValueKey(tag.$2),
+          useHero: !isWide,
+          hasAppBar: !isWide,
+          hasPadding: !isWide,
+        );
       case ("basic", "a11y"):
-        return A11ySettingsPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+        return A11ySettingsPage(
+          key: ValueKey(tag.$2),
+          useHero: !isWide,
+          hasAppBar: !isWide,
+          hasPadding: !isWide,
+        );
       case ("basic", "about"):
-        return AboutPage(useHero: !isWide, key: ValueKey(tag.$2), hasAppBar: !isWide, hasPadding: !isWide);
+        return AboutPage(
+          useHero: !isWide,
+          key: ValueKey(tag.$2),
+          hasAppBar: !isWide,
+          hasPadding: !isWide,
+        );
       default:
-        return const SizedBox.shrink();
+        return styled.buildPlaceHolder(text: "未选择项目", context: context);
     }
+  }
+
+  Widget _buildSettingItems(
+    BuildContext context,
+    bool isWide,
+    void Function((String, String)) onItemTapped,
+    bool Function((String, String)) isSelected,
+  ) {
+    return ConstrainedBox(
+      constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
+      child: SingleChildScrollView(
+        child: Column(
+          children: _settingItems.map((item) {
+            final selected = isSelected(item.tag);
+            return styled.buildListTile(
+              active: selected,
+              isFirst: item.isFirst,
+              isLast: item.isLast,
+              leading: item.icon,
+              title: item.title,
+              titleTag: isWide ? null : item.tag.$2,
+              trailing: const Icon(Icons.arrow_forward),
+              onTapped: () => onItemTapped(item.tag),
+              context: context,
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -50,38 +128,13 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     return AdaptiveView(
       placeholderText: "未选择设置项",
       pageBuilder: _buildPage,
-      leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
-        return SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _settingItems.map((item) {
-              final selected = isSelected(item.tag);
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 100),
-                child: ConstrainedBox(
-                  key: selected ? const ValueKey("selected") : const ValueKey("notSelected"),
-                  constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
-                  child: styled.buildListTile(
-                    active: selected,
-                    isFirst: item.isFirst,
-                    isLast: item.isLast,
-                    leading: item.icon,
-                    title: item.title,
-                    titleTag: isWide ? null : item.tag.$2,
-                    trailing: const Icon(Icons.arrow_forward),
-                    onTapped: () => onItemTapped(item.tag),
-                    context: context,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      },
+      leftPaneBuilder: _buildSettingItems,
       padding: styles.pagePaddingAll,
-      navMode: context.watch<AppProvider>().currentNavMode,
-      widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
-          styles.layoutSpacing,
+      navMode: _appProvider.currentNavMode,
+      widthThreshold:
+          styles.tileWidthConstraint.maxWidth +
+          styles.tileWidthConstraintSmall.maxWidth +
+          styles.layoutSpacing * 2,
     );
   }
 }
