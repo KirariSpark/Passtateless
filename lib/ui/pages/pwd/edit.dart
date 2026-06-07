@@ -48,6 +48,15 @@ class _PwdEditPageState extends State<PwdEditPage> {
     super.dispose();
   }
 
+  void _changeValue(String nameSpace, String value) {
+    _appProvider.hasUnsavedChanges = true;
+    final stat = _pwdProvider.setValueById(widget.id, nameSpace, value);
+    if (stat != ErrorCode.success) {
+      appLogger.logger.e("Failed to change $nameSpace for archive ${widget.id}: $stat");
+      ui.showSnackBarQuick(stat.generic, context);
+    }
+  }
+
   AppBar? _buildAppBar() {
     return styled.buildAppBar(
       title: "编辑：${_identifierController.text == '' ? '未命名' : _identifierController.text}",
@@ -71,40 +80,19 @@ class _PwdEditPageState extends State<PwdEditPage> {
                 styled.buildTextField(
                   context: context,
                   controller: _identifierController,
-                  onChanged: (value) {
-                    _appProvider.hasUnsavedChanges = true;
-                    final stat = _pwdProvider.setValueById(widget.id, "identifier", value);
-                    if (stat != ErrorCode.success) {
-                      appLogger.logger.e("Failed to rename archive ${widget.id}: $stat");
-                      ui.showSnackBarQuick(stat.generic, context);
-                    }
-                  },
+                  onChanged: (value) => _changeValue("identifier", value),
                   label: "档案名",
                 ),
                 styled.buildTextField(
                   context: context,
                   controller: _userNameController,
-                  onChanged: (value) {
-                    _appProvider.hasUnsavedChanges = true;
-                    final stat = _pwdProvider.setValueById(widget.id, "userName", value);
-                    if (stat != ErrorCode.success) {
-                      appLogger.logger.e("Cannot change userName for archive ${widget.id}: $stat");
-                      ui.showSnackBarQuick(stat.generic, context);
-                    }
-                  },
+                  onChanged: (value) => _changeValue("userName", value),
                   label: "用户名",
                 ),
                 styled.buildTextField(
                   context: context,
                   controller: _accountController,
-                  onChanged: (value) {
-                    _appProvider.hasUnsavedChanges = true;
-                    final stat = _pwdProvider.setValueById(widget.id, "account", value);
-                    if (stat != ErrorCode.success) {
-                      appLogger.logger.e("Cannot change account for archive ${widget.id}: $stat");
-                      ui.showSnackBarQuick(stat.generic, context);
-                    }
-                  },
+                  onChanged: (value) => _changeValue("account", value),
                   label: "账号",
                 )
               ],
