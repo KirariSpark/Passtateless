@@ -24,46 +24,46 @@ class HelpOverviewPage extends StatelessWidget {
     );
   }
 
+  Widget _buildDocList(
+    BuildContext context,
+    bool isWide,
+    void Function((String, String)) onItemTapped,
+    bool Function((String, String)) isSelected
+  ) {
+    final items = DocItems.values;
+    return ConstrainedBox(
+      constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
+      child: ListView(
+        children: List.generate(items.length, (index) {
+          final item = items[index];
+          final tag = ("help", item.mode);
+          final selected = isSelected(tag);
+          return styled.buildListTile(
+            active: selected,
+            isFirst: index == 0,
+            isLast: index == items.length - 1,
+            title: item.displayName,
+            titleTag: isWide ? null : item.displayName,
+            subtitle: item.desc,
+            trailing: const Icon(Icons.arrow_forward),
+            onTapped: () {
+              appLogger.logger.i("Opening doc ${item.name}");
+              onItemTapped(tag);
+            },
+            context: context,
+          );
+        }),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveView(
       placeholderText: "未选择文档项",
       pageBuilder: _loadDoc,
-      leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
-        final items = DocItems.values;
-        return SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(items.length, (index) {
-              final item = items[index];
-              final tag = ("help", item.mode);
-              final selected = isSelected(tag);
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 100),
-                child: ConstrainedBox(
-                  key: selected ? const ValueKey("selected") : const ValueKey("notSelected"),
-                  constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
-                  child: styled.buildListTile(
-                    active: selected,
-                    isFirst: index == 0,
-                    isLast: index == items.length - 1,
-                    title: item.displayName,
-                    titleTag: isWide ? null : item.displayName,
-                    subtitle: item.desc,
-                    trailing: const Icon(Icons.arrow_forward),
-                    onTapped: () {
-                      appLogger.logger.i("Opening doc ${item.name}");
-                      onItemTapped(tag);
-                    },
-                    context: context,
-                  ),
-                ),
-              );
-            }),
-          ),
-        );
-      },
-      navMode: Provider.of<AppProvider>(context, listen: false).currentNavMode,
+      leftPaneBuilder: _buildDocList,
+      navMode: context.read<AppProvider>().currentNavMode,
       padding: styles.pagePaddingAll,
       widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
           styles.layoutSpacing,

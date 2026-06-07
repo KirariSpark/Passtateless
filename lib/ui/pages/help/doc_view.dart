@@ -62,14 +62,7 @@ class _DocViewPageState extends State<DocViewPage> {
           return Container(
             padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
             alignment: Alignment.topCenter,
-            child: Container(
-              decoration: BoxDecoration(
-                color: ColorScheme.of(context).surfaceContainerLow,
-                borderRadius: styles.borderRadius,
-              ),
-              constraints: styles.pageWidthConstraint,
-              child: Markdown(data: snapshot.data!),
-            ),
+            child: Markdown(data: snapshot.data!)
           );
         },
       ),
