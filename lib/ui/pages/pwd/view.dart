@@ -15,8 +15,6 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';
 
-// TODO: 这里没改完
-
 /// 密码记录的只读页面
 ///
 /// 记录的 id 将被用于 Hero 动画
@@ -83,13 +81,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
       return styled.buildListTile(
         context: context,
         title: "配置生成规则",
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("点击编辑", style: Theme.of(context).textTheme.bodyLarge),
-            const Icon(Icons.arrow_forward_ios, size: 16),
-          ],
-        ),
+        trailing: Icon(Icons.arrow_forward),
         isLast: true,
         onTapped: _editCfg,
       );
@@ -117,22 +109,22 @@ class _PwdViewPageState extends State<PwdViewPage> {
     return res;
   }
 
-  bool _usePreset(Presets preset) {
+  bool _isBuiltin(Presets preset) {
     return <Presets>[Presets.simple, Presets.complex, Presets.bank].contains(_preset);
   }
 
   /// 生成密码并显示提示（返回生成的密码或错误信息）
-  Future<(ErrorCode, String)> _genPwd(
-    BuildContext context,
-    bool copyAfterGenerate,
-    String identifier,
-    String userName,
-    String account,
-  ) async {
+  Future<(ErrorCode, String)> _genPwd({
+    required BuildContext context,
+    required bool copyAfterGenerate,
+    required String identifier,
+    required String userName,
+    required String account
+  }) async {
     appLogger.logger.i("Generating password");
     setState(() => isGenerating = true);
 
-    if (_usePreset(_preset)) {
+    if (_isBuiltin(_preset)) {
       appLogger.logger.i("Generating using builtin presets");
       final res = await parser.parseBuiltins(
         _preset,
@@ -160,10 +152,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              "JSON 格式错误\n${e.toString()}",
-              style: TextStyle(fontFamily: "SourceCodePro"),
-            ),
+            content: Text("JSON 格式错误\n${e.toString()}", style: TextStyle(fontFamily: "SourceCodePro")),
             showCloseIcon: true,
           ),
         );
@@ -181,6 +170,85 @@ class _PwdViewPageState extends State<PwdViewPage> {
       );
     }
     return null;
+  }
+
+  void _selectPreset(Presets? value) {
+    appLogger.logger.i("Setting preset to ${value?.name}");
+    setState(() => _preset = value ?? Presets.simple);
+    Navigator.pop(context);
+  }
+
+  void _showPresetSelectionDialog() {
+    ui.showAlertDialogQuick(
+      title: "选择预设",
+      content: RadioGroup(
+        groupValue: _preset,
+        onChanged: _selectPreset,
+        child: Column(
+          children: [
+            for (var item in Presets.values) RadioListTile(
+              value: item,
+              subtitle: Text(item.desc),
+              shape: styles.roundedBorder,
+              title: Text(item.displayName)
+            )
+          ],
+        )
+      ),
+      actionText: "取消",
+      action: () => Navigator.of(context).pop(),
+      context: context,
+    );
+  }
+
+  void _showWarningDialog() {
+    ui.showConfirmDialogQuick(
+      context: context,
+      function: _viewPwd,
+      title: "危险操作",
+      info: "此操作将会显示你的密码，以便于你的记忆\n请确保周围没有人能够窥视到你的屏幕",
+    );
+  }
+
+  Future<void> _genAndCopyPwd() async {
+    // 开始生成
+    appLogger.logger.i(
+      "Generating password for copying",
+    );
+    await _genPwd(
+      context: context,
+      copyAfterGenerate: true,
+      identifier: identifier,
+      userName: userName,
+      account: account,
+    );
+    // 启用按钮
+    setState(() => isGenerating = false);
+  }
+
+  Future<void> _viewPwd() async {
+    appLogger.logger.i("Generating password for viewing");
+    Navigator.pop(context);
+    final (stat, res) = await _genPwd(
+      context: context,
+      copyAfterGenerate: false,
+      identifier: identifier,
+      userName: userName,
+      account: account
+    );
+    if (context.mounted) {
+      if (stat == ErrorCode.success) {
+        appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
+        Navigator.push(
+          context,
+          ui.switchRoute(_appProvider.currentNavMode, builder: (context) => FullscreenPwd(res)),
+        );
+      } else {
+        appLogger.logger.e("Can not generate password: ${stat.code}");
+      }
+    }
+    // 启用按钮
+    setState(() => isGenerating = false);
   }
 
   @override
@@ -235,25 +303,19 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 // 移除数字
                 SwitchListTile(
                   value: removeDigits,
-                  onChanged: (value){
-                    setState(() {
-                      removeDigits = !removeDigits;
-                    });
+                  onChanged: (value) {
+                    setState(() => removeDigits = value);
                     appLogger.logger.d("Current digit removal state: $removeDigits");
                   },
                   title: const Text("移除数字"),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: styles.radius)
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(isFirst: true)),
                   tileColor: ColorScheme.of(context).surfaceContainerLow,
                 ),
                 // 移除字母
                 SwitchListTile(
                   value: removeAlpha,
-                  onChanged: (value){
-                    setState(() {
-                      removeAlpha = !removeAlpha;
-                    });
+                  onChanged: (value) {
+                    setState(() => removeAlpha = value);
                     appLogger.logger.d("Current alphabet removal state: $removeAlpha");
                   },
                   title: const Text("移除字母"),
@@ -262,20 +324,15 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 // 移除特殊字符
                 SwitchListTile(
                   value: removeSp,
-                  onChanged: (value){
-                    setState(() {
-                      removeSp = !removeSp;
-                    });
+                  onChanged: (value) {
+                    setState(() => removeSp = value);
                     appLogger.logger.d("Current special char removal state: $removeSp");
                   },
                   title: const Text("移除特殊字符"),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(bottom: styles.radius)
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(isLast: true)),
                   tileColor: ColorScheme.of(context).surfaceContainerLow,
                 ),
                 styles.spacingSizedBox,
-                // 生成预设
                 styled.buildListTile(
                   context: context,
                   title: "生成预设",
@@ -288,40 +345,8 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   ),
                   isFirst: true,
                   isLast: _preset == Presets.custom ? false : true,
-                  onTapped: (){
-                    ui.showAlertDialogQuick(
-                      title: "选择预设",
-                      content: RadioGroup(
-                        groupValue: _preset,
-                        onChanged: (value) {
-                          appLogger.logger.i(
-                            "Setting preset to ${value?.name}",
-                          );
-                          setState(() {
-                            _preset = value ?? Presets.simple;
-                          });
-                          Navigator.of(context).pop();
-                        },
-                        child: Column(
-                          children: [
-                            for (var item in Presets.values) RadioListTile(
-                              value: item,
-                              subtitle: Text(item.desc),
-                              shape: styles.roundedBorder,
-                              title: Text(item.displayName)
-                            )
-                          ],
-                        )
-                      ),
-                      actionText: "取消",
-                      action: () {
-                        Navigator.of(context).pop();
-                      },
-                      context: context,
-                    );
-                  },
+                  onTapped: _showPresetSelectionDialog,
                 ),
-                // 视情况选择是否显示配置编辑页面
                 ?_showConfigEdit(),
                 styles.spacingSizedBox,
                 // 按钮
@@ -331,51 +356,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                     // 查看密码
                     Expanded(
                       child: styled.buildTextButton(
-                        onPressed: isGenerating
-                            ? null
-                            : () async {
-                                ui.showConfirmDialogQuick(
-                                  context: context,
-                                  function: () async {
-                                    appLogger.logger.i(
-                                      "Generating password for viewing",
-                                    );
-                                    Navigator.of(context).pop();
-                                    var (stat, res) = await _genPwd(
-                                      context,
-                                      false,
-                                      identifier,
-                                      userName,
-                                      account,
-                                    );
-                                    if (context.mounted) {
-                                      if (stat == ErrorCode.success) {
-                                        appLogger.logger.i(
-                                          "Generated successfully, pushing to fullscreen mode",
-                                        );
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                FullscreenPwd(res),
-                                          ),
-                                        );
-                                      } else {
-                                        appLogger.logger.e(
-                                          "Can not generate password: ${stat.code}",
-                                        );
-                                      }
-                                    }
-                                    // 启用按钮
-                                    setState(() {
-                                      isGenerating = false;
-                                    });
-                                  },
-                                  title: "危险操作",
-                                  info:
-                                      "此操作将会显示你的密码，以便于你的记忆。\n请确保周围没有人能够窥视到你的屏幕。",
-                                );
-                              },
+                        onPressed: isGenerating ? null : _showWarningDialog,
                         context: context,
                         child: const Text("查看密码"),
                       ),
@@ -383,25 +364,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                     // 复制密码
                     Expanded(
                       child: styled.buildTextButton(
-                        onPressed: isGenerating
-                            ? null
-                            : () async {
-                                // 开始生成
-                                appLogger.logger.i(
-                                  "Generating password for copying",
-                                );
-                                await _genPwd(
-                                  context,
-                                  true,
-                                  identifier,
-                                  userName,
-                                  account,
-                                );
-                                // 启用按钮
-                                setState(() {
-                                  isGenerating = false;
-                                });
-                              },
+                        onPressed: isGenerating ? null : _genAndCopyPwd,
                         context: context,
                         child: const Text("复制密码"),
                       ),
