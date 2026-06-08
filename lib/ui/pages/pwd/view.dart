@@ -304,6 +304,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 SwitchListTile(
                   value: removeDigits,
                   onChanged: (value) {
+                    if (removeSp == true && removeAlpha == true) return;
                     setState(() => removeDigits = value);
                     appLogger.logger.d("Current digit removal state: $removeDigits");
                   },
@@ -315,6 +316,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 SwitchListTile(
                   value: removeAlpha,
                   onChanged: (value) {
+                    if (removeDigits == true && removeSp == true) return;
                     setState(() => removeAlpha = value);
                     appLogger.logger.d("Current alphabet removal state: $removeAlpha");
                   },
@@ -325,6 +327,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                 SwitchListTile(
                   value: removeSp,
                   onChanged: (value) {
+                    if (removeDigits == true && removeAlpha == true) return;
                     setState(() => removeSp = value);
                     appLogger.logger.d("Current special char removal state: $removeSp");
                   },
