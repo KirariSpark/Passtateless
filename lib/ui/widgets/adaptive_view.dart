@@ -7,16 +7,18 @@ import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 // TODO: 需要重命名参数
 
-/// 自适应双栏布局，带自定义嵌套导航
+/// 自适应双栏布局，带自定义嵌套导航<br>
+/// 在窄屏下显示单栏布局，此时的 navigateTo 表现和 Navigator.push 相同<br>
+/// 宽屏下显示双栏布局，此时 navigateTo 仅导航第二栏（右侧栏）
 class AdaptiveView extends StatefulWidget {
   /// 构建左侧面板<br>
   /// [isWide] 当前是否为宽屏<br>
-  /// [onItemTapped] 点击左侧项的回调，内部已处理宽窄屏路由分发逻辑，通常来说，你需要提供左侧面板项的一个tag（String, String）<br>
+  /// [navigateTo] 点击左侧项的回调，内部已处理宽窄屏路由分发逻辑，通常来说，你需要提供左侧面板项的一个tag（String, String）<br>
   /// [isSelected] 判断某项是否被选中（窄屏下永远返回 false），通常来说，你需要提供左侧面板项的一个tag（String, String）<br>
   final Widget Function(
     BuildContext context,
     bool isWide,
-    void Function((String, String) tag) onItemTapped,
+    void Function((String, String) tag) navigateTo,
     bool Function((String, String) tag) isSelected,
   ) leftPaneBuilder;
 
@@ -57,13 +59,11 @@ class _AdaptiveViewState extends State<AdaptiveView> {
   (String, String)? _selectedTag;
   final GlobalKey<NavigatorState> _rightNavigatorKey = GlobalKey<NavigatorState>();
 
-  // 点击处理逻辑
-  void _onItemTapped((String, String) tag, bool isWide) {
+  /// 根据点击项和当前布局，选择不同的方式导航到指定页面
+  void _navigateTo((String, String) tag, bool isWide) {
     appLogger.logger.d("Tag $tag tapped while wide layout is $isWide");
     if (isWide) {
-      setState(() {
-        _selectedTag = tag;
-      });
+      setState(() => _selectedTag = tag);
       _rightNavigatorKey.currentState?.pushAndRemoveUntil(
         ui.switchRoute(widget.navMode, builder: (_) => widget.pageBuilder(tag, isWide)),
         (route) => false,
@@ -120,7 +120,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
         spacing: styles.layoutSpacing,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          widget.leftPaneBuilder(context, isWide, (tag) => _onItemTapped(tag, isWide), (tag) => _isSelected(tag, isWide)),
+          widget.leftPaneBuilder(context, isWide, (tag) => _navigateTo(tag, isWide), (tag) => _isSelected(tag, isWide)),
           const VerticalDivider(width: 1),
           Expanded(
             child: widget.rightPaneConstraints != null
@@ -137,7 +137,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
       key: const ValueKey('narrow-layout'),
       padding: widget.padding,
       alignment: Alignment.topCenter,
-      child: widget.leftPaneBuilder(context, isWide, (tag) => _onItemTapped(tag, isWide), (tag) => _isSelected(tag, isWide)),
+      child: widget.leftPaneBuilder(context, isWide, (tag) => _navigateTo(tag, isWide), (tag) => _isSelected(tag, isWide)),
     );
   }
 

@@ -26,7 +26,7 @@ class CustomizeSettingsPage extends StatelessWidget {
         leftPaneBuilder: (
           BuildContext context,
           bool isWide,
-          void Function((String, String)) onItemTapped,
+          void Function((String, String)) navigateTo,
           bool Function((String, String)) isSelected
         ) {
           return Container(
@@ -40,7 +40,7 @@ class CustomizeSettingsPage extends StatelessWidget {
                     title: "主题",
                     trailing: Icon(Icons.arrow_forward),
                     isFirst: true,
-                    onTapped: () => onItemTapped(("customize", "theme")),
+                    onTapped: () => navigateTo(("customize", "theme")),
                     active: isSelected(("customize", "theme")),
                     titleTag: isWide ? null : "settings/themes",
                     context: context
@@ -50,7 +50,7 @@ class CustomizeSettingsPage extends StatelessWidget {
                     title: "动画",
                     trailing: Icon(Icons.arrow_forward),
                     isLast: true,
-                    onTapped: () => onItemTapped(("customize", "animations")),
+                    onTapped: () => navigateTo(("customize", "animations")),
                     active: isSelected(("customize", "animations")),
                     titleTag: isWide ? null : "settings/animations",
                     context: context

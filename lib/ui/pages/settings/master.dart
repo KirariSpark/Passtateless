@@ -27,7 +27,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
         ? styled.buildAppBar(title: "主密码", context: context, titleTag: useHero ? "masterPwd" : null)
         : null,
       body: AdaptiveView(
-        leftPaneBuilder: (context, isWide, onItemTapped, isSelected) {
+        leftPaneBuilder: (context, isWide, navigateTo, isSelected) {
           return Container(
             padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
             constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
@@ -47,7 +47,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                       trailing: Icon(Icons.arrow_forward),
                       title: "更改主密码",
                       titleTag: "pages/settings/change_master",
-                      onTapped: () => onItemTapped(("master", "change")),
+                      onTapped: () => navigateTo(("master", "change")),
                       context: context
                     ),
                   ),

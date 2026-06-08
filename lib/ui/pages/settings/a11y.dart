@@ -25,7 +25,7 @@ class A11ySettingsPage extends StatelessWidget {
         leftPaneBuilder: (
           BuildContext context,
           bool isWide,
-          void Function((String, String)) onItemTapped,
+          void Function((String, String)) navigateTo,
           bool Function((String, String)) isSelected
         ) {
           return Container(
@@ -41,7 +41,7 @@ class A11ySettingsPage extends StatelessWidget {
                     isFirst: true,
                     titleTag: isWide ? null : "contrast",
                     active: isSelected(("a11y", "contrast")),
-                    onTapped: () => onItemTapped(("a11y", "contrast")),
+                    onTapped: () => navigateTo(("a11y", "contrast")),
                     context: context
                   ),
                   styled.buildListTile(

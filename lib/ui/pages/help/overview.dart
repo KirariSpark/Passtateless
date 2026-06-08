@@ -27,7 +27,7 @@ class HelpOverviewPage extends StatelessWidget {
   Widget _buildDocList(
     BuildContext context,
     bool isWide,
-    void Function((String, String)) onItemTapped,
+    void Function((String, String)) navigateTo,
     bool Function((String, String)) isSelected
   ) {
     final items = DocItems.values;
@@ -48,7 +48,7 @@ class HelpOverviewPage extends StatelessWidget {
             trailing: const Icon(Icons.arrow_forward),
             onTapped: () {
               appLogger.logger.i("Opening doc ${item.name}");
-              onItemTapped(tag);
+              navigateTo(tag);
             },
             context: context,
           );

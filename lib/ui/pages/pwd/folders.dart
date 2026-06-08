@@ -222,7 +222,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
 
   Widget _buildFolderList({
     required List<String> folders,
-    required void Function((String, String)) onItemTapped,
+    required void Function((String, String)) navigateTo,
     required bool Function((String, String)) isSelected,
     required bool isWide
   }) {
@@ -241,7 +241,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             return Material(
               child: styled.buildListTileAdvanced(
                 onRightClick: () => _showBottomSheet(title: displayTitle, folder: folders[index]),
-                onTapped: () => onItemTapped(("folders", folders[index])),
+                onTapped: () => navigateTo(("folders", folders[index])),
                 isFirst: isFirst,
                 isLast: isLast,
                 title: displayTitle,
@@ -262,8 +262,8 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     return Scaffold(
       appBar: _buildAppBar(widget.hasAppBar),
       body: AdaptiveView(
-        leftPaneBuilder: (_, isWide, onItemTapped, isSelected) => _buildFolderList(
-          folders: folders, onItemTapped: onItemTapped, isSelected: isSelected, isWide: isWide
+        leftPaneBuilder: (_, isWide, navigateTo, isSelected) => _buildFolderList(
+          folders: folders, navigateTo: navigateTo, isSelected: isSelected, isWide: isWide
         ),
         pageBuilder: ((String, String) tag, bool isWide) {
           if (tag.$1 == "folders") {
@@ -273,8 +273,10 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           }
         },
         navMode: _appProvider.currentNavMode,
-        widthThreshold: styles.tileWidthConstraintSmall.maxWidth
-            + styles.tileWidthConstraint.maxWidth + styles.layoutSpacing * 2
+        widthThreshold:
+            styles.tileWidthConstraintSmall.maxWidth +
+            styles.tileWidthConstraint.maxWidth +
+            styles.layoutSpacing * 2
       )
     );
   }

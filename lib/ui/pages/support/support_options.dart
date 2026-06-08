@@ -18,7 +18,7 @@ class SupportOptionsPage extends StatelessWidget {
       leftPaneBuilder: (
         BuildContext context,
         bool isWide,
-        void Function((String, String)) onItemTapped,
+        void Function((String, String)) navigateTo,
         bool Function((String, String)) isSelected
       ) {
         return ConstrainedBox(
@@ -47,7 +47,7 @@ class SupportOptionsPage extends StatelessWidget {
                         title: "分享 Windows 版本",
                         titleTag: "share_windows",
                         active: isSelected(("share", "windows")),
-                        onTapped: () => onItemTapped(("share", "windows")),
+                        onTapped: () => navigateTo(("share", "windows")),
                         context: context
                       )
                     ),
@@ -56,7 +56,7 @@ class SupportOptionsPage extends StatelessWidget {
                         title: "分享 Android 版本",
                         titleTag: "share_android",
                         active: isSelected(("share", "android")),
-                        onTapped: () => onItemTapped(("share", "android")),
+                        onTapped: () => navigateTo(("share", "android")),
                         context: context
                       )
                     ),

@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildLeftContent(
     BuildContext context,
     bool isWide,
-    void Function((String, String) tag) onItemTapped,
+    void Function((String, String) tag) navigateTo,
     bool Function((String, String) tag) isSelected,
   ) {
     bool hasUnsavedChanges = context.watch<AppProvider>().hasUnsavedChanges;
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                 onTapped: () {
                   setState(() => _isPwdSelected = false);
                   appLogger.logger.d("Selected: ('pages', 'folders')");
-                  onItemTapped(("pages", "folders"));
+                  navigateTo(("pages", "folders"));
                 },
                 active: isSelected(("pages", "folders")),
                 context: context
@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                 onTapped: () {
                   setState(() => _isPwdSelected = false);
                   appLogger.logger.d("Selected: ('pages', 'pwdEval')");
-                  onItemTapped(("pages", "pwdEval"));
+                  navigateTo(("pages", "pwdEval"));
                 },
                 active: isSelected(("pages", "pwdEval")),
                 context: context
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                   _selectedPwdId = id;
                   _isPwdSelected = true;
                 });
-                onItemTapped(("pwd", id));
+                navigateTo(("pwd", id));
               },
               selectedId: _isPwdSelected && isWide ? _selectedPwdId : null,
             ),
@@ -160,8 +160,10 @@ class _HomePageState extends State<HomePage> {
       pageBuilder: _switchPage,
       navMode: context.read<AppProvider>().currentNavMode,
       padding: styles.pagePaddingAll,
-      widthThreshold: styles.tileWidthConstraintSmall.maxWidth
-          + styles.tileWidthConstraint.maxWidth + styles.layoutSpacing * 2
+      widthThreshold:
+          styles.tileWidthConstraintSmall.maxWidth +
+          styles.tileWidthConstraint.maxWidth +
+          styles.layoutSpacing * 2
     );
   }
 }

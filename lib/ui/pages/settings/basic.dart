@@ -97,7 +97,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   Widget _buildSettingItems(
     BuildContext context,
     bool isWide,
-    void Function((String, String)) onItemTapped,
+    void Function((String, String)) navigateTo,
     bool Function((String, String)) isSelected,
   ) {
     return ConstrainedBox(
@@ -114,7 +114,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
               title: item.title,
               titleTag: isWide ? null : item.tag.$2,
               trailing: const Icon(Icons.arrow_forward),
-              onTapped: () => onItemTapped(item.tag),
+              onTapped: () => navigateTo(item.tag),
               context: context,
             );
           }).toList(),
