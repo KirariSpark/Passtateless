@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
 class AboutPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
+
   /// 是否要包含AppBar
   final bool hasAppBar;
+
   /// 是否有内边距
   final bool hasPadding;
+
   const AboutPage({super.key, required this.useHero, this.hasPadding = true, this.hasAppBar = true});
 
   @override
@@ -28,11 +31,10 @@ class AboutPage extends StatelessWidget {
               children: [
                 Image.asset("assets/icon.png", width: 100),
                 styles.spacingSizedBox,
-                styles.spacingSizedBox,
                 Text("Passtateless", style: Theme.of(context).textTheme.bodyLarge),
                 Text("0.1.10 - alpha"),
                 styles.spacingSizedBox,
-                TextButton(
+                styled.buildTextButton(
                   onPressed: () {
                     ui.showAlertDialogQuick(
                       title: "Passtateless",
@@ -47,8 +49,9 @@ class AboutPage extends StatelessWidget {
                       context: context
                     );
                   },
-                  style: styles.buttonStyle,
-                  child: Text("详情")
+                  child: Text("详情"),
+                  context: context,
+                  highlighted: false
                 )
               ],
             ),

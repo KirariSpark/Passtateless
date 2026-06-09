@@ -9,10 +9,13 @@ import 'package:provider/provider.dart';
 class A11ySettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
+
   /// 是否要包含AppBar
   final bool hasAppBar;
+
   /// 是否有内边距
   final bool hasPadding;
+
   const A11ySettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
 
   @override
@@ -71,8 +74,8 @@ class A11ySettingsPage extends StatelessWidget {
           }
         },
         navMode: context.watch<AppProvider>().currentNavMode,
-        widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
-            styles.layoutSpacing,
+        widthThreshold: styles.tileWidthConstraintSmall.maxWidth * 2 +
+            styles.layoutSpacing * 2,
       ),
     );
   }
