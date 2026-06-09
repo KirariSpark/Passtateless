@@ -5,8 +5,6 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
-// TODO: 需要重命名参数
-
 /// 自适应双栏布局，带自定义嵌套导航<br>
 /// 在窄屏下显示单栏布局，此时的 navigateTo 表现和 Navigator.push 相同<br>
 /// 宽屏下显示双栏布局，此时 navigateTo 仅导航第二栏（右侧栏）

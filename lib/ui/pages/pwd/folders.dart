@@ -50,7 +50,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     super.dispose();
   }
 
-  void _showBottomSheet({required String title, required String folder}) {
+  void _showBottomSheet({
+    required String title,
+    required String folder,
+    required bool isWide,
+    required void Function((String, String)) navigateTo
+  }) {
     ui.showBottomSheetQuick(
       context: context,
       title: title,
@@ -59,13 +64,23 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           title: "重命名",
           leading: Icons.edit_outlined,
           isFirst: true,
-          onTapped: () => _showRenameFolderDialog(folder:folder, title: title),
+          onTapped: () => _showRenameFolderDialog(
+            folder:folder,
+            title: title,
+            isWide: isWide,
+            navigateTo: navigateTo
+          ),
           context: context
         ),
         styled.buildListTile(
           title: "删除",
           leading: Icons.delete_outline,
-          onTapped: () => _showDelFolderDialog(folder: folder, title: title),
+          onTapped: () => _showDelFolderDialog(
+            folder: folder,
+            title: title,
+            isWide: isWide,
+            navigateTo: navigateTo
+          ),
           context: context
         ),
         Divider(height: 1),
@@ -117,21 +132,24 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
     );
   }
 
-  // TODO: 重命名文件夹后，应该重新选择
   void _renameFolder(String folder) {
     appLogger.logger.i("Renaming folder to ${_folderNameController.text}");
     var res = _pwdProvider.renameFolder(folder, _folderNameController.text);
     if (res == ErrorCode.success) {
       _appProvider.hasUnsavedChanges = true;
       appLogger.logger.i("Renamed successfully");
-      Navigator.of(context).pop();
     } else {
       appLogger.logger.e("Can not rename folder: ${res.code}");
       ui.showSnackBarQuick(res.generic, context);
     }
   }
 
-  void _showRenameFolderDialog({required String folder, required String title}) {
+  void _showRenameFolderDialog({
+    required String folder,
+    required String title,
+    required bool isWide,
+    required void Function((String, String)) navigateTo
+  }) {
     appLogger.logger.i("Trying to rename folder $folder");
     Navigator.pop(context);
     // 内置文件夹 未分类 不能重命名
@@ -145,22 +163,29 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       content: styled.buildTextField(context: context, controller: _folderNameController, label: "新名称"),
       action: () => Navigator.of(context).pop(),
       actionText: "取消",
-      action2: () => _renameFolder(folder),
+      action2: () {
+        _renameFolder(folder);
+        Navigator.pop(context);
+        if (isWide) navigateTo(("folders", _folderNameController.text));
+      },
       action2Text: "确定",
       context: context
     );
   }
 
-  // TODO: 删除文件夹后，应该清空选择
   void _delFolder(String folder) {
     appLogger.logger.i("Trying to delete folder $folder");
     _pwdProvider.removeFolder(folder);
     _appProvider.hasUnsavedChanges = true;
     appLogger.logger.i("Folder deleted");
-    Navigator.of(context).pop();
   }
 
-  void _showDelFolderDialog({required String folder, required String title}) {
+  void _showDelFolderDialog({
+    required String folder,
+    required String title,
+    required bool isWide,
+    required void Function((String, String)) navigateTo
+  }) {
     Navigator.pop(context);
     // 未分类 文件夹是内置文件夹，不能删除
     if (folder.isEmpty) {
@@ -170,7 +195,11 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
       ui.showConfirmDialogQuick(
         context: context,
         info: "确定要删除文件夹 “$folder” 吗\n一旦更改被保存，你将永远失去它",
-        function: () => _delFolder(folder),
+        function: () {
+          _delFolder(folder);
+          Navigator.pop(context);
+          if (isWide) navigateTo(("empty", ""));
+        },
         title: '删除：$title'
       );
     }
@@ -240,7 +269,12 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
             final String displayTitle = folders[index].isEmpty ? "未分类" : folders[index];
             return Material(
               child: styled.buildListTileAdvanced(
-                onRightClick: () => _showBottomSheet(title: displayTitle, folder: folders[index]),
+                onRightClick: () => _showBottomSheet(
+                  title: displayTitle,
+                  folder: folders[index],
+                  isWide: isWide,
+                  navigateTo: navigateTo
+                ),
                 onTapped: () => navigateTo(("folders", folders[index])),
                 isFirst: isFirst,
                 isLast: isLast,
@@ -274,8 +308,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
         },
         navMode: _appProvider.currentNavMode,
         widthThreshold:
-            styles.tileWidthConstraintSmall.maxWidth +
-            styles.tileWidthConstraint.maxWidth +
+            styles.tileWidthConstraintSmall.maxWidth * 2 +
             styles.layoutSpacing * 2
       )
     );
