@@ -32,7 +32,7 @@ class AboutPage extends StatelessWidget {
                 Image.asset("assets/icon.png", width: 100),
                 styles.spacingSizedBox,
                 Text("Passtateless", style: Theme.of(context).textTheme.bodyLarge),
-                Text("0.1.10 - alpha"),
+                Text("0.1.11 - beta"),
                 styles.spacingSizedBox,
                 styled.buildTextButton(
                   onPressed: () {
