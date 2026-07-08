@@ -10,7 +10,7 @@ import 'package:passtateless/ui/pages/pwd/folders.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
-import 'package:passtateless/ui/widgets/stars.dart';
+import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
@@ -22,27 +22,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _isPwdSelected = false;
-  String? _selectedPwdId;
   bool _isSaving = false;
-  late final AppProvider _appProvider;
-  late final PwdProvider _pwdProvider;
+  late final AppProvider appProvider;
+  late final PwdProvider pwdProvider;
 
   @override
   void initState() {
     super.initState();
-    _appProvider = context.read<AppProvider>();
-    _pwdProvider = context.read<PwdProvider>();
+    appProvider = context.read<AppProvider>();
+    pwdProvider = context.read<PwdProvider>();
   }
 
   Future<void> _save() async {
     appLogger.logger.i("Saving changes in password archive");
     setState(() => _isSaving = true);
     ui.showSnackBarQuick("正在保存", context);
-    var stat = await _pwdProvider.saveArchive(_appProvider.masterPwd);
+    var stat = await pwdProvider.saveArchive(appProvider.masterPwd);
     if (mounted) {
       if (stat == ErrorCode.success) {
-        _appProvider.hasUnsavedChanges = false;
+        appProvider.hasUnsavedChanges = false;
         setState(() => _isSaving = false);
         appLogger.logger.i("Saved successfully");
         ui.showSnackBarQuick("你的档案已保存", context);
@@ -96,60 +94,43 @@ class _HomePageState extends State<HomePage> {
 
     return ConstrainedBox(
       constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
-      child: Column(
-        spacing: styles.layoutSpacing,
+      child: ListView(
         children: [
-          // 入口部分
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              styled.buildListTile(
-                title: "资料夹",
-                titleTag: HeroTags.folders.tag,
-                subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
-                leading: Icons.format_list_bulleted,
-                trailing: _buildTrailing(hasUnsavedChanges),
-                isFirst: true,
-                onTapped: () {
-                  setState(() => _isPwdSelected = false);
-                  appLogger.logger.d("Selected: ('pages', 'folders')");
-                  navigateTo(("pages", "folders"));
-                },
-                active: isSelected(("pages", "folders")),
-                context: context
-              ),
-              styled.buildListTile(
-                title: "密码强度",
-                titleTag: HeroTags.pwdEval.tag,
-                subtitle: "评估密码强度，获取相关建议",
-                leading: Icons.checklist,
-                trailing: Icon(Icons.arrow_forward),
-                isLast: true,
-                onTapped: () {
-                  setState(() => _isPwdSelected = false);
-                  appLogger.logger.d("Selected: ('pages', 'pwdEval')");
-                  navigateTo(("pages", "pwdEval"));
-                },
-                active: isSelected(("pages", "pwdEval")),
-                context: context
-              )
-            ],
+          ...[for (final (index, item) in pwdProvider.starredPwds.indexed) PwdTile(
+            pwdRecord: item,
+            isFirst: index == 0,
+            isLast: index == pwdProvider.starredPwds.length - 1,
+            isActive: isSelected(("pwd", item["id"])),
+            onTapped: () => navigateTo(("pwd", item["id"])),
+          )],
+          ? pwdProvider.starredPwds.isEmpty ? null : styles.spacingSizedBox,
+          styled.buildListTile(
+            title: "资料夹",
+            titleTag: HeroTags.folders.tag,
+            subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
+            leading: Icons.format_list_bulleted,
+            trailing: _buildTrailing(hasUnsavedChanges),
+            isFirst: true,
+            onTapped: () {
+              appLogger.logger.d("Selected: ('pages', 'folders')");
+              navigateTo(("pages", "folders"));
+            },
+            active: isSelected(("pages", "folders")),
+            context: context
           ),
-          // 收藏夹
-          Expanded(
-            child: StarredPasswords(
-              hasConstraint: false,
-              isWide: isWide,
-              onItemTapped: (id) {
-                appLogger.logger.d("Selected password from home page: $id");
-                setState(() {
-                  _selectedPwdId = id;
-                  _isPwdSelected = true;
-                });
-                navigateTo(("pwd", id));
-              },
-              selectedId: _isPwdSelected && isWide ? _selectedPwdId : null,
-            ),
+          styled.buildListTile(
+            title: "密码强度",
+            titleTag: HeroTags.pwdEval.tag,
+            subtitle: "评估密码强度，获取相关建议",
+            leading: Icons.checklist,
+            trailing: Icon(Icons.arrow_forward),
+            isLast: true,
+            onTapped: () {
+              appLogger.logger.d("Selected: ('pages', 'pwdEval')");
+              navigateTo(("pages", "pwdEval"));
+            },
+            active: isSelected(("pages", "pwdEval")),
+            context: context
           ),
         ],
       ),
