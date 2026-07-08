@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
-import 'package:passtateless/ui/pages/settings/master.dart';
 import 'package:passtateless/ui/pages/settings/advanced.dart';
 import 'package:passtateless/ui/pages/settings/a11y.dart';
+import 'package:passtateless/ui/pages/settings/change_master.dart';
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/pages/settings/customize.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
 // 基础设置页面
@@ -20,12 +23,6 @@ class BasicSettingsPage extends StatefulWidget {
 
 class _BasicSettingsPageState extends State<BasicSettingsPage> {
   final List<_SettingItem> _settingItems = const [
-    _SettingItem(
-      tag: ("basic", "masterPwd"),
-      icon: Icons.key,
-      title: "主密码",
-      isFirst: true,
-    ),
     _SettingItem(
       tag: ("basic", "customize"),
       icon: Icons.color_lens_outlined,
@@ -48,23 +45,30 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       isLast: true,
     ),
   ];
-  late final AppProvider _appProvider;
+  late final AppProvider appProvider;
 
   @override
   void initState() {
     super.initState();
-    _appProvider = context.read<AppProvider>();
+    appProvider = context.read<AppProvider>();
+  }
+
+  Future<void> _changeRemindDays(RemindDays value, BuildContext context) async {
+    appProvider.remindMe = value;
+    appLogger.logger.i("Remind settings updated to ${value.name}");
+    await appProvider.saveConfig();
+    if (context.mounted) {
+      appLogger.logger.i("Changes in settings saved");
+      Navigator.pop(context);
+    }
   }
 
   Widget _buildPage((String, String) tag, bool isWide) {
+    if (tag == Pages.changeMaster.id) {
+      return MasterPwdPage(useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
+    }
+
     switch (tag) {
-      case ("basic", "masterPwd"):
-        return MasterPwdSettingsPage(
-          useHero: !isWide,
-          key: ValueKey(tag.$2),
-          hasAppBar: !isWide,
-          hasPadding: !isWide,
-        );
       case ("basic", "customize"):
         return CustomizeSettingsPage(
           useHero: !isWide,
@@ -108,20 +112,64 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
       child: SingleChildScrollView(
         child: Column(
-          children: _settingItems.map((item) {
-            final selected = isSelected(item.tag);
-            return styled.buildListTile(
-              active: selected,
-              isFirst: item.isFirst,
-              isLast: item.isLast,
-              leading: item.icon,
-              title: item.title,
-              titleTag: isWide ? null : item.tag.$2,
-              trailing: const Icon(Icons.arrow_forward),
-              onTapped: () => navigateTo(item.tag),
+          children: [
+            styled.buildListTile(
+              title: "更改主密码",
+              titleTag: HeroTags.changeMaster.tag,
+              leading: Icons.key,
+              trailing: Icon(Icons.arrow_forward),
+              isFirst: true,
+              onTapped: () => navigateTo(Pages.changeMaster.id),
               context: context,
-            );
-          }).toList(),
+            ),
+            styled.buildListTile(
+              title: "提醒我更改主密码",
+              subtitle: "当前：${appProvider.remindMe.displayName}",
+              leading: Icons.schedule,
+              trailing: Icon(Icons.arrow_drop_down),
+              isLast: true,
+              onTapped: () => ui.showBottomSheetQuick(
+                context: context, 
+                title: "在选择的天数后提醒你", 
+                children: [
+                  RadioGroup(
+                    groupValue: appProvider.remindMe,
+                    onChanged: (value) => _changeRemindDays(value!, context),
+                    child: Column(
+                      children: [
+                        for (final (index, item) in RemindDays.values.indexed) RadioListTile(
+                          value: item,
+                          title: Text(item.displayName),
+                          tileColor: ColorScheme.of(context).surfaceContainerLow,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: ui.calcRadius(
+                              isFirst: index == 0, isLast: index == RemindDays.values.length - 1
+                            ),
+                          )
+                        )
+                      ],
+                    ),
+                  ),
+                ]
+              ),
+              context: context
+            ),
+            styles.spacingSizedBox,
+            ..._settingItems.map((item) {
+              final selected = isSelected(item.tag);
+              return styled.buildListTile(
+                active: selected,
+                isFirst: item.isFirst,
+                isLast: item.isLast,
+                leading: item.icon,
+                title: item.title,
+                titleTag: isWide ? null : item.tag.$2,
+                trailing: const Icon(Icons.arrow_forward),
+                onTapped: () => navigateTo(item.tag),
+                context: context,
+              );
+            })
+          ],
         ),
       ),
     );
@@ -134,7 +182,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       pageBuilder: _buildPage,
       leftPaneBuilder: _buildSettingItems,
       padding: styles.pagePaddingAll,
-      navMode: _appProvider.currentNavMode,
+      navMode: appProvider.currentNavMode,
       widthThreshold:
           styles.tileWidthConstraint.maxWidth +
           styles.tileWidthConstraintSmall.maxWidth +
