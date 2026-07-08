@@ -134,8 +134,10 @@ enum DocItems {
 
 enum HeroTags {
   pwdEval("pwd/eval"),
-  changeMaster("settings/masterSettings/changeMaster"),
-  themeSettings("settings/customize/themeSettings"),
+  changeMaster("settings/changeMaster"),
+  themeSettings("settings/theme"),
+  animationSettings("settings/animation"),
+  contrastnessSettings("settings/contrastness"),
   folders("pwd/folders");
 
   final String tag;
@@ -144,7 +146,10 @@ enum HeroTags {
 }
 
 enum Pages {
-  changeMaster(("settings", "changeMaster"));
+  changeMaster(("settings", "changeMaster")),
+  animationSettings(("settings", "animation")),
+  contrastnessSettings(("settings", "contrastness")),
+  themeSettings(("settings", "theme"));
 
   final (String, String) id;
 

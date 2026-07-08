@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/core/enums.dart';
+import 'package:passtateless/ui/pages/settings/animations.dart';
+import 'package:passtateless/ui/pages/settings/contrast.dart';
+import 'package:passtateless/ui/pages/settings/themes.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/advanced.dart';
-import 'package:passtateless/ui/pages/settings/a11y.dart';
 import 'package:passtateless/ui/pages/settings/change_master.dart';
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
-import 'package:passtateless/ui/pages/settings/customize.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -23,21 +24,7 @@ class BasicSettingsPage extends StatefulWidget {
 
 class _BasicSettingsPageState extends State<BasicSettingsPage> {
   final List<_SettingItem> _settingItems = const [
-    _SettingItem(
-      tag: ("basic", "customize"),
-      icon: Icons.color_lens_outlined,
-      title: "个性化",
-    ),
-    _SettingItem(
-      tag: ("basic", "a11y"),
-      icon: Icons.accessibility_new,
-      title: "可访问性",
-    ),
-    _SettingItem(
-      tag: ("basic", "advanced"), 
-      icon: Icons.code, 
-      title: "高级设置"
-    ),
+    _SettingItem(tag: ("basic", "advanced"), icon: Icons.code, title: "高级设置"),
     _SettingItem(
       tag: ("basic", "about"),
       icon: Icons.info_outlined,
@@ -65,26 +52,37 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
 
   Widget _buildPage((String, String) tag, bool isWide) {
     if (tag == Pages.changeMaster.id) {
-      return MasterPwdPage(useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
+      return MasterPwdPage(
+        useHero: !isWide,
+        hasPadding: !isWide,
+        hasAppBar: !isWide,
+      );
+    }
+    if (tag == Pages.themeSettings.id) {
+      return ThemeSettingsPage(
+        useHero: !isWide,
+        hasAppBar: !isWide,
+        hasPadding: !isWide,
+      );
+    }
+    if (tag == Pages.animationSettings.id) {
+      return AnimationSettingsPage(
+        useHero: !isWide,
+        hasAppBar: !isWide,
+        hasPadding: !isWide,
+      );
+    }
+    if (tag == Pages.contrastnessSettings.id) {
+      return ContrastSettingsPage(
+        useHero: !isWide,
+        hasAppBar: !isWide,
+        hasPadding: !isWide,
+      );
     }
 
     switch (tag) {
-      case ("basic", "customize"):
-        return CustomizeSettingsPage(
-          useHero: !isWide,
-          key: ValueKey(tag.$2),
-          hasAppBar: !isWide,
-          hasPadding: !isWide,
-        );
       case ("basic", "advanced"):
         return AdvancedSettingsPage(
-          key: ValueKey(tag.$2),
-          useHero: !isWide,
-          hasAppBar: !isWide,
-          hasPadding: !isWide,
-        );
-      case ("basic", "a11y"):
-        return A11ySettingsPage(
           key: ValueKey(tag.$2),
           useHero: !isWide,
           hasAppBar: !isWide,
@@ -109,7 +107,9 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     bool Function((String, String)) isSelected,
   ) {
     return ConstrainedBox(
-      constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
+      constraints: isWide
+          ? styles.tileWidthConstraintSmall
+          : styles.tileWidthConstraint,
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -129,30 +129,61 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
               trailing: Icon(Icons.arrow_drop_down),
               isLast: true,
               onTapped: () => ui.showBottomSheetQuick(
-                context: context, 
-                title: "在选择的天数后提醒你", 
+                context: context,
+                title: "在选择的天数后提醒你",
                 children: [
                   RadioGroup(
                     groupValue: appProvider.remindMe,
                     onChanged: (value) => _changeRemindDays(value!, context),
                     child: Column(
                       children: [
-                        for (final (index, item) in RemindDays.values.indexed) RadioListTile(
-                          value: item,
-                          title: Text(item.displayName),
-                          tileColor: ColorScheme.of(context).surfaceContainerLow,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: ui.calcRadius(
-                              isFirst: index == 0, isLast: index == RemindDays.values.length - 1
+                        for (final (index, item) in RemindDays.values.indexed)
+                          RadioListTile(
+                            value: item,
+                            title: Text(item.displayName),
+                            tileColor: ColorScheme.of(
+                              context,
+                            ).surfaceContainerLow,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: ui.calcRadius(
+                                isFirst: index == 0,
+                                isLast: index == RemindDays.values.length - 1,
+                              ),
                             ),
-                          )
-                        )
+                          ),
                       ],
                     ),
                   ),
-                ]
+                ],
               ),
-              context: context
+              context: context,
+            ),
+            styles.spacingSizedBox,
+            styled.buildListTile(
+              title: "主题",
+              titleTag: HeroTags.themeSettings.tag,
+              leading: Icons.color_lens_outlined,
+              trailing: Icon(Icons.arrow_forward),
+              onTapped: () => navigateTo(Pages.themeSettings.id),
+              isFirst: true,
+              context: context,
+            ),
+            styled.buildListTile(
+              title: "动画",
+              titleTag: HeroTags.animationSettings.tag,
+              leading: Icons.animation,
+              trailing: Icon(Icons.arrow_forward),
+              onTapped: () => navigateTo(Pages.animationSettings.id),
+              context: context,
+            ),
+            styled.buildListTile(
+              title: "对比度",
+              titleTag: HeroTags.contrastnessSettings.tag,
+              leading: Icons.contrast,
+              trailing: Icon(Icons.arrow_forward),
+              onTapped: () => navigateTo(Pages.contrastnessSettings.id),
+              isLast: true,
+              context: context,
             ),
             styles.spacingSizedBox,
             ..._settingItems.map((item) {
@@ -168,7 +199,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                 onTapped: () => navigateTo(item.tag),
                 context: context,
               );
-            })
+            }),
           ],
         ),
       ),
