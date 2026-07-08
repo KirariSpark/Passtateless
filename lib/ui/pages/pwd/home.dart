@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
@@ -104,6 +105,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               styled.buildListTile(
                 title: "资料夹",
+                titleTag: HeroTags.folders.tag,
                 subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
                 leading: Icons.format_list_bulleted,
                 trailing: _buildTrailing(hasUnsavedChanges),
@@ -118,6 +120,7 @@ class _HomePageState extends State<HomePage> {
               ),
               styled.buildListTile(
                 title: "密码强度",
+                titleTag: HeroTags.pwdEval.tag,
                 subtitle: "评估密码强度，获取相关建议",
                 leading: Icons.checklist,
                 trailing: Icon(Icons.arrow_forward),

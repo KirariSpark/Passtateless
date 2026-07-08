@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
@@ -44,7 +45,7 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
       key: ValueKey("change_master"),
       appBar: widget.hasAppBar ? styled.buildAppBar(
         title: "更改主密码",
-        titleTag: widget.useHero ? "pages/settings/change_master" : null,
+        titleTag: widget.useHero ? HeroTags.changeMaster.tag : null,
         exitIcon: Icons.close,
         context: context
       ) : null,

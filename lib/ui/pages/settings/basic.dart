@@ -36,7 +36,11 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       icon: Icons.accessibility_new,
       title: "可访问性",
     ),
-    _SettingItem(tag: ("basic", "advanced"), icon: Icons.code, title: "高级设置"),
+    _SettingItem(
+      tag: ("basic", "advanced"), 
+      icon: Icons.code, 
+      title: "高级设置"
+    ),
     _SettingItem(
       tag: ("basic", "about"),
       icon: Icons.info_outlined,

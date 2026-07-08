@@ -123,4 +123,15 @@ enum DocItems {
   const DocItems(this.displayName, this.mode, this.desc, this.path);
 }
 
+enum HeroTags {
+  pwdEval("pwd/eval"),
+  changeMaster("settings/masterSettings/changeMaster"),
+  themeSettings("settings/customize/themeSettings"),
+  folders("pwd/folders");
+
+  final String tag;
+
+  const HeroTags(this.tag);
+}
+
 const List<DocItems> editorHelpItems = [DocItems.jsonBasic, DocItems.cfg, DocItems.cfgTips];

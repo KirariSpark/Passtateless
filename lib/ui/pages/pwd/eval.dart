@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
@@ -47,7 +48,11 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
 
   AppBar? _buildAppBar() {
     if (widget.hasAppBar) {
-      return styled.buildAppBar(title: "密码强度", context: context, titleTag: widget.useHero ? "pwdEval" : null);
+      return styled.buildAppBar(
+        title: "密码强度", 
+        context: context, 
+        titleTag: widget.useHero ? HeroTags.pwdEval.tag : null
+      );
     }
     return null;
   }

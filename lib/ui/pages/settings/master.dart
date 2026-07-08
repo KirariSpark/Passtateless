@@ -13,19 +13,36 @@ import 'package:provider/provider.dart';
 class MasterPwdSettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
+
   /// 是否要包含AppBar
   final bool hasAppBar;
+  
   /// 是否有内边距
   final bool hasPadding;
-  const MasterPwdSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+  
+  const MasterPwdSettingsPage({
+    super.key, 
+    required this.useHero, 
+    this.hasAppBar = true, 
+    this.hasPadding = true
+  });
+
+  AppBar? _buildAppBar(BuildContext context) {
+    if (hasAppBar) {
+      return styled.buildAppBar(
+        title: "主密码", 
+        context: context, 
+        titleTag: useHero ? "masterPwd" : null
+      );
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     final appProvider = context.watch<AppProvider>();
     return Scaffold(
-      appBar: hasAppBar
-        ? styled.buildAppBar(title: "主密码", context: context, titleTag: useHero ? "masterPwd" : null)
-        : null,
+      appBar: _buildAppBar(context),
       body: AdaptiveView(
         leftPaneBuilder: (context, isWide, navigateTo, isSelected) {
           return Container(
@@ -46,7 +63,7 @@ class MasterPwdSettingsPage extends StatelessWidget {
                       leading: Icons.edit_outlined,
                       trailing: Icon(Icons.arrow_forward),
                       title: "更改主密码",
-                      titleTag: "pages/settings/change_master",
+                      titleTag: HeroTags.changeMaster.tag,
                       onTapped: () => navigateTo(("master", "change")),
                       context: context
                     ),

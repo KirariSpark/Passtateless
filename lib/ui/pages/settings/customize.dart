@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/settings/animations.dart';
 import 'package:passtateless/ui/pages/settings/themes.dart';
@@ -10,18 +11,35 @@ import 'package:provider/provider.dart';
 class CustomizeSettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
+
   /// 是否要包含AppBar
   final bool hasAppBar;
+
   /// 是否有内边距
   final bool hasPadding;
-  const CustomizeSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+
+  const CustomizeSettingsPage({
+    super.key,
+    required this.useHero,
+    this.hasAppBar = true,
+    this.hasPadding = true,
+  });
+
+  AppBar? _buildAppBar(BuildContext context) {
+    if (hasAppBar) {
+      return styled.buildAppBar(
+        title: "个性化",
+        context: context,
+        titleTag: useHero ? "customize" : null,
+      );
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: hasAppBar
-        ? styled.buildAppBar(title: "个性化", context: context, titleTag: useHero ? "customize" : null)
-        : null,
+      appBar: _buildAppBar(context),
       body: AdaptiveView(
         leftPaneBuilder: (
           BuildContext context,
@@ -42,7 +60,7 @@ class CustomizeSettingsPage extends StatelessWidget {
                     isFirst: true,
                     onTapped: () => navigateTo(("customize", "theme")),
                     active: isSelected(("customize", "theme")),
-                    titleTag: isWide ? null : "settings/themes",
+                    titleTag: isWide ? null : HeroTags.themeSettings.tag,
                     context: context
                   ),
                   styled.buildListTile(
@@ -63,17 +81,27 @@ class CustomizeSettingsPage extends StatelessWidget {
         pageBuilder: ((String, String) tag, bool isWide) {
           switch (tag) {
             case ("customize", "theme"):
-              return ThemeSettingsPage(useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+              return ThemeSettingsPage(
+                useHero: !isWide,
+                hasAppBar: !isWide,
+                hasPadding: !isWide,
+              );
             case ("customize", "animations"):
-              return AnimationSettingsPage(useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+              return AnimationSettingsPage(
+                useHero: !isWide,
+                hasAppBar: !isWide,
+                hasPadding: !isWide,
+              );
             default:
               return SizedBox.shrink();
           }
         },
         navMode: context.watch<AppProvider>().currentNavMode,
-        widthThreshold: styles.tileWidthConstraint.maxWidth + styles.tileWidthConstraintSmall.maxWidth +
+        widthThreshold:
+            styles.tileWidthConstraint.maxWidth +
+            styles.tileWidthConstraintSmall.maxWidth +
             styles.layoutSpacing,
-      )
+      ),
     );
   }
 }
