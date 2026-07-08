@@ -138,6 +138,8 @@ enum HeroTags {
   themeSettings("settings/theme"),
   animationSettings("settings/animation"),
   contrastnessSettings("settings/contrastness"),
+  advancedSettings("settings/advanced"),
+  about("settings/about"),
   folders("pwd/folders");
 
   final String tag;
@@ -149,6 +151,8 @@ enum Pages {
   changeMaster(("settings", "changeMaster")),
   animationSettings(("settings", "animation")),
   contrastnessSettings(("settings", "contrastness")),
+  advancedSettings(("settings", "advanced")),
+  about(("settings", "about")),
   themeSettings(("settings", "theme"));
 
   final (String, String) id;

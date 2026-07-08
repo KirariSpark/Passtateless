@@ -23,15 +23,6 @@ class BasicSettingsPage extends StatefulWidget {
 }
 
 class _BasicSettingsPageState extends State<BasicSettingsPage> {
-  final List<_SettingItem> _settingItems = const [
-    _SettingItem(tag: ("basic", "advanced"), icon: Icons.code, title: "高级设置"),
-    _SettingItem(
-      tag: ("basic", "about"),
-      icon: Icons.info_outlined,
-      title: "关于",
-      isLast: true,
-    ),
-  ];
   late final AppProvider appProvider;
 
   @override
@@ -50,54 +41,55 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     }
   }
 
-  Widget _buildPage((String, String) tag, bool isWide) {
-    if (tag == Pages.changeMaster.id) {
+  Widget _buildPage((String, String) id, bool isWide) {
+    if (id == Pages.changeMaster.id) {
       return MasterPwdPage(
+        key: ValueKey(id),
         useHero: !isWide,
         hasPadding: !isWide,
         hasAppBar: !isWide,
       );
     }
-    if (tag == Pages.themeSettings.id) {
+    if (id == Pages.themeSettings.id) {
       return ThemeSettingsPage(
+        key: ValueKey(id),
         useHero: !isWide,
         hasAppBar: !isWide,
         hasPadding: !isWide,
       );
     }
-    if (tag == Pages.animationSettings.id) {
+    if (id == Pages.animationSettings.id) {
       return AnimationSettingsPage(
+        key: ValueKey(id),
         useHero: !isWide,
         hasAppBar: !isWide,
         hasPadding: !isWide,
       );
     }
-    if (tag == Pages.contrastnessSettings.id) {
+    if (id == Pages.contrastnessSettings.id) {
       return ContrastSettingsPage(
+        key: ValueKey(id),
         useHero: !isWide,
         hasAppBar: !isWide,
         hasPadding: !isWide,
       );
     }
-
-    switch (tag) {
-      case ("basic", "advanced"):
-        return AdvancedSettingsPage(
-          key: ValueKey(tag.$2),
-          useHero: !isWide,
-          hasAppBar: !isWide,
-          hasPadding: !isWide,
-        );
-      case ("basic", "about"):
-        return AboutPage(
-          useHero: !isWide,
-          key: ValueKey(tag.$2),
-          hasAppBar: !isWide,
-          hasPadding: !isWide,
-        );
-      default:
-        return styled.buildPlaceHolder(text: "未选择项目", context: context);
+    if (id == Pages.advancedSettings.id) {
+      return AdvancedSettingsPage(
+        key: ValueKey(id.$2),
+        useHero: !isWide,
+        hasAppBar: !isWide,
+        hasPadding: !isWide,
+      );
     }
+    if (id == Pages.about.id) {
+      return AboutPage(
+        key: ValueKey(id),
+        hasAppBar: !isWide,
+        hasPadding: !isWide,
+      );
+    }
+    return styled.buildPlaceHolder(text: "未选择项目", context: context);
   }
 
   Widget _buildSettingItems(
@@ -124,7 +116,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
             ),
             styled.buildListTile(
               title: "提醒我更改主密码",
-              subtitle: "当前：${appProvider.remindMe.displayName}",
+              subtitle: "当前：${context.watch<AppProvider>().remindMe.displayName}",
               leading: Icons.schedule,
               trailing: Icon(Icons.arrow_drop_down),
               isLast: true,
@@ -186,20 +178,23 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
               context: context,
             ),
             styles.spacingSizedBox,
-            ..._settingItems.map((item) {
-              final selected = isSelected(item.tag);
-              return styled.buildListTile(
-                active: selected,
-                isFirst: item.isFirst,
-                isLast: item.isLast,
-                leading: item.icon,
-                title: item.title,
-                titleTag: isWide ? null : item.tag.$2,
-                trailing: const Icon(Icons.arrow_forward),
-                onTapped: () => navigateTo(item.tag),
-                context: context,
-              );
-            }),
+            styled.buildListTile(
+              title: "高级设置", 
+              titleTag: HeroTags.advancedSettings.tag,
+              leading: Icons.code,
+              trailing: Icon(Icons.arrow_forward),
+              onTapped: () => navigateTo(Pages.advancedSettings.id),
+              isFirst: true,
+              context: context
+            ),
+            styled.buildListTile(
+              title: "关于",
+              leading: Icons.info_outline,
+              trailing: Icon(Icons.arrow_forward),
+              onTapped: () => navigateTo(Pages.about.id),
+              isLast: true,
+              context: context
+            )
           ],
         ),
       ),
@@ -220,21 +215,4 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
           styles.layoutSpacing * 2,
     );
   }
-}
-
-// 设置项数据类
-class _SettingItem {
-  final (String, String) tag;
-  final IconData icon;
-  final String title;
-  final bool isFirst;
-  final bool isLast;
-
-  const _SettingItem({
-    required this.tag,
-    required this.icon,
-    required this.title,
-    this.isFirst = false,
-    this.isLast = false,
-  });
 }
