@@ -4,8 +4,7 @@ import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/help/overview.dart';
 import 'package:passtateless/ui/pages/pwd/home.dart';
 import 'package:passtateless/ui/pages/settings/basic.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui ;
-import 'package:passtateless/ui/pages/support/support_options.dart';
+import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:provider/provider.dart';
 
@@ -84,11 +83,6 @@ class _MainAppState extends State<MainApp> {
                   activeIcon: Icon(Icons.help),
                   label: "帮助",
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.coffee_outlined),
-                  activeIcon: Icon(Icons.coffee),
-                  label: "支持我",
-                ),
               ],
               showUnselectedLabels: false,
               backgroundColor: ColorScheme.of(context).surfaceContainer,
@@ -123,11 +117,6 @@ class _MainAppState extends State<MainApp> {
                         selectedIcon: Icon(Icons.help),
                         label: Text("帮助"),
                       ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.coffee_outlined),
-                        selectedIcon: Icon(Icons.coffee),
-                        label: Text("支持我"),
-                      ),
                     ],
                   ),
                   Expanded(child: _buildBodyContent(currentAxis, appProvider)),
@@ -151,8 +140,7 @@ class _MainAppState extends State<MainApp> {
         children: [
           HomePage(),
           BasicSettingsPage(),
-          HelpOverviewPage(),
-          SupportOptionsPage()
+          HelpOverviewPage()
         ],
       ),
     );
