@@ -16,8 +16,6 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  Axis? _lastScrollDirection;
-
   @override
   void initState() {
     super.initState();
@@ -52,13 +50,6 @@ class _MainAppState extends State<MainApp> {
           appProvider.currentIndex = index;
         }
 
-        // 滚动方向改变时，重新布局前要做的事
-        if (_lastScrollDirection != null && _lastScrollDirection != currentAxis) {
-          appLogger.logger.d("Layout direction changed, recovering page index");
-          appLogger.logger.d("Current direction is ${currentAxis.name}");
-        }
-        _lastScrollDirection = currentAxis;
-
         if (currentWidth < desktopWidth) {
           // 移动端：底部导航
           return Scaffold(
@@ -84,7 +75,6 @@ class _MainAppState extends State<MainApp> {
                   label: "帮助",
                 ),
               ],
-              showUnselectedLabels: false,
               backgroundColor: ColorScheme.of(context).surfaceContainer,
             ),
           );
