@@ -107,11 +107,11 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
           children: [
             styled.buildListTile(
               title: "更改主密码",
-              titleTag: HeroTags.changeMaster.tag,
               leading: Icons.key,
               trailing: Icon(Icons.arrow_forward),
               isFirst: true,
               onTapped: () => navigateTo(Pages.changeMaster.id),
+              active: isSelected(Pages.changeMaster.id),
               context: context,
             ),
             styled.buildListTile(
@@ -153,38 +153,38 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
             styles.spacingSizedBox,
             styled.buildListTile(
               title: "主题",
-              titleTag: HeroTags.themeSettings.tag,
               leading: Icons.color_lens_outlined,
               trailing: Icon(Icons.arrow_forward),
               onTapped: () => navigateTo(Pages.themeSettings.id),
               isFirst: true,
+              active: isSelected(Pages.themeSettings.id),
               context: context,
             ),
             styled.buildListTile(
               title: "动画",
-              titleTag: HeroTags.animationSettings.tag,
               leading: Icons.animation,
               trailing: Icon(Icons.arrow_forward),
               onTapped: () => navigateTo(Pages.animationSettings.id),
+              active: isSelected(Pages.animationSettings.id),
               context: context,
             ),
             styled.buildListTile(
               title: "对比度",
-              titleTag: HeroTags.contrastnessSettings.tag,
               leading: Icons.contrast,
               trailing: Icon(Icons.arrow_forward),
               onTapped: () => navigateTo(Pages.contrastnessSettings.id),
               isLast: true,
+              active: isSelected(Pages.contrastnessSettings.id),
               context: context,
             ),
             styles.spacingSizedBox,
             styled.buildListTile(
               title: "高级设置", 
-              titleTag: HeroTags.advancedSettings.tag,
               leading: Icons.code,
               trailing: Icon(Icons.arrow_forward),
               onTapped: () => navigateTo(Pages.advancedSettings.id),
               isFirst: true,
+              active: isSelected(Pages.advancedSettings.id),
               context: context
             ),
             styled.buildListTile(
@@ -193,6 +193,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
               trailing: Icon(Icons.arrow_forward),
               onTapped: () => navigateTo(Pages.about.id),
               isLast: true,
+              active: isSelected(Pages.about.id),
               context: context
             )
           ],

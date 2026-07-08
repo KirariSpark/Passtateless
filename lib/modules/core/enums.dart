@@ -139,7 +139,6 @@ enum HeroTags {
   animationSettings("settings/animation"),
   contrastnessSettings("settings/contrastness"),
   advancedSettings("settings/advanced"),
-  about("settings/about"),
   folders("pwd/folders");
 
   final String tag;
