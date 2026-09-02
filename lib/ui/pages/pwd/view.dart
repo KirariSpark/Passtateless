@@ -49,7 +49,8 @@ class PwdViewPage extends StatefulWidget {
 
 class _PwdViewPageState extends State<PwdViewPage> {
   // 一些只读的属性
-  final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  final CodeLineEditingController _configController =
+      CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
   late final String identifier;
   late final String userName;
   late final String account;
@@ -100,6 +101,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
         title: "配置生成规则",
         trailing: Icon(Icons.arrow_forward),
         isLast: true,
+        isFirst: true,
         onTapped: _editCfg,
       );
     }
@@ -199,31 +201,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
   void _selectPreset(Presets? value) {
     appLogger.logger.i("Setting preset to ${value?.name}");
     setState(() => _preset = value ?? Presets.simple);
-    Navigator.pop(context);
-  }
-
-  void _showPresetSelectionDialog() {
-    ui.showAlertDialogQuick(
-      title: "选择预设",
-      content: RadioGroup(
-        groupValue: _preset,
-        onChanged: _selectPreset,
-        child: Column(
-          children: [
-            for (var item in Presets.values)
-              RadioListTile(
-                value: item,
-                subtitle: Text(item.desc),
-                shape: styles.roundedBorder,
-                title: Text(item.displayName),
-              ),
-          ],
-        ),
-      ),
-      actionText: "取消",
-      action: () => Navigator.of(context).pop(),
-      context: context,
-    );
   }
 
   void _showWarningDialog() {
@@ -285,20 +262,20 @@ class _PwdViewPageState extends State<PwdViewPage> {
         styled.buildTextField(
           label: "档案名",
           controller: identifierController,
-          context: context
+          context: context,
         ),
         styles.spacingSizedBox,
         styled.buildTextField(
           label: "用户名",
           controller: userNameController,
-          context: context
+          context: context,
         ),
         styles.spacingSizedBox,
         styled.buildTextField(
           label: "账号",
           controller: accountController,
-          context: context
-        )
+          context: context,
+        ),
       ];
     } else {
       return [
@@ -336,10 +313,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
       account = data["account"];
       id = data["id"];
     } else {
-      identifier = "Quick mode enabled";
-      userName = "Quick mode enabled";
-      account = "Quick mode enabled";
-      id = "Quick mode enabled";
+      identifier = "快速开始";
+      userName = "快速开始";
+      account = "快速开始";
+      id = "快速开始";
     }
   }
 
@@ -412,23 +389,24 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   tileColor: ColorScheme.of(context).surfaceContainerLow,
                 ),
                 styles.spacingSizedBox,
-                styled.buildListTile(
-                  context: context,
-                  title: "生成预设",
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _preset.displayName,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      Icon(Icons.arrow_drop_down),
-                    ],
+                DropdownMenu(
+                  label: Text("生成预设"),
+                  width: double.infinity,
+                  helperText: _preset.desc,
+                  menuStyle: MenuStyle(
+                    maximumSize: WidgetStatePropertyAll<Size>(Size(120, double.infinity))
                   ),
-                  isFirst: true,
-                  isLast: _preset == Presets.custom ? false : true,
-                  onTapped: _showPresetSelectionDialog,
+                  dropdownMenuEntries: [
+                    for (Presets i in Presets.values) DropdownMenuEntry(
+                      value: i,
+                      label: i.displayName,
+                    )
+                  ],
+                  onSelected: (value) => _selectPreset(value),
+                  initialSelection: _preset,
+                  selectOnly: true,
                 ),
+                styles.spacingSizedBox,
                 ?_showConfigEdit(),
                 styles.spacingSizedBox,
                 // 按钮
