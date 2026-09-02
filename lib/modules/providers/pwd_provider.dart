@@ -50,26 +50,6 @@ class PwdProvider extends ChangeNotifier {
 
   List<Map<String, dynamic>> getPwdList(String folder) => _pwdMap[folder] ?? [];
 
-  /// 对 _pwdMap 的键进行排序，同时确保空字符串 "" 永远在最后
-  void _sortPwdMapKeys() {
-    appLogger.logger.i("Sorting passwords");
-    final sortedKeys = _pwdMap.keys.toList()
-      ..sort((a, b) {
-        if (a.isEmpty && b.isEmpty) return 0;
-        if (a.isEmpty) return 1; // a 是空字符串，排到后面
-        if (b.isEmpty) return -1; // b 是空字符串，排到后面
-        return a.compareTo(b); // 其他情况按字母顺序排序
-      });
-
-    // 按照排序后的键重新构建 Map，以保持新的顺序
-    final sortedMap = <String, List<Map<String, dynamic>>>{};
-    for (var key in sortedKeys) {
-      sortedMap[key] = _pwdMap[key]!;
-    }
-    _pwdMap = sortedMap;
-    appLogger.logger.i("Password sorted");
-  }
-
   /// 通过 id 查找该记录在 _pwdMap 中的真实位置
   _PwdLocation? _findLocationById(String id) {
     appLogger.logger.d("Finding password id $id");
@@ -237,51 +217,6 @@ class PwdProvider extends ChangeNotifier {
     final loc = _findLocationById(id);
     if (loc != null) return _pwdMap[loc.folder]![loc.index];
     return {};
-  }
-
-  /// 新增一个文件夹
-  ErrorCode addFolder(String name) {
-    appLogger.logger.i("Adding folder $name");
-    if (name == "") {
-      appLogger.logger.e("Empty folder name");
-      return ErrorCode.emptyFolderName;
-    } else if (_pwdMap.containsKey(name)) {
-      appLogger.logger.e("Duplicate folder name");
-      return ErrorCode.duplicateFolderName;
-    } else {
-      _pwdMap.addAll({name: []});
-      _sortPwdMapKeys(); // 先排序
-      notifyListeners(); // 再通知
-      appLogger.logger.i("Successfully added folder");
-      return ErrorCode.success;
-    }
-  }
-
-  /// 移除一个文件夹
-  ErrorCode removeFolder(String name) {
-    appLogger.logger.i("Removing folder $name");
-    _pwdMap.remove(name);
-    notifyListeners();
-    return ErrorCode.success;
-  }
-
-  /// 重命名文件夹
-  ErrorCode renameFolder(String before, String after) {
-    appLogger.logger.i("Renaming folder $before to $after");
-    if (after == "") {
-      appLogger.logger.e("New name is empty");
-      return ErrorCode.emptyFolderName;
-    } else if (_pwdMap.containsKey(after)) {
-      appLogger.logger.e("New name duplicated");
-      return ErrorCode.duplicateFolderName;
-    } else {
-      _pwdMap[after] = _pwdMap[before]!;
-      _pwdMap.remove(before);
-      _sortPwdMapKeys(); // 先排序
-      notifyListeners(); // 再通知
-      appLogger.logger.i("Renamed successfully");
-      return ErrorCode.success;
-    }
   }
 
   /// 获取当前密码的 JSON 字符串
