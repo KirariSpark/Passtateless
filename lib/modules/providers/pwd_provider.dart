@@ -197,55 +197,6 @@ class PwdProvider extends ChangeNotifier {
     }
   }
 
-  /// 将有效档案移动到新文件夹
-  ErrorCode moveTo(String id, String target) {
-    appLogger.logger.i("Moving password id $id to folder $target");
-    if (!isRecordValid(id)) {
-      appLogger.logger.e("Record id $id is invalid");
-      return ErrorCode.invalidRecord;
-    }
-    if (!_pwdMap.containsKey(target)) {
-      appLogger.logger.e("Target folder $target does not exist");
-      return ErrorCode.noSuchFolder;
-    }
-    final loc = _findLocationById(id)!;
-    if (loc.folder == target) {
-      appLogger.logger.i("Record already in target folder, no action needed");
-      return ErrorCode.success;
-    }
-    final record = _pwdMap[loc.folder]![loc.index];
-    _pwdMap[loc.folder]!.removeAt(loc.index); // 从原位置移除，不单独通知
-    _pwdMap[target]!.add(record); // 添加到目标文件夹
-    appLogger.logger.i("Successfully moved password id $id to $target");
-    notifyListeners();
-    return ErrorCode.success;
-  }
-
-  /// 将有效档案复制到新文件夹，并生成新 id
-  ErrorCode copyTo(String id, String target) {
-    appLogger.logger.i("Copying password id $id to folder $target");
-    if (!isRecordValid(id)) {
-      appLogger.logger.e("Record id $id is invalid");
-      return ErrorCode.invalidRecord;
-    }
-    if (!_pwdMap.containsKey(target)) {
-      appLogger.logger.e("Target folder $target does not exist");
-      return ErrorCode.noSuchFolder;
-    }
-    final loc = _findLocationById(id)!;
-    final original = _pwdMap[loc.folder]![loc.index];
-    final newRecord = Map<String, dynamic>.from(original);
-    final newId = _uuid.v4();
-    newRecord["id"] = newId;
-    appLogger.logger.d("Generated new id $newId for copy");
-    _pwdMap[target]!.add(newRecord);
-    appLogger.logger.i(
-      "Successfully copied password id $id to $target with new id $newId",
-    );
-    notifyListeners();
-    return ErrorCode.success;
-  }
-
   /// 在指定文件夹中增加一条空记录
   String addEmptyRecordTo(String folder) {
     appLogger.logger.i("Adding empty password to folder $folder");
