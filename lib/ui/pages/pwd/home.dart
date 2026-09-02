@@ -6,7 +6,7 @@ import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/eval.dart';
-import 'package:passtateless/ui/pages/pwd/folders.dart';
+import 'package:passtateless/ui/pages/pwd/list.dart';
 import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
     switch (tag) {
       case ("pages", "folders"):
         // 宽屏状态下不需要这些东西，父级页面已经做好了
-        return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
+        return PwdListPage(key: ValueKey(tag.$2), useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pages", "quickMode"):
@@ -107,9 +107,9 @@ class _HomePageState extends State<HomePage> {
           )],
           ? pwdProvider.starredPwds.isEmpty ? null : styles.spacingSizedBox,
           styled.buildListTile(
-            title: "资料夹",
+            title: "所有密码",
             titleTag: HeroTags.folders.tag,
-            subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改全部密码资料夹",
+            subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改所有密码",
             leading: Icons.format_list_bulleted,
             trailing: _buildTrailing(hasUnsavedChanges),
             isFirst: true,

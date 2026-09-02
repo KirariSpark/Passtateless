@@ -28,7 +28,7 @@ class PwdListPage extends StatelessWidget {
 
   const PwdListPage({
     super.key,
-    required this.folder,
+    this.folder = "",
     required this.useHero,
     this.hasPadding = true,
     this.hasAppBar = true
@@ -138,7 +138,7 @@ class PwdListPage extends StatelessWidget {
   }) {
     if (hasAppBar) {
       return styled.buildAppBar(
-        title: folder.isEmpty ? '未分类' : folder,
+        title: "所有密码",
         context: context,
         actions: [
           styled.buildPopupMenuButton(
@@ -202,7 +202,8 @@ class PwdListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pwdList = context.watch<PwdProvider>().getPwdList(folder);
+    // final pwdList = context.watch<PwdProvider>().getPwdList(folder);
+    final pwdList = context.watch<PwdProvider>().allPwds;
     final appProvider = context.read<AppProvider>();
     final pwdProvider = context.read<PwdProvider>();
     return _buildUi(

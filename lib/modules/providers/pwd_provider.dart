@@ -36,6 +36,16 @@ class PwdProvider extends ChangeNotifier {
     return _stars;
   }
 
+  List<Map<String, dynamic>> get allPwds {
+    final List<String> keys = _pwdMap.keys.toList();
+    List<Map<String, dynamic>> allPwds = [];
+    for (String key in keys) {
+      List<Map<String, dynamic>> pwds = _pwdMap[key]!;
+      allPwds.addAll(pwds);
+    }
+    return allPwds;
+  }
+
   List<String> get pwdFolders => _pwdMap.keys.toList();
 
   List<Map<String, dynamic>> getPwdList(String folder) => _pwdMap[folder] ?? [];
@@ -43,7 +53,8 @@ class PwdProvider extends ChangeNotifier {
   /// 对 _pwdMap 的键进行排序，同时确保空字符串 "" 永远在最后
   void _sortPwdMapKeys() {
     appLogger.logger.i("Sorting passwords");
-    final sortedKeys = _pwdMap.keys.toList()..sort((a, b) {
+    final sortedKeys = _pwdMap.keys.toList()
+      ..sort((a, b) {
         if (a.isEmpty && b.isEmpty) return 0;
         if (a.isEmpty) return 1; // a 是空字符串，排到后面
         if (b.isEmpty) return -1; // b 是空字符串，排到后面
@@ -86,7 +97,8 @@ class PwdProvider extends ChangeNotifier {
         final processedList = <Map<String, dynamic>>[];
         for (final item in value) {
           final itemMap = Map<String, dynamic>.from(item as Map);
-          final hasUuid = itemMap.containsKey("id") &&
+          final hasUuid =
+              itemMap.containsKey("id") &&
               itemMap["id"] != null &&
               itemMap["id"].toString().isNotEmpty;
 
@@ -128,9 +140,10 @@ class PwdProvider extends ChangeNotifier {
     }
     final item = _pwdMap[loc.folder]![loc.index];
     // 检查必需的键是否存在
-    if (!item.containsKey("identifier") || !item.containsKey("userName") ||
-        !item.containsKey("account") || !item.containsKey("starred")
-    ) {
+    if (!item.containsKey("identifier") ||
+        !item.containsKey("userName") ||
+        !item.containsKey("account") ||
+        !item.containsKey("starred")) {
       appLogger.logger.w("Record id $id missing required keys");
       return false;
     }
@@ -226,7 +239,9 @@ class PwdProvider extends ChangeNotifier {
     newRecord["id"] = newId;
     appLogger.logger.d("Generated new id $newId for copy");
     _pwdMap[target]!.add(newRecord);
-    appLogger.logger.i("Successfully copied password id $id to $target with new id $newId");
+    appLogger.logger.i(
+      "Successfully copied password id $id to $target with new id $newId",
+    );
     notifyListeners();
     return ErrorCode.success;
   }
@@ -256,7 +271,8 @@ class PwdProvider extends ChangeNotifier {
     appLogger.logger.i("Switching star state of password id $id");
     final loc = _findLocationById(id);
     if (loc != null) {
-      _pwdMap[loc.folder]![loc.index]["starred"] = !_pwdMap[loc.folder]![loc.index]["starred"];
+      _pwdMap[loc.folder]![loc.index]["starred"] =
+          !_pwdMap[loc.folder]![loc.index]["starred"];
       appLogger.logger.i("Successfully switched star state");
       notifyListeners();
     } else {
@@ -374,7 +390,9 @@ class PwdProvider extends ChangeNotifier {
         return ErrorCode.jsonFormatError;
       }
     } else if (stat == ErrorCode.fileNotExist) {
-      appLogger.logger.w("No archive file found, creating empty archive using current master password");
+      appLogger.logger.w(
+        "No archive file found, creating empty archive using current master password",
+      );
       await saveArchive(masterPwd);
       return await readArchive(masterPwd);
     } else {
@@ -386,7 +404,11 @@ class PwdProvider extends ChangeNotifier {
   /// 保存当前数据到加密的归档文件
   Future<ErrorCode> saveArchive(String masterPwd) async {
     appLogger.logger.i("Writing password archive");
-    final stat = await writeEncryptedJsonFile(enums.Paths.pwdRecord.path, _pwdMap, masterPwd);
+    final stat = await writeEncryptedJsonFile(
+      enums.Paths.pwdRecord.path,
+      _pwdMap,
+      masterPwd,
+    );
     appLogger.logger.d("Stat: ${stat.code}");
     return stat;
   }
@@ -405,7 +427,9 @@ class PwdProvider extends ChangeNotifier {
       if (inputNew == inputConfirm) {
         // 再验证它们是否为空
         if ((inputNew.isNotEmpty) && (inputConfirm.isNotEmpty)) {
-          appLogger.logger.i("Verifying passed, saving archive using new password");
+          appLogger.logger.i(
+            "Verifying passed, saving archive using new password",
+          );
           // 新密码和确认密码验证通过，执行重新加密保存
           return await saveArchive(utils.toSHA256(inputNew));
         } else {
