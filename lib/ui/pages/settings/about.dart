@@ -26,7 +26,7 @@ class AboutPage extends StatelessWidget {
                 Image.asset("assets/icon.png", width: 100),
                 styles.spacingSizedBox,
                 Text("Passtateless", style: Theme.of(context).textTheme.bodyLarge),
-                Text("0.1.12 - beta"),
+                Text("0.2.0 - alpha"),
                 styles.spacingSizedBox,
                 styled.buildTextButton(
                   onPressed: () => showLicensePage(context: context),
