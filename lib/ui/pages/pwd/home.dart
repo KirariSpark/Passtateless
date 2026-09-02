@@ -58,6 +58,8 @@ class _HomePageState extends State<HomePage> {
         return PwdFolderPage(key: ValueKey(tag.$2), useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
+      case ("pages", "quickMode"):
+       return PwdViewPage(key: ValueKey(tag.$2), enableEdit: true, useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pwd", String id):
         return PwdViewPage(key: ValueKey(id), id: id, useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       default:
@@ -124,12 +126,24 @@ class _HomePageState extends State<HomePage> {
             subtitle: "评估密码强度，获取相关建议",
             leading: Icons.checklist,
             trailing: Icon(Icons.arrow_forward),
-            isLast: true,
             onTapped: () {
               appLogger.logger.d("Selected: ('pages', 'pwdEval')");
               navigateTo(("pages", "pwdEval"));
             },
             active: isSelected(("pages", "pwdEval")),
+            context: context
+          ),
+          styled.buildListTile(
+            title: "快速开始",
+            subtitle: "不创建资料，直接生成密码",
+            leading: Icons.play_circle_outline,
+            trailing: Icon(Icons.arrow_forward),
+            isLast: true,
+            onTapped: () {
+              appLogger.logger.d("Selected: ('pages', 'pwdEval')");
+              navigateTo(("pages", "quickMode"));
+            },
+            active: isSelected(("pages", "quickMode")),
             context: context
           ),
         ],

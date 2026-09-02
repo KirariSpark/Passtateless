@@ -15,7 +15,7 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';
 
-/// 密码记录的只读页面
+/// 密码记录的查看页面，也用于密码的生成功能，通过传入enableEdit来启用快速模式（此时将不会使用传入的id初始化页面）
 ///
 /// 记录的 id 将被用于 Hero 动画
 class PwdViewPage extends StatefulWidget {
@@ -30,7 +30,18 @@ class PwdViewPage extends StatefulWidget {
 
   /// 页面是否有内边距
   final bool hasPadding;
-  const PwdViewPage({super.key,required this.id, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+
+  /// 是否启用编辑模式/快速模式
+  final bool enableEdit;
+
+  const PwdViewPage({
+    super.key,
+    this.id = "",
+    this.useHero = true,
+    this.hasAppBar = true,
+    this.hasPadding = true,
+    this.enableEdit = false,
+  });
 
   @override
   State<PwdViewPage> createState() => _PwdViewPageState();
@@ -48,21 +59,27 @@ class _PwdViewPageState extends State<PwdViewPage> {
   late final AppProvider _appProvider;
   late final PwdProvider _pwdProvider;
 
+  // Controllers
+  final TextEditingController identifierController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController accountController = TextEditingController();
+
   // 一些内部要用到的状态
   Presets _preset = Presets.simple;
   bool isGenerating = false;
   bool removeDigits = false;
   bool removeAlpha = false;
   bool removeSp = false;
+  bool somethingWentWrong = false; // 暂时还没用
 
   Future<void> _editCfg() async {
     // 跳转并等待返回结果
     appLogger.logger.i("Pushing to generator config edit page");
     final result = await Navigator.push(
-      context, 
+      context,
       ui.switchRoute(
-        _appProvider.currentNavMode, 
-        builder: (_) => CfgEditPage(initialText: _configController.text)
+        _appProvider.currentNavMode,
+        builder: (_) => CfgEditPage(initialText: _configController.text),
       ),
     );
 
@@ -110,7 +127,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
   }
 
   bool _isBuiltin(Presets preset) {
-    return <Presets>[Presets.simple, Presets.complex, Presets.bank].contains(_preset);
+    return <Presets>[
+      Presets.simple,
+      Presets.complex,
+      Presets.bank,
+    ].contains(_preset);
   }
 
   /// 生成密码并显示提示（返回生成的密码或错误信息）
@@ -119,7 +140,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
     required bool copyAfterGenerate,
     required String identifier,
     required String userName,
-    required String account
+    required String account,
   }) async {
     appLogger.logger.i("Generating password");
     setState(() => isGenerating = true);
@@ -152,7 +173,10 @@ class _PwdViewPageState extends State<PwdViewPage> {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("JSON 格式错误\n${e.toString()}", style: TextStyle(fontFamily: "SourceCodePro")),
+            content: Text(
+              "JSON 格式错误\n${e.toString()}",
+              style: TextStyle(fontFamily: "SourceCodePro"),
+            ),
             showCloseIcon: true,
           ),
         );
@@ -186,14 +210,15 @@ class _PwdViewPageState extends State<PwdViewPage> {
         onChanged: _selectPreset,
         child: Column(
           children: [
-            for (var item in Presets.values) RadioListTile(
-              value: item,
-              subtitle: Text(item.desc),
-              shape: styles.roundedBorder,
-              title: Text(item.displayName)
-            )
+            for (var item in Presets.values)
+              RadioListTile(
+                value: item,
+                subtitle: Text(item.desc),
+                shape: styles.roundedBorder,
+                title: Text(item.displayName),
+              ),
           ],
-        )
+        ),
       ),
       actionText: "取消",
       action: () => Navigator.of(context).pop(),
@@ -212,15 +237,13 @@ class _PwdViewPageState extends State<PwdViewPage> {
 
   Future<void> _genAndCopyPwd() async {
     // 开始生成
-    appLogger.logger.i(
-      "Generating password for copying",
-    );
+    appLogger.logger.i("Generating password for copying");
     await _genPwd(
       context: context,
       copyAfterGenerate: true,
-      identifier: identifier,
-      userName: userName,
-      account: account,
+      identifier: widget.enableEdit ? identifierController.text : identifier,
+      userName: widget.enableEdit ? userNameController.text : userName,
+      account: widget.enableEdit ? accountController.text : account,
     );
     // 启用按钮
     setState(() => isGenerating = false);
@@ -234,14 +257,19 @@ class _PwdViewPageState extends State<PwdViewPage> {
       copyAfterGenerate: false,
       identifier: identifier,
       userName: userName,
-      account: account
+      account: account,
     );
     if (context.mounted) {
       if (stat == ErrorCode.success) {
-        appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
+        appLogger.logger.i(
+          "Generated successfully, pushing to fullscreen mode",
+        );
         Navigator.push(
           context,
-          ui.switchRoute(_appProvider.currentNavMode, builder: (context) => FullscreenPwd(res)),
+          ui.switchRoute(
+            _appProvider.currentNavMode,
+            builder: (context) => FullscreenPwd(res),
+          ),
         );
       } else {
         appLogger.logger.e("Can not generate password: ${stat.code}");
@@ -251,22 +279,76 @@ class _PwdViewPageState extends State<PwdViewPage> {
     setState(() => isGenerating = false);
   }
 
+  List<Widget> _buildHeader() {
+    if (widget.enableEdit) {
+      return [
+        styled.buildTextField(
+          label: "档案名",
+          controller: identifierController,
+          context: context
+        ),
+        styles.spacingSizedBox,
+        styled.buildTextField(
+          label: "用户名",
+          controller: userNameController,
+          context: context
+        ),
+        styles.spacingSizedBox,
+        styled.buildTextField(
+          label: "账号",
+          controller: accountController,
+          context: context
+        )
+      ];
+    } else {
+      return [
+        styled.buildListTile(
+          title: "档案名",
+          subtitle: identifier,
+          isFirst: true,
+          context: context,
+        ),
+        styled.buildListTile(
+          title: "用户名",
+          subtitle: userName,
+          context: context,
+        ),
+        styled.buildListTile(
+          title: "账号",
+          subtitle: account,
+          isLast: true,
+          context: context,
+        ),
+      ];
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _appProvider = context.read<AppProvider>();
     _pwdProvider = context.read<PwdProvider>();
 
-    final data = _pwdProvider.getItemById(widget.id);
-    identifier = data["identifier"];
-    userName = data["userName"];
-    account = data["account"];
-    id = data["id"];
+    if (!widget.enableEdit) {
+      final data = _pwdProvider.getItemById(widget.id);
+      identifier = data["identifier"];
+      userName = data["userName"];
+      account = data["account"];
+      id = data["id"];
+    } else {
+      identifier = "Quick mode enabled";
+      userName = "Quick mode enabled";
+      account = "Quick mode enabled";
+      id = "Quick mode enabled";
+    }
   }
 
   @override
   void dispose() {
     _configController.dispose();
+    identifierController.dispose();
+    userNameController.dispose();
+    accountController.dispose();
     super.dispose();
   }
 
@@ -282,23 +364,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
             constraints: styles.tileWidthConstraint,
             child: Column(
               children: [
-                styled.buildListTile(
-                  title: "档案名",
-                  subtitle: identifier,
-                  isFirst: true,
-                  context: context,
-                ),
-                styled.buildListTile(
-                  title: "用户名",
-                  subtitle: userName,
-                  context: context,
-                ),
-                styled.buildListTile(
-                  title: "账号",
-                  subtitle: account,
-                  isLast: true,
-                  context: context,
-                ),
+                ..._buildHeader(),
                 styles.spacingSizedBox,
                 // 移除数字
                 SwitchListTile(
@@ -306,10 +372,14 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   onChanged: (value) {
                     if (removeSp == true && removeAlpha == true) return;
                     setState(() => removeDigits = value);
-                    appLogger.logger.d("Current digit removal state: $removeDigits");
+                    appLogger.logger.d(
+                      "Current digit removal state: $removeDigits",
+                    );
                   },
                   title: const Text("移除数字"),
-                  shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(isFirst: true)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: ui.calcRadius(isFirst: true),
+                  ),
                   tileColor: ColorScheme.of(context).surfaceContainerLow,
                 ),
                 // 移除字母
@@ -318,7 +388,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   onChanged: (value) {
                     if (removeDigits == true && removeSp == true) return;
                     setState(() => removeAlpha = value);
-                    appLogger.logger.d("Current alphabet removal state: $removeAlpha");
+                    appLogger.logger.d(
+                      "Current alphabet removal state: $removeAlpha",
+                    );
                   },
                   title: const Text("移除字母"),
                   tileColor: ColorScheme.of(context).surfaceContainerLow,
@@ -329,10 +401,14 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   onChanged: (value) {
                     if (removeDigits == true && removeAlpha == true) return;
                     setState(() => removeSp = value);
-                    appLogger.logger.d("Current special char removal state: $removeSp");
+                    appLogger.logger.d(
+                      "Current special char removal state: $removeSp",
+                    );
                   },
                   title: const Text("移除特殊字符"),
-                  shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(isLast: true)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: ui.calcRadius(isLast: true),
+                  ),
                   tileColor: ColorScheme.of(context).surfaceContainerLow,
                 ),
                 styles.spacingSizedBox,
@@ -342,8 +418,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(_preset.displayName, style: Theme.of(context).textTheme.bodyLarge),
-                      Icon(Icons.arrow_drop_down)
+                      Text(
+                        _preset.displayName,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      Icon(Icons.arrow_drop_down),
                     ],
                   ),
                   isFirst: true,
