@@ -17,7 +17,12 @@ class AnimationSettingsPage extends StatefulWidget {
   /// 是否有内边距
   final bool hasPadding;
 
-  const AnimationSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+  const AnimationSettingsPage({
+    super.key,
+    required this.useHero,
+    this.hasAppBar = true,
+    this.hasPadding = true
+  });
 
   @override
   State<AnimationSettingsPage> createState() => _AnimationSettingsPageState();
@@ -38,7 +43,7 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
 
     return Scaffold(
       appBar: widget.hasAppBar
-        ? styled.buildAppBar(title: "动画", context: context, titleTag: widget.useHero ? "settings/animations" : null)
+        ? styled.buildAppBar(title: "动画", context: context, titleTag: widget.useHero ? HeroTags.animationSettings.tag : null)
         : null,
       body: Container(
         alignment: Alignment.topCenter,

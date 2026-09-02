@@ -23,7 +23,7 @@ class ContrastSettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: hasAppBar ? styled.buildAppBar(
         title: "对比度",
-        titleTag: useHero ? "contrast" : null,
+        titleTag: useHero ? HeroTags.contrastnessSettings.tag : null,
         context: context
       ) : null,
       body: Container(
