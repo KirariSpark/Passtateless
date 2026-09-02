@@ -13,20 +13,37 @@ import 'package:provider/provider.dart';
 class ThemeSettingsPage extends StatelessWidget {
   /// 有AppBar时，是否要使用Hero动画
   final bool useHero;
+  
   /// 是否要包含AppBar
   final bool hasAppBar;
+  
   /// 是否有内边距
   final bool hasPadding;
-  const ThemeSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+  
+  const ThemeSettingsPage({
+    super.key, 
+    required this.useHero,
+    this.hasAppBar = true, 
+    this.hasPadding = true
+  });
+
+  AppBar? _buildAppBar(BuildContext context) {
+    if (hasAppBar) {
+      return styled.buildAppBar(
+        title: "主题", 
+        context: context, 
+        titleTag: useHero ? HeroTags.themeSettings.tag : null
+      );
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     final appProvider = context.watch<AppProvider>();
 
     return Scaffold(
-      appBar: hasAppBar
-        ? styled.buildAppBar(title: "主题", context: context, titleTag: useHero ? "settings/themes" : null)
-        : null,
+      appBar: _buildAppBar(context),
       body: Container(
         alignment: Alignment.topCenter,
         child: Container(

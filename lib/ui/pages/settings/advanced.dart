@@ -25,7 +25,12 @@ class AdvancedSettingsPage extends StatefulWidget {
   /// 是否有内边距
   final bool hasPadding;
 
-  const AdvancedSettingsPage({super.key, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+  const AdvancedSettingsPage({
+    super.key,
+    required this.useHero,
+    this.hasAppBar = true,
+    this.hasPadding = true
+  });
 
   @override
   State<AdvancedSettingsPage> createState() => _AdvancedSettingsPageState();
@@ -188,7 +193,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: widget.hasAppBar
-        ? styled.buildAppBar(title: "高级设置", titleTag: widget.useHero ? "advanced" : null, context: context)
+        ? styled.buildAppBar(title: "高级设置", titleTag: widget.useHero ? HeroTags.advancedSettings.tag : null, context: context)
         : null,
       body: Container(
         alignment: Alignment.topCenter,

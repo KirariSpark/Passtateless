@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
+import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
@@ -227,7 +228,7 @@ class _PwdFolderPageState extends State<PwdFolderPage> {
           )
         ],
         context: context,
-        titleTag: widget.useHero ? "folders" : null
+        titleTag: widget.useHero ? HeroTags.folders.tag : null
       );
     }
     return null;

@@ -108,12 +108,21 @@ enum DocItems {
   basic("基本信息", "basic", "本软件的介绍", "assets/docs/basic.md"),
   getStarted("开始使用", "get_started", "查看此文档以快速上手", "assets/docs/get_started.md"),
   faq("常见问题", "faq", "你可能会遇到的问题", "assets/docs/faq.md"),
-  jsonBasic("JSON 基础", "json_basic", "了解基础的 JSON 语法", "assets/docs/json_basic.md"),
+  jsonBasic(
+    "JSON 基础",
+    "json_basic",
+    "了解基础的 JSON 语法",
+    "assets/docs/json_basic.md",
+  ),
   cfg("配置生成器", "cfg", "了解生成器的功能及其参数", "assets/docs/cfg.md"),
   cfgTips("生成器提示", "cfg_tips", "生成器的一些特性", "assets/docs/cfg_tips.md"),
   features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md"),
-  importExport("导入导出", "import_export", "备份、恢复和分享你的数据", "assets/docs/import_export.md");
-
+  importExport(
+    "导入导出",
+    "import_export",
+    "备份、恢复和分享你的数据",
+    "assets/docs/import_export.md",
+  );
 
   final String displayName;
   final String mode;
@@ -123,4 +132,35 @@ enum DocItems {
   const DocItems(this.displayName, this.mode, this.desc, this.path);
 }
 
-const List<DocItems> editorHelpItems = [DocItems.jsonBasic, DocItems.cfg, DocItems.cfgTips];
+enum HeroTags {
+  pwdEval("pwd/eval"),
+  changeMaster("settings/changeMaster"),
+  themeSettings("settings/theme"),
+  animationSettings("settings/animation"),
+  contrastnessSettings("settings/contrastness"),
+  advancedSettings("settings/advanced"),
+  folders("pwd/folders");
+
+  final String tag;
+
+  const HeroTags(this.tag);
+}
+
+enum Pages {
+  changeMaster(("settings", "changeMaster")),
+  animationSettings(("settings", "animation")),
+  contrastnessSettings(("settings", "contrastness")),
+  advancedSettings(("settings", "advanced")),
+  about(("settings", "about")),
+  themeSettings(("settings", "theme"));
+
+  final (String, String) id;
+
+  const Pages(this.id);
+}
+
+const List<DocItems> editorHelpItems = [
+  DocItems.jsonBasic,
+  DocItems.cfg,
+  DocItems.cfgTips,
+];
