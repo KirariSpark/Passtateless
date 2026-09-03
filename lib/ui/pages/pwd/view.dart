@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
+import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
 import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
@@ -212,7 +213,74 @@ class _PwdViewPageState extends State<PwdViewPage> {
     );
   }
 
+  /// 弹出主密码验证对话框，返回：验证结果为ErrorCode或null（用户取消）
+  Future<ErrorCode?> _verifyMasterPwd() async {
+    appLogger.logger.i("Requesting master password verification");
+    final controller = TextEditingController();
+    final result = await showDialog<ErrorCode>(
+      useRootNavigator: false,
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        scrollable: true,
+        shape: styles.roundedBorder,
+        title: const Text("验证主密码"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("生成密码前需要先验证主密码"),
+            styles.spacingSizedBox,
+            styled.buildTextField(
+              context: dialogContext,
+              controller: controller,
+              label: "主密码",
+              passwordMode: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            style: styles.buttonStyle,
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text("取消"),
+          ),
+          TextButton(
+            style: styles.buttonStyle,
+            onPressed: () {
+              if (controller.text.isEmpty) {
+                Navigator.pop(dialogContext, ErrorCode.emptyPwd);
+              } else if (utils.toSHA256(controller.text) ==
+                  _appProvider.masterPwd) {
+                Navigator.pop(dialogContext, ErrorCode.success);
+              } else {
+                Navigator.pop(dialogContext, ErrorCode.wrongPwd);
+              }
+            },
+            child: const Text("确定"),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return result;
+  }
+
+  /// 验证主密码，未通过或取消时返回false；密码错误时给出提示
+  Future<bool> _ensureMasterPwdVerified() async {
+    if (_appProvider.masterPwd.isEmpty) return true;
+    final result = await _verifyMasterPwd();
+    if (result == ErrorCode.success) return true;
+    if (result != null && mounted) {
+      appLogger.logger.e(result.generic);
+      ui.showSnackBarQuick(result.generic, context);
+    }
+    return false;
+  }
+
   Future<void> _genAndCopyPwd() async {
+    // 生成前先验证主密码
+    if (!await _ensureMasterPwdVerified()) return;
+    if (!mounted) return;
     // 开始生成
     appLogger.logger.i("Generating password for copying");
     await _genPwd(
@@ -223,12 +291,15 @@ class _PwdViewPageState extends State<PwdViewPage> {
       account: widget.enableEdit ? accountController.text : account,
     );
     // 启用按钮
-    setState(() => isGenerating = false);
+    if (mounted) setState(() => isGenerating = false);
   }
 
   Future<void> _viewPwd() async {
     appLogger.logger.i("Generating password for viewing");
     Navigator.pop(context);
+    // 生成前先验证主密码
+    if (!await _ensureMasterPwdVerified()) return;
+    if (!mounted) return;
     final (stat, res) = await _genPwd(
       context: context,
       copyAfterGenerate: false,
@@ -236,21 +307,18 @@ class _PwdViewPageState extends State<PwdViewPage> {
       userName: userName,
       account: account,
     );
-    if (context.mounted) {
-      if (stat == ErrorCode.success) {
-        appLogger.logger.i(
-          "Generated successfully, pushing to fullscreen mode",
-        );
-        Navigator.push(
-          context,
-          ui.switchRoute(
-            _appProvider.currentNavMode,
-            builder: (context) => FullscreenPwd(res),
-          ),
-        );
-      } else {
-        appLogger.logger.e("Can not generate password: ${stat.code}");
-      }
+    if (!mounted) return;
+    if (stat == ErrorCode.success) {
+      appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
+      Navigator.push(
+        context,
+        ui.switchRoute(
+          _appProvider.currentNavMode,
+          builder: (context) => FullscreenPwd(res),
+        ),
+      );
+    } else {
+      appLogger.logger.e("Can not generate password: ${stat.code}");
     }
     // 启用按钮
     setState(() => isGenerating = false);
