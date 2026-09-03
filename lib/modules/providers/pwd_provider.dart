@@ -24,29 +24,30 @@ class PwdProvider extends ChangeNotifier {
   Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
   List<Map<String, dynamic>> _stars = [];
 
-  bool _removeDigits = false;
-  bool _removeAlpha = false;
-  bool _removeSp = false;
+  /// 已开启"移除"的字符类型队列，队首为最旧的项
+  final List<enums.CharType> _removedQueue = [];
 
-  bool get removeDigits => _removeDigits;
-  bool get removeAlpha => _removeAlpha;
-  bool get removeSp => _removeSp;
+  bool get removeDigits => _removedQueue.contains(enums.CharType.digits);
+  bool get removeAlpha => _removedQueue.contains(enums.CharType.alpha);
+  bool get removeSp => _removedQueue.contains(enums.CharType.specialChar);
 
-  set removeDigits(bool value) {
-    if (value && _removeAlpha && _removeSp) return;
-    _removeDigits = value;
-    notifyListeners();
-  }
+  set removeDigits(bool value) => _setRemoved(enums.CharType.digits, value);
+  set removeAlpha(bool value) => _setRemoved(enums.CharType.alpha, value);
+  set removeSp(bool value) => _setRemoved(enums.CharType.specialChar, value);
 
-  set removeAlpha(bool value) {
-    if (value && _removeDigits && _removeSp) return;
-    _removeAlpha = value;
-    notifyListeners();
-  }
-
-  set removeSp(bool value) {
-    if (value && _removeDigits && _removeAlpha) return;
-    _removeSp = value;
+  void _setRemoved(enums.CharType type, bool enabled) {
+    if (enabled) {
+      // 若已开启则视为重新确认：摘除后重新入队
+      _removedQueue.remove(type);
+      // 队列已达上限(2)时，最旧的(队首)项自动取消移除
+      if (_removedQueue.length >= 2) {
+        _removedQueue.removeAt(0);
+      }
+      _removedQueue.add(type);
+    } else {
+      // 单独取消移除，从队列中任意位置摘除
+      _removedQueue.remove(type);
+    }
     notifyListeners();
   }
 

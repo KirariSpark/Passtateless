@@ -27,6 +27,13 @@ enum Presets {
   const Presets(this.preset, this.displayName, this.desc);
 }
 
+/// 密码生成时可移除的字符类型（数字/字母/特殊字符）
+enum CharType {
+  digits,
+  alpha,
+  specialChar;
+}
+
 enum RemindDays {
   debugAlways(Duration(milliseconds: 0), "每次启动"),
   days60(Duration(days: 60), '每 60 天'),
