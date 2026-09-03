@@ -53,11 +53,7 @@ class PwdProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<PwdItem> get starredPwds {
-    return flattenAndGetItemList(_pwdMap).where((item) => item.starred).toList();
-  }
-
-  List<Map<String, dynamic>> get allPwds => flattenPwdMap(_pwdMap);
+  List<PwdItem> get starredPwdList => flattenAndGetItemList(_pwdMap).where((item) => item.starred).toList();
 
   List<PwdItem> get pwdList => flattenAndGetItemList(_pwdMap);
 
@@ -124,38 +120,7 @@ class PwdProvider extends ChangeNotifier {
   /// 有效条件：存在 identifier、userName、account、starred 键，且除 identifier 外的键值不为空
   bool isRecordValid(String id) {
     appLogger.logger.d("Checking validity of password id $id");
-    final loc = _findLocationById(id);
-    if (loc == null) {
-      appLogger.logger.w("No record found for id $id");
-      return false;
-    }
-    final item = _pwdMap[loc.folder]![loc.index];
-    // 检查必需的键是否存在
-    if (!item.containsKey("identifier") ||
-        !item.containsKey("userName") ||
-        !item.containsKey("account") ||
-        !item.containsKey("starred")) {
-      appLogger.logger.w("Record id $id missing required keys");
-      return false;
-    }
-    // identifier 允许为空，其他键值不能为空
-    final userName = item["userName"];
-    final account = item["account"];
-    final starred = item["starred"];
-    if (userName == null || userName.toString().isEmpty) {
-      appLogger.logger.w("Record id $id has empty userName");
-      return false;
-    }
-    if (account == null || account.toString().isEmpty) {
-      appLogger.logger.w("Record id $id has empty account");
-      return false;
-    }
-    if (starred == null) {
-      appLogger.logger.w("Record id $id has null starred");
-      return false;
-    }
-    appLogger.logger.d("Record id $id is valid");
-    return true;
+    return pwdList.firstWhere((item) => item.isMe(id)).isValid();
   }
 
   /// 使用 id 更新指定项的数据

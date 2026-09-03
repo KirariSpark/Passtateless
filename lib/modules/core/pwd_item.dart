@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import 'package:passtateless/modules/core/logger.dart';
 
 /// 单个密码记录的类
 class PwdItem {
@@ -45,7 +46,7 @@ class PwdItem {
       "userName": userName,
       "account": account,
       "starred": starred,
-      "tags": tags
+      "tags": tags,
     };
   }
 
@@ -53,6 +54,7 @@ class PwdItem {
   ///
   /// 不要求字典中有 "id" 键，若缺失则自动生成一个 UUID V4。
   factory PwdItem.fromMap(Map<String, dynamic> map) {
+    appLogger.logger.d("Creating PwdItem from a map");
     return PwdItem(
       id: map["id"] as String? ?? const Uuid().v4(),
       identifier: map["identifier"] as String? ?? "",
@@ -62,4 +64,9 @@ class PwdItem {
       tags: (map["tags"] as List?)?.whereType<String>().toList() ?? const [],
     );
   }
+
+  /// 检查这一项记录是否是有效的
+  ///
+  /// 要求 account、userName 均不为空
+  bool isValid() => (account.isNotEmpty && userName.isNotEmpty);
 }

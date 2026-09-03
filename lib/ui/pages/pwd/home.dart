@@ -98,14 +98,14 @@ class _HomePageState extends State<HomePage> {
       constraints: isWide ? styles.tileWidthConstraintSmall : styles.tileWidthConstraint,
       child: ListView(
         children: [
-          ...[for (final (index, item) in pwdProvider.starredPwds.indexed) PwdTile(
+          ...[for (final (index, item) in pwdProvider.starredPwdList.indexed) PwdTile(
             pwdRecord: item,
             isFirst: index == 0,
-            isLast: index == pwdProvider.starredPwds.length - 1,
+            isLast: index == pwdProvider.starredPwdList.length - 1,
             isActive: isSelected(("pwd", item.id)),
             onTapped: () => navigateTo(("pwd", item.id)),
           )],
-          ? pwdProvider.starredPwds.isEmpty ? null : styles.spacingSizedBox,
+          ? pwdProvider.starredPwdList.isEmpty ? null : styles.spacingSizedBox,
           styled.buildListTile(
             title: "所有密码",
             titleTag: HeroTags.folders.tag,
