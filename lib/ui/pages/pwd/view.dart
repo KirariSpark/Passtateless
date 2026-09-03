@@ -12,6 +12,7 @@ import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
 import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/removal_cfg.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';
 
@@ -67,9 +68,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
   // 一些内部要用到的状态
   Presets _preset = Presets.simple;
   bool isGenerating = false;
-  bool removeDigits = false;
-  bool removeAlpha = false;
-  bool removeSp = false;
 
   Future<void> _editCfg() async {
     // 跳转并等待返回结果
@@ -143,9 +141,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
       identifier: identifier,
       userName: userName,
       account: account,
-      removeDigits: removeDigits,
-      removeAlpha: removeAlpha,
-      removeSp: removeSp,
+      removeDigits: _pwdProvider.removeDigits,
+      removeAlpha: _pwdProvider.removeAlpha,
+      removeSp: _pwdProvider.removeSp,
     );
 
     if (res.$1 == ErrorCode.jsonFormatError) {
@@ -389,51 +387,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
               children: [
                 ..._buildHeader(),
                 styles.spacingSizedBox,
-                // 移除数字
-                SwitchListTile(
-                  value: removeDigits,
-                  onChanged: (value) {
-                    if (removeSp == true && removeAlpha == true) return;
-                    setState(() => removeDigits = value);
-                    appLogger.logger.d(
-                      "Current digit removal state: $removeDigits",
-                    );
-                  },
-                  title: const Text("移除数字"),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ui.calcRadius(isFirst: true),
-                  ),
-                  tileColor: ColorScheme.of(context).surfaceContainerLow,
-                ),
-                // 移除字母
-                SwitchListTile(
-                  value: removeAlpha,
-                  onChanged: (value) {
-                    if (removeDigits == true && removeSp == true) return;
-                    setState(() => removeAlpha = value);
-                    appLogger.logger.d(
-                      "Current alphabet removal state: $removeAlpha",
-                    );
-                  },
-                  title: const Text("移除字母"),
-                  tileColor: ColorScheme.of(context).surfaceContainerLow,
-                ),
-                // 移除特殊字符
-                SwitchListTile(
-                  value: removeSp,
-                  onChanged: (value) {
-                    if (removeDigits == true && removeAlpha == true) return;
-                    setState(() => removeSp = value);
-                    appLogger.logger.d(
-                      "Current special char removal state: $removeSp",
-                    );
-                  },
-                  title: const Text("移除特殊字符"),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ui.calcRadius(isLast: true),
-                  ),
-                  tileColor: ColorScheme.of(context).surfaceContainerLow,
-                ),
+                const RemovalCfg(),
                 styles.spacingSizedBox,
                 DropdownMenu(
                   label: Text("生成预设"),

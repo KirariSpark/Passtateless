@@ -24,6 +24,32 @@ class PwdProvider extends ChangeNotifier {
   Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
   List<Map<String, dynamic>> _stars = [];
 
+  bool _removeDigits = false;
+  bool _removeAlpha = false;
+  bool _removeSp = false;
+
+  bool get removeDigits => _removeDigits;
+  bool get removeAlpha => _removeAlpha;
+  bool get removeSp => _removeSp;
+
+  set removeDigits(bool value) {
+    if (value && _removeAlpha && _removeSp) return;
+    _removeDigits = value;
+    notifyListeners();
+  }
+
+  set removeAlpha(bool value) {
+    if (value && _removeDigits && _removeSp) return;
+    _removeAlpha = value;
+    notifyListeners();
+  }
+
+  set removeSp(bool value) {
+    if (value && _removeDigits && _removeAlpha) return;
+    _removeSp = value;
+    notifyListeners();
+  }
+
   List<Map<String, dynamic>> get starredPwds {
     _stars = [];
     _pwdMap.forEach((folder, items) {
