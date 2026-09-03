@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/core/pwd_item.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -65,7 +66,7 @@ class PwdListPage extends StatelessWidget {
   }
 
   List<Widget> _buildList({
-    required List<Map<String, dynamic>> pwdList,
+    required List<PwdItem> pwdList,
     required BuildContext context,
     required PwdProvider pwdProvider,
     required AppProvider appProvider,
@@ -94,11 +95,11 @@ class PwdListPage extends StatelessWidget {
             isFirst: index == 0,
             isLast: index == pwdList.length - 1,
             onTapped: () {
-              appLogger.logger.i("Pushing to view page for ${item["id"]}");
+              appLogger.logger.i("Pushing to view page for ${item.id}");
               Navigator.push(
                 context,
                 ui.switchRoute(
-                  appProvider.currentNavMode, builder: (context) => PwdViewPage(id: item["id"], useHero: true),
+                  appProvider.currentNavMode, builder: (context) => PwdViewPage(id: item.id, useHero: true),
                 ),
               );
             },
@@ -164,7 +165,7 @@ class PwdListPage extends StatelessWidget {
   }
 
   Scaffold _buildUi(
-    List<Map<String, dynamic>> pwdList,
+    List<PwdItem> pwdList,
     BuildContext context, {
     required bool useHero,
     required bool hasPadding,
@@ -202,12 +203,11 @@ class PwdListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final pwdList = context.watch<PwdProvider>().getPwdList(folder);
-    final pwdList = context.watch<PwdProvider>().allPwds;
+    final pwds = context.watch<PwdProvider>().pwdList;
     final appProvider = context.read<AppProvider>();
     final pwdProvider = context.read<PwdProvider>();
     return _buildUi(
-      pwdList,
+      pwds,
       context,
       useHero: useHero,
       hasPadding: hasPadding,

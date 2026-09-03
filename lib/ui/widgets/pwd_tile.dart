@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/core/pwd_item.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -11,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class PwdTile extends StatelessWidget {
   /// 单个密码记录条目
-  final Map<String, dynamic> pwdRecord;
+  final PwdItem pwdRecord;
 
   /// 组件本身被点击时，应该做的事
   final void Function()? onTapped;
@@ -45,7 +46,7 @@ class PwdTile extends StatelessWidget {
 
   void _deleteArchive(BuildContext context, PwdProvider pwdProvider, AppProvider appProvider) {
     appLogger.logger.i("Deleting password archive");
-    final res = pwdProvider.removeRecordById(pwdRecord["id"]);
+    final res = pwdProvider.removeRecordById(pwdRecord.id);
     if (res != ErrorCode.success) {
       appLogger.logger.e("Can not delete archive: $res");
       ui.showSnackBarQuick(res.generic, context);
@@ -66,10 +67,10 @@ class PwdTile extends StatelessWidget {
   }
 
   void _editArchive(BuildContext context, AppProvider appProvider) {
-    appLogger.logger.i("Pushing to edit page for ${pwdRecord["id"]}");
+    appLogger.logger.i("Pushing to edit page for ${pwdRecord.id}");
     Navigator.pop(context);
     Navigator.push(
-      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: pwdRecord["id"]))
+      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: pwdRecord.id))
     );
   }
 
@@ -113,17 +114,16 @@ class PwdTile extends StatelessWidget {
   }
 
   String? _getAltSubtitle() {
-    return pwdRecord.containsKey("identifier") && pwdRecord["identifier"].toString().isNotEmpty
-      ? "原标题：${pwdRecord["identifier"]}" : null;
+    return pwdRecord.identifier.toString().isNotEmpty ? "原标题：${pwdRecord.identifier}" : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final String displayName = pwdRecord["identifier"] == "" ? "未命名" : pwdRecord["identifier"];
+    final String displayName = pwdRecord.identifier == "" ? "未命名" : pwdRecord.identifier;
     final pwdProvider = context.read<PwdProvider>();
     final appProvider = context.read<AppProvider>();
 
-    if (!pwdProvider.isRecordValid(pwdRecord["id"])) {
+    if (!pwdProvider.isRecordValid(pwdRecord.id)) {
       return Material(
         child: styled.buildListTile(
           title: "无效记录",
@@ -146,15 +146,14 @@ class PwdTile extends StatelessWidget {
           extraMenuItems: extraContextMenuItems
         ),
         title: displayName,
-        titleTag: useHero ? pwdRecord["id"] : null,
-        subtitle: "${pwdRecord["userName"]} @ ${pwdRecord["account"]}",
+        subtitle: "${pwdRecord.userName} @ ${pwdRecord.account}",
         trailing: IconButton(
           style: styles.buttonStyle,
           onPressed: () {
             appProvider.hasUnsavedChanges = true;
-            pwdProvider.switchStarStateById(pwdRecord["id"]);
+            pwdProvider.switchStarStateById(pwdRecord.id);
           },
-          icon: pwdRecord["starred"]
+          icon: pwdRecord.starred
             ? Icon(Icons.star, color: ColorScheme.of(context).primary)
             : Icon(Icons.star_border),
         ),

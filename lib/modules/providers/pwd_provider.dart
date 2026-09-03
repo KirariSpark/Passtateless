@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:passtateless/modules/compability/flatten.dart';
 import 'package:passtateless/modules/core/enums.dart' as enums;
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/core/pwd_item.dart';
 import 'package:passtateless/modules/file_mgr/json_mgr.dart';
 import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:uuid/uuid.dart';
@@ -22,7 +24,7 @@ class _PwdLocation {
 
 class PwdProvider extends ChangeNotifier {
   Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
-  List<Map<String, dynamic>> _stars = [];
+  // List<PwdItem> _pwdList = [];
 
   /// 已开启"移除"的字符类型队列，队首为最旧的项
   final List<enums.CharType> _removedQueue = [];
@@ -51,31 +53,13 @@ class PwdProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Map<String, dynamic>> get starredPwds {
-    _stars = [];
-    _pwdMap.forEach((folder, items) {
-      for (var item in items) {
-        if (item.containsKey("starred") && item["starred"]) {
-          _stars.add(item);
-        }
-      }
-    });
-    return _stars;
+  List<PwdItem> get starredPwds {
+    return flattenAndGetItemList(_pwdMap).where((item) => item.starred).toList();
   }
 
-  List<Map<String, dynamic>> get allPwds {
-    final List<String> keys = _pwdMap.keys.toList();
-    List<Map<String, dynamic>> allPwds = [];
-    for (String key in keys) {
-      List<Map<String, dynamic>> pwds = _pwdMap[key]!;
-      allPwds.addAll(pwds);
-    }
-    return allPwds;
-  }
+  List<Map<String, dynamic>> get allPwds => flattenPwdMap(_pwdMap);
 
-  List<String> get pwdFolders => _pwdMap.keys.toList();
-
-  List<Map<String, dynamic>> getPwdList(String folder) => _pwdMap[folder] ?? [];
+  List<PwdItem> get pwdList => flattenAndGetItemList(_pwdMap);
 
   /// 通过 id 查找该记录在 _pwdMap 中的真实位置
   _PwdLocation? _findLocationById(String id) {

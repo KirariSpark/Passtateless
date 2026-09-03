@@ -1,4 +1,5 @@
 import "package:passtateless/modules/core/logger.dart";
+import "package:passtateless/modules/core/pwd_item.dart";
 import "package:uuid/uuid.dart";
 
 final _uuid = const Uuid();
@@ -17,7 +18,9 @@ List<Map<String, dynamic>> flattenPwdMap(
   appLogger.logger.i("Converting old password map to newer password list");
   final List<String> keys = oldMap.keys.toList();
   final List<Map<String, dynamic>> converted = [];
-  appLogger.logger.d("All old password map keys: $keys, they will be turned to tags");
+  appLogger.logger.d(
+    "All old password map keys: $keys, they will be turned to tags",
+  );
   for (final String key in keys) {
     final items = oldMap[key] ?? const <Map<String, dynamic>>[];
     if (items.isEmpty) continue;
@@ -38,6 +41,14 @@ List<Map<String, dynamic>> flattenPwdMap(
     }
   }
   return converted;
+}
+
+/// 执行和`flattenPwdMap`相同的操作，然后将列表的内容从字典换成`PwdItem`
+List<PwdItem> flattenAndGetItemList(
+  Map<String, List<Map<String, dynamic>>> oldMap,
+) {
+  final mapList = flattenPwdMap(oldMap);
+  return [for (final item in mapList) PwdItem.fromMap(item)];
 }
 
 /// 收集旧条目自身的标签并合并文件夹名，返回去重后的非空标签列表

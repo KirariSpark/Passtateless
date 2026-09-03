@@ -102,8 +102,8 @@ class _HomePageState extends State<HomePage> {
             pwdRecord: item,
             isFirst: index == 0,
             isLast: index == pwdProvider.starredPwds.length - 1,
-            isActive: isSelected(("pwd", item["id"])),
-            onTapped: () => navigateTo(("pwd", item["id"])),
+            isActive: isSelected(("pwd", item.id)),
+            onTapped: () => navigateTo(("pwd", item.id)),
           )],
           ? pwdProvider.starredPwds.isEmpty ? null : styles.spacingSizedBox,
           styled.buildListTile(
