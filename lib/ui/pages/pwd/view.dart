@@ -3,9 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/generator/parser.dart' as parser;
+import 'package:passtateless/modules/generator/generate.dart' as generate;
 import 'package:provider/provider.dart';
-import 'dart:convert';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -50,8 +49,7 @@ class PwdViewPage extends StatefulWidget {
 
 class _PwdViewPageState extends State<PwdViewPage> {
   // 一些只读的属性
-  final CodeLineEditingController _configController =
-      CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
   late final String identifier;
   late final String userName;
   late final String account;
@@ -72,7 +70,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
   bool removeDigits = false;
   bool removeAlpha = false;
   bool removeSp = false;
-  bool somethingWentWrong = false; // 暂时还没用
 
   Future<void> _editCfg() async {
     // 跳转并等待返回结果
@@ -129,14 +126,6 @@ class _PwdViewPageState extends State<PwdViewPage> {
     return res;
   }
 
-  bool _isBuiltin(Presets preset) {
-    return <Presets>[
-      Presets.simple,
-      Presets.complex,
-      Presets.bank,
-    ].contains(_preset);
-  }
-
   /// 生成密码并显示提示（返回生成的密码或错误信息）
   Future<(ErrorCode, String)> _genPwd({
     required BuildContext context,
@@ -148,36 +137,24 @@ class _PwdViewPageState extends State<PwdViewPage> {
     appLogger.logger.i("Generating password");
     setState(() => isGenerating = true);
 
-    if (_isBuiltin(_preset)) {
-      appLogger.logger.i("Generating using builtin presets");
-      final res = await parser.parseBuiltins(
-        _preset,
-        "$identifier: $userName @ $account",
-        removeAlpha: removeAlpha,
-        removeDigits: removeDigits,
-        removeSp: removeSp,
-      );
-      return _postProcess(res, copyAfterGenerate);
-    }
+    final res = await generate.generatePassword(
+      preset: _preset,
+      configText: _configController.text,
+      identifier: identifier,
+      userName: userName,
+      account: account,
+      removeDigits: removeDigits,
+      removeAlpha: removeAlpha,
+      removeSp: removeSp,
+    );
 
-    try {
-      appLogger.logger.i("Generating using custom config");
-      final res = await parser.parse(
-        jsonDecode(_configController.text),
-        "$identifier: $userName @ $account",
-        removeAlpha: removeAlpha,
-        removeDigits: removeDigits,
-        removeSp: removeSp,
-      );
-      return _postProcess(res, copyAfterGenerate);
-    } catch (e) {
+    if (res.$1 == ErrorCode.jsonFormatError) {
       if (context.mounted) {
-        appLogger.logger.e("Can not generate password: $e");
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "JSON 格式错误\n${e.toString()}",
+              "JSON 格式错误\n${res.$2}",
               style: TextStyle(fontFamily: "SourceCodePro"),
             ),
             showCloseIcon: true,
@@ -186,6 +163,8 @@ class _PwdViewPageState extends State<PwdViewPage> {
       }
       return (ErrorCode.jsonFormatError, "");
     }
+
+    return _postProcess(res, copyAfterGenerate);
   }
 
   AppBar? _buildAppBar(bool hasAppBar) {
@@ -249,8 +228,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
             onPressed: () {
               if (controller.text.isEmpty) {
                 Navigator.pop(dialogContext, ErrorCode.emptyPwd);
-              } else if (utils.toSHA256(controller.text) ==
-                  _appProvider.masterPwd) {
+              } else if (utils.toSHA256(controller.text) ==  _appProvider.masterPwd) {
                 Navigator.pop(dialogContext, ErrorCode.success);
               } else {
                 Navigator.pop(dialogContext, ErrorCode.wrongPwd);
