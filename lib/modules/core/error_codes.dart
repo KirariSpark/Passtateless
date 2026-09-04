@@ -9,18 +9,13 @@ enum ErrorCode {
   unknownCommand(7, "输入包含未知命令"),
   invalidArgs(8, "输入包含无效参数"),
   generateFailed(9, "无法生成满足要求的密码"),
-  duplicateFolderName(10, "文件夹名 {item} 与已有的键重复", "不能输入重复的资料夹名称"),
-  emptyFolderName(11, "不能输入空名称"),
-  wrongConfirmPwd(12, "新密码与确认密码不符"),
-  wrongPwd(13, "密码错误"),
-  emptyPwd(14, "密码为空"),
-  noSuchId(15, "无效 ID", "无效 ID：{item}"),
-  noSuchLoc(16, "无效位置"),
-  brokenConfig(17, "配置文件损坏"),
-  isNotMap(18, "输入数据类型不是字典"),
-  existingUuid(19, "发现了已存在（且不应存在）的UUID"),
-  invalidRecord(20, "密码档案无效"),
-  noSuchFolder(21, "不存在的文件夹", "不存在文件夹 {item}");
+  wrongConfirmPwd(10, "新密码与确认密码不符"),
+  wrongPwd(11, "密码错误"),
+  emptyPwd(12, "密码为空"),
+  noSuchId(13, "无效 ID", "无效 ID：{item}"),
+  noSuchLoc(14, "无效位置"),
+  brokenConfig(15, "配置文件损坏"),
+  invalidRecord(16, "密码档案无效");
 
   final int code;
   final String _messageTemplate;

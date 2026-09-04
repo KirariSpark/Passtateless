@@ -53,9 +53,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _switchPage((String, String) tag, bool isWide) {
     switch (tag) {
-      case ("pages", "folders"):
+      case ("pages", "pwdList"):
         // 宽屏状态下不需要这些东西，父级页面已经做好了
-        return PwdListPage(key: ValueKey(tag.$2), useHero: !isWide, hasPadding: !isWide, hasAppBar: !isWide);
+        return PwdListPage(key: ValueKey(tag.$2), hasPadding: !isWide, hasAppBar: !isWide);
       case ("pages", "pwdEval"):
         return PwdEvalPage(key: ValueKey(tag.$2), useHero: !isWide, hasAppBar: !isWide, hasPadding: !isWide);
       case ("pages", "quickMode"):
@@ -108,16 +108,15 @@ class _HomePageState extends State<HomePage> {
           ? pwdProvider.starredPwdList.isEmpty ? null : styles.spacingSizedBox,
           styled.buildListTile(
             title: "所有密码",
-            titleTag: HeroTags.folders.tag,
             subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改所有密码",
             leading: Icons.format_list_bulleted,
             trailing: _buildTrailing(hasUnsavedChanges),
             isFirst: true,
             onTapped: () {
-              appLogger.logger.d("Selected: ('pages', 'folders')");
-              navigateTo(("pages", "folders"));
+              appLogger.logger.d("Selected: ('pages', 'pwdList')");
+              navigateTo(("pages", "pwdList"));
             },
-            active: isSelected(("pages", "folders")),
+            active: isSelected(("pages", "pwdList")),
             context: context
           ),
           styled.buildListTile(

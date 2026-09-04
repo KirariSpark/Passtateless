@@ -255,7 +255,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
               styled.buildListTile(
                 isLast: true,
                 title: "导入密码",
-                subtitle: "此行为会覆盖部分现有的密码档案",
+                subtitle: "此行为会覆盖现有的密码档案",
                 titleTag: "pwd_import",
                 trailing: Icon(Icons.arrow_forward),
                 onTapped: () => Navigator.push(

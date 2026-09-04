@@ -12,15 +12,8 @@ import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:provider/provider.dart';
 
-/// 查看资料夹中所有密码的页面
-///
-/// 资料夹名称将会被用于 Hero 动画
+/// 查看所有密码的页面
 class PwdListPage extends StatelessWidget {
-  final String folder;
-
-  /// 是否使用 Hero 动画
-  final bool useHero;
-
   /// 页面是否有横向内边距
   final bool hasPadding;
 
@@ -29,8 +22,6 @@ class PwdListPage extends StatelessWidget {
 
   const PwdListPage({
     super.key,
-    this.folder = "",
-    required this.useHero,
     this.hasPadding = true,
     this.hasAppBar = true
   });
@@ -158,7 +149,6 @@ class PwdListPage extends StatelessWidget {
             ],
           ),
         ],
-        titleTag: useHero ? folder : null,
       );
     }
     return null;
@@ -167,7 +157,6 @@ class PwdListPage extends StatelessWidget {
   Scaffold _buildUi(
     List<PwdItem> pwdList,
     BuildContext context, {
-    required bool useHero,
     required bool hasPadding,
     required AppProvider appProvider,
     required PwdProvider pwdProvider,
@@ -209,7 +198,6 @@ class PwdListPage extends StatelessWidget {
     return _buildUi(
       pwds,
       context,
-      useHero: useHero,
       hasPadding: hasPadding,
       appProvider: appProvider,
       pwdProvider: pwdProvider

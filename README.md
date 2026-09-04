@@ -30,7 +30,3 @@
 
 ### 提醒我更改主密码
 ![remind.png](readme_assets/remind.png)
-
-## 开发计划
-
-- [ ] 移除整个资料夹系统，计划使用标签系统来代替
