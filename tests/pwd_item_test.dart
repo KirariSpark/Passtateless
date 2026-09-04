@@ -109,4 +109,27 @@ void main() {
       expect(restored.tags, item.tags);
     });
   });
+
+  group('显示用 getter', () {
+    test('displayName 在有 identifier 时原样返回，否则返回未命名', () {
+      final item = PwdItem(id: "a", identifier: "我的邮箱");
+      expect(item.displayName, "我的邮箱");
+      final unnamed = PwdItem(id: "a", identifier: "");
+      expect(unnamed.displayName, "未命名");
+    });
+
+    test('displayAccount 在有 account 时原样返回，否则返回未知账号', () {
+      final item = PwdItem(id: "a", account: "google.com");
+      expect(item.displayAccount, "google.com");
+      final unknown = PwdItem(id: "a", account: "");
+      expect(unknown.displayAccount, "未知账号");
+    });
+
+    test('displayUserName 在有 userName 时原样返回，否则返回未知用户名', () {
+      final item = PwdItem(id: "a", userName: "kirari");
+      expect(item.displayUserName, "kirari");
+      final unknown = PwdItem(id: "a", userName: "");
+      expect(unknown.displayUserName, "未知用户名");
+    });
+  });
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/core/pwd_item.dart';
 import 'package:passtateless/modules/generator/generate.dart' as generate;
 import 'package:provider/provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
@@ -59,6 +60,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
   // Providers
   late final AppProvider _appProvider;
   late final PwdProvider _pwdProvider;
+
+  // 非快速模式下打开的记录
+  late final PwdItem? _record;
 
   // Controllers
   final TextEditingController identifierController = TextEditingController();
@@ -168,7 +172,9 @@ class _PwdViewPageState extends State<PwdViewPage> {
   AppBar? _buildAppBar(bool hasAppBar) {
     if (hasAppBar) {
       return styled.buildAppBar(
-        title: identifier.isEmpty ? '未命名' : identifier,
+        title: widget.enableEdit
+            ? "快速开始"
+            : (_record?.displayName ?? "未命名"),
         titleTag: widget.useHero ? id : null,
         context: context,
       );
@@ -351,12 +357,13 @@ class _PwdViewPageState extends State<PwdViewPage> {
     _pwdProvider = context.read<PwdProvider>();
 
     if (!widget.enableEdit) {
-      final record = _pwdProvider.getItemById(widget.id);
-      identifier = record?.identifier ?? "";
-      userName = record?.userName ?? "";
-      account = record?.account ?? "";
-      id = record?.id ?? widget.id;
+      _record = _pwdProvider.getItemById(widget.id);
+      identifier = _record?.identifier ?? "";
+      userName = _record?.userName ?? "";
+      account = _record?.account ?? "";
+      id = _record?.id ?? widget.id;
     } else {
+      _record = null;
       identifier = "快速开始";
       userName = "快速开始";
       account = "快速开始";

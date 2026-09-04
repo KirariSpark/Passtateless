@@ -59,8 +59,10 @@ class _PwdEditPageState extends State<PwdEditPage> {
   }
 
   AppBar? _buildAppBar() {
+    final String title =
+        _pwdProvider.getItemById(widget.id)?.displayName ?? "未命名";
     return styled.buildAppBar(
-      title: "编辑：${_identifierController.text == '' ? '未命名' : _identifierController.text}",
+      title: "编辑：$title",
       context: context,
     );
   }

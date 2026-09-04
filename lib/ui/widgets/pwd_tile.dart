@@ -119,7 +119,7 @@ class PwdTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String displayName = pwdRecord.identifier == "" ? "未命名" : pwdRecord.identifier;
+    final String displayName = pwdRecord.displayName;
     final pwdProvider = context.read<PwdProvider>();
     final appProvider = context.read<AppProvider>();
 

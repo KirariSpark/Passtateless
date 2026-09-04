@@ -19,6 +19,15 @@ class PwdItem {
   /// 判断传入的 [otherId] 是否就是这个记录的 id
   bool isMe(String otherId) => _id == otherId;
 
+  /// identifier 的显示用值，为空时返回"未命名"
+  String get displayName => identifier.isEmpty ? "未命名" : identifier;
+
+  /// account 的显示用值，为空时返回"未知账号"
+  String get displayAccount => account.isEmpty ? "未知账号" : account;
+
+  /// userName 的显示用值，为空时返回"未知用户名"
+  String get displayUserName => userName.isEmpty ? "未知用户名" : userName;
+
   /// 记录一个密码
   ///
   /// 技术上来说，id以外的字符串参数随便填什么都行，注释只用于解释其设计用途
