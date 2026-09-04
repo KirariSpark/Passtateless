@@ -8,6 +8,7 @@ import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class PwdTile extends StatelessWidget {
@@ -29,9 +30,6 @@ class PwdTile extends StatelessWidget {
   /// 是否使用 Hero 动画
   final bool useHero;
 
-  /// 右键菜单中，要额外添加的项
-  final List<ListTile>? extraContextMenuItems;
-
   /// 用于显示密码的改版ListTile
   const PwdTile({
     super.key,
@@ -41,7 +39,6 @@ class PwdTile extends StatelessWidget {
     this.isLast = false,
     this.isActive = false,
     this.useHero = true,
-    this.extraContextMenuItems
   });
 
   void _deleteArchive(BuildContext context, PwdProvider pwdProvider, AppProvider appProvider) {
@@ -66,50 +63,20 @@ class PwdTile extends StatelessWidget {
     );
   }
 
-  void _editArchive(BuildContext context, AppProvider appProvider) {
-    appLogger.logger.i("Pushing to edit page for ${pwdRecord.id}");
-    Navigator.pop(context);
+  void _newArchive(BuildContext context, PwdProvider pwdProvider,  AppProvider appProvider) {
+    appLogger.logger.i("Adding empty record");
+    final newId = pwdProvider.addEmptyRecord();
+    appProvider.hasUnsavedChanges = true;
+    appLogger.logger.i("Record added, pushing to edit page for new record $newId");
     Navigator.push(
-      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: pwdRecord.id))
+      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: newId))
     );
   }
 
-  void _showContextMenu({
-    required BuildContext context,
-    required String displayName,
-    required PwdProvider pwdProvider,
-    required AppProvider appProvider,
-    List<ListTile>? extraMenuItems
-  }) {
-    List<Widget>? realChildren = [
-      styled.buildListTile(
-        leading: Icons.edit_outlined,
-        title: "编辑",
-        isFirst: true,
-        onTapped: () => _editArchive(context, appProvider),
-        context: context
-      ),
-      styled.buildListTile(
-        leading: Icons.delete_outline,
-        title: "删除",
-        isLast: extraMenuItems == null ? true : false,
-        onTapped: () {
-          Navigator.pop(context);
-          _showDelDialog(context, pwdProvider, appProvider);
-        },
-        context: context
-      )
-    ];
-
-    if (extraMenuItems != null) {
-      realChildren.add(Divider(height: 1));
-      realChildren.addAll(extraMenuItems);
-    }
-
-    ui.showBottomSheetQuick(
-      context: context,
-      title: displayName,
-      children: realChildren
+  void _editArchive(BuildContext context, AppProvider appProvider) {
+    appLogger.logger.i("Pushing to edit page for ${pwdRecord.id}");
+    Navigator.push(
+      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: pwdRecord.id))
     );
   }
 
@@ -137,14 +104,21 @@ class PwdTile extends StatelessWidget {
     }
 
     return Material(
-      child: styled.buildListTileAdvanced(
-        onRightClick: () => _showContextMenu(
-          context: context,
-          displayName: displayName,
-          pwdProvider: pwdProvider,
-          appProvider: appProvider,
-          extraMenuItems: extraContextMenuItems
-        ),
+      child: StyledMenuListTile(
+        menuItems: [
+          PopupMenuItem(
+            child: Text("编辑"),
+            onTap: () => _editArchive(context, appProvider),
+          ),
+          PopupMenuItem(
+            child: Text("删除"),
+            onTap: () => _showDelDialog(context, pwdProvider, appProvider),
+          ),
+          PopupMenuItem(
+            child: Text("新建"),
+            onTap: () => _newArchive(context, pwdProvider, appProvider),
+          )
+        ],
         title: displayName,
         subtitle: "${pwdRecord.userName} @ ${pwdRecord.account}",
         trailing: IconButton(
@@ -157,11 +131,10 @@ class PwdTile extends StatelessWidget {
             ? Icon(Icons.star, color: ColorScheme.of(context).primary)
             : Icon(Icons.star_border),
         ),
-        onTapped: onTapped,
+        onTap: onTapped,
         isFirst: isFirst,
         isLast: isLast,
-        context: context,
-        active: isActive
+        highlighted: isActive
       ),
     );
   }

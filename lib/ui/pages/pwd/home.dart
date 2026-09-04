@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
@@ -12,6 +11,7 @@ import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -106,44 +106,40 @@ class _HomePageState extends State<HomePage> {
             onTapped: () => navigateTo(("pwd", item.id)),
           )],
           ? pwdProvider.starredPwdList.isEmpty ? null : styles.spacingSizedBox,
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "所有密码",
             subtitle: hasUnsavedChanges ? "有未保存的更改" : "查看和修改所有密码",
-            leading: Icons.format_list_bulleted,
+            leadingIcon: Icons.format_list_bulleted,
             trailing: _buildTrailing(hasUnsavedChanges),
             isFirst: true,
-            onTapped: () {
+            onTap: () {
               appLogger.logger.d("Selected: ('pages', 'pwdList')");
               navigateTo(("pages", "pwdList"));
             },
-            active: isSelected(("pages", "pwdList")),
-            context: context
+            highlighted: isSelected(("pages", "pwdList")),
           ),
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "密码强度",
-            titleTag: HeroTags.pwdEval.tag,
             subtitle: "评估密码强度，获取相关建议",
-            leading: Icons.checklist,
+            leadingIcon: Icons.checklist,
             trailing: Icon(Icons.arrow_forward),
-            onTapped: () {
+            onTap: () {
               appLogger.logger.d("Selected: ('pages', 'pwdEval')");
               navigateTo(("pages", "pwdEval"));
             },
-            active: isSelected(("pages", "pwdEval")),
-            context: context
+            highlighted: isSelected(("pages", "pwdEval")),
           ),
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "快速开始",
             subtitle: "不创建资料，直接生成密码",
-            leading: Icons.play_circle_outline,
+            leadingIcon: Icons.play_circle_outline,
             trailing: Icon(Icons.arrow_forward),
             isLast: true,
-            onTapped: () {
+            onTap: () {
               appLogger.logger.d("Selected: ('pages', 'pwdEval')");
               navigateTo(("pages", "quickMode"));
             },
-            active: isSelected(("pages", "quickMode")),
-            context: context
+            highlighted: isSelected(("pages", "quickMode")),
           ),
         ],
       ),

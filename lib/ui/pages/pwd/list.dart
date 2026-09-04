@@ -10,6 +10,7 @@ import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/pwd_tile.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 
 /// 查看所有密码的页面
@@ -66,14 +67,13 @@ class PwdListPage extends StatelessWidget {
       return <Widget>[
         ConstrainedBox(
           constraints: styles.tileWidthConstraint,
-          child: styled.buildListTile(
+          child: StyledListTileSimple(
             title: "没有密码",
             subtitle: "点击新增一条密码",
-            onTapped: () => _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider),
-            leading: Icons.not_interested,
+            onTap: () => _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider),
+            leadingIcon: Icons.not_interested,
             isFirst: true,
             isLast: true,
-            context: context,
           ),
         ),
       ];
@@ -94,27 +94,6 @@ class PwdListPage extends StatelessWidget {
                 ),
               );
             },
-            extraContextMenuItems: [
-              styled.buildListTile(
-                title: "新建档案",
-                leading: Icons.add,
-                onTapped: () {
-                  Navigator.pop(context);
-                  _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider);
-                },
-                context: context
-              ),
-              styled.buildListTile(
-                title: "保存更改",
-                leading: Icons.save_outlined,
-                isLast: true,
-                onTapped: () {
-                  Navigator.pop(context);
-                  _save(context, pwdProvider, appProvider);
-                },
-                context: context
-              )
-            ],
           ),
         );
       }
