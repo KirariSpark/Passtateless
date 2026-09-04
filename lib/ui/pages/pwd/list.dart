@@ -56,8 +56,8 @@ class PwdListPage extends StatelessWidget {
     required PwdProvider pwdProvider,
     required AppProvider appProvider  
   }) {
-    appLogger.logger.i("Adding empty record to folder $folder");
-    final newId = pwdProvider.addEmptyRecordTo(folder);
+    appLogger.logger.i("Adding empty record");
+    final newId = pwdProvider.addEmptyRecord();
     appProvider.hasUnsavedChanges = true;
     appLogger.logger.i("Record added, pushing to edit page for new record $newId");
     Navigator.push(

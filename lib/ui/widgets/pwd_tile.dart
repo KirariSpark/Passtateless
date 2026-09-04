@@ -123,7 +123,7 @@ class PwdTile extends StatelessWidget {
     final pwdProvider = context.read<PwdProvider>();
     final appProvider = context.read<AppProvider>();
 
-    if (!pwdProvider.isRecordValid(pwdRecord.id)) {
+    if (!pwdRecord.isValid()) {
       return Material(
         child: styled.buildListTile(
           title: "无效记录",

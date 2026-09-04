@@ -11,20 +11,9 @@ import 'dart:convert';
 
 const _uuid = Uuid();
 
-class _PwdLocation {
-  final String folder;
-  final int index;
-  const _PwdLocation({required this.folder, required this.index});
-
-  @override
-  String toString() {
-    return "$folder/$index";
-  }
-}
-
 class PwdProvider extends ChangeNotifier {
-  Map<String, List<Map<String, dynamic>>> _pwdMap = {"": []};
-  // List<PwdItem> _pwdList = [];
+  /// 当前全部密码记录的扁平列表，标签随每条记录存储
+  final List<PwdItem> _pwdList = [];
 
   /// 已开启"移除"的字符类型队列，队首为最旧的项
   final List<enums.CharType> _removedQueue = [];
@@ -53,121 +42,66 @@ class PwdProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<PwdItem> get starredPwdList => flattenAndGetItemList(_pwdMap).where((item) => item.starred).toList();
+  /// 全部密码记录
+  List<PwdItem> get pwdList => _pwdList;
 
-  List<PwdItem> get pwdList => flattenAndGetItemList(_pwdMap);
+  /// 被收藏的密码记录
+  List<PwdItem> get starredPwdList =>
+      pwdList.where((item) => item.starred).toList();
 
-  /// 通过 id 查找该记录在 _pwdMap 中的真实位置
-  _PwdLocation? _findLocationById(String id) {
-    appLogger.logger.d("Finding password id $id");
-    for (var folder in _pwdMap.keys) {
-      for (var (index, item) in _pwdMap[folder]!.indexed) {
-        if (item["id"] == id) {
-          final loc = _PwdLocation(folder: folder, index: index);
-          appLogger.logger.d("Found password id $id at $loc");
-          return loc;
-        }
-      }
+  /// 通过 id 查找记录，找不到时返回 null
+  PwdItem? getItemById(String id) {
+    appLogger.logger.i("Getting password by id $id");
+    for (final item in _pwdList) {
+      if (item.isMe(id)) return item;
     }
     appLogger.logger.e("No password matching id $id");
     return null;
   }
 
-  /// 解析字典，补上UUID，并设置自身的_pwdMap
-  ErrorCode _parsePwdMap(Map map, {bool allowExistingUuid = true}) {
-    final newPwdMap = <String, List<Map<String, dynamic>>>{};
-
-    for (final entry in map.entries) {
-      final key = entry.key.toString();
-      final value = entry.value;
-      if (value is List) {
-        final processedList = <Map<String, dynamic>>[];
-        for (final item in value) {
-          final itemMap = Map<String, dynamic>.from(item as Map);
-          final hasUuid =
-              itemMap.containsKey("id") &&
-              itemMap["id"] != null &&
-              itemMap["id"].toString().isNotEmpty;
-
-          // 不允许已存在的UUID时直接返回错误
-          if (!allowExistingUuid && hasUuid) {
-            return ErrorCode.existingUuid;
-          }
-
-          // 没有UUID则自动生成
-          if (!hasUuid) {
-            appLogger.logger.d("Generating id for password");
-            itemMap["id"] = _uuid.v4();
-          }
-
-          processedList.add(itemMap);
-        }
-        newPwdMap[key] = processedList;
-      }
-    }
-
-    // 只有全部成功才更新 _pwdMap，并保留原有不相关的键
-    _pwdMap.addAll(newPwdMap);
-    if (!_pwdMap.containsKey("")) {
-      _pwdMap[""] = [];
-    }
-
-    notifyListeners();
-    return ErrorCode.success;
-  }
-
-  /// 检查 id 对应的记录是否有效
-  /// 有效条件：存在 identifier、userName、account、starred 键，且除 identifier 外的键值不为空
-  bool isRecordValid(String id) {
-    appLogger.logger.d("Checking validity of password id $id");
-    return pwdList.firstWhere((item) => item.isMe(id)).isValid();
-  }
-
-  /// 使用 id 更新指定项的数据
-  ErrorCode setValueById(String id, String key, String value) {
+  /// 使用 [changes] 就地修改指定记录，随后通知监听者
+  ///
+  /// 找不到对应 id 时返回 [ErrorCode.noSuchId]，不做任何修改。
+  ErrorCode mutateById(String id, void Function(PwdItem record) changes) {
     appLogger.logger.i("Updating password id $id");
-    final loc = _findLocationById(id);
-    if (loc == null) {
+    final item = getItemById(id);
+    if (item == null) {
       appLogger.logger.e("No such password");
       return ErrorCode.noSuchId;
-    } else {
-      _pwdMap[loc.folder]![loc.index][key] = value;
-      appLogger.logger.i("Password updated successfully");
-      notifyListeners();
-      return ErrorCode.success;
     }
+    changes(item);
+    appLogger.logger.i("Password updated successfully");
+    notifyListeners();
+    return ErrorCode.success;
   }
 
   /// 使用 id 从所有密码中移除指定项
   ErrorCode removeRecordById(String id) {
     appLogger.logger.i("Removing password id $id");
-    final loc = _findLocationById(id);
-    if (loc == null) {
+    final int before = _pwdList.length;
+    _pwdList.removeWhere((item) => item.isMe(id));
+    if (_pwdList.length == before) {
       appLogger.logger.e("No such password");
       return ErrorCode.noSuchId;
-    } else {
-      _pwdMap[loc.folder]!.removeAt(loc.index);
-      appLogger.logger.i("Password removed successfully");
-      notifyListeners();
-      return ErrorCode.success;
     }
+    appLogger.logger.i("Password removed successfully");
+    notifyListeners();
+    return ErrorCode.success;
   }
 
-  /// 在指定文件夹中增加一条空记录
-  String addEmptyRecordTo(String folder) {
-    appLogger.logger.i("Adding empty password to folder $folder");
-    final id = _uuid.v4();
+  /// 增加一条空记录，可附带初始 [tags]
+  String addEmptyRecord({List<String> tags = const []}) {
+    appLogger.logger.i("Adding empty password record");
+    final String id = _uuid.v4();
     appLogger.logger.d("Password id: $id");
-    if (!_pwdMap.containsKey("")) {
-      _pwdMap[""] = [];
-    }
-    _pwdMap[folder]!.add({
-      "id": id,
-      "identifier": "",
-      "userName": "example",
-      "account": "example.com",
-      "starred": false,
-    });
+    _pwdList.add(
+      PwdItem(
+        id: id,
+        userName: "example",
+        account: "example.com",
+        tags: tags,
+      ),
+    );
     appLogger.logger.i("Successfully added password");
     notifyListeners();
     return id;
@@ -176,57 +110,73 @@ class PwdProvider extends ChangeNotifier {
   /// 通过 id 修改收藏状态
   void switchStarStateById(String id) {
     appLogger.logger.i("Switching star state of password id $id");
-    final loc = _findLocationById(id);
-    if (loc != null) {
-      _pwdMap[loc.folder]![loc.index]["starred"] =
-          !_pwdMap[loc.folder]![loc.index]["starred"];
-      appLogger.logger.i("Successfully switched star state");
-      notifyListeners();
-    } else {
+    final item = getItemById(id);
+    if (item == null) {
       appLogger.logger.e("No such password");
+      return;
     }
+    item.starred = !item.starred;
+    appLogger.logger.i("Successfully switched star state");
+    notifyListeners();
   }
 
-  /// 通过 id 查找记录
-  Map<String, dynamic> getItemById(String id) {
-    appLogger.logger.i("Getting password by id $id");
-    final loc = _findLocationById(id);
-    if (loc != null) return _pwdMap[loc.folder]![loc.index];
-    return {};
+  /// 把解码后的存档内容解析为密码记录列表
+  ///
+  /// 新版存档的根节点是“条目字典”的列表；旧版存档的根节点是
+  /// “文件夹名 -> 条目列表”的字典，旧版会被展平，文件夹名自动并入标签
+  /// （详见 flatten.dart）。格式无法识别时抛出 [FormatException]。
+  List<PwdItem> _parsePwdData(dynamic decoded) {
+    if (decoded is List) {
+      return [
+        for (final item in decoded)
+          PwdItem.fromMap(Map<String, dynamic>.from(item as Map)),
+      ];
+    } else if (decoded is Map) {
+      final oldMap = <String, List<Map<String, dynamic>>>{};
+      for (final entry in decoded.entries) {
+        final key = entry.key.toString();
+        final value = entry.value;
+        if (value is List) {
+          oldMap[key] = [
+            for (final item in value)
+              Map<String, dynamic>.from(item as Map),
+          ];
+        }
+      }
+      return flattenAndGetItemList(oldMap);
+    }
+    throw const FormatException("Decoded data is neither a List nor a Map");
   }
 
-  /// 获取当前密码的 JSON 字符串
+  /// 获取当前密码的 JSON 字符串（导出）
+  ///
   /// [master] 用户输入的主密码明文
   /// [masterSHA] 来自 Provider 的主密码哈希
   (ErrorCode, String) getPwdJson(String master, String masterSHA) {
-    appLogger.logger.i("Getting JSON text of current password map");
+    appLogger.logger.i("Getting JSON text of current password list");
     if (utils.toSHA256(master) == masterSHA) {
       appLogger.logger.i("Correct password, getting JSON");
-      return (ErrorCode.success, utils.formatJSON(json.encode(_pwdMap)).$2);
+      final list = [for (final item in _pwdList) item.toMap()];
+      return (ErrorCode.success, utils.formatJSON(json.encode(list)).$2);
     } else {
       appLogger.logger.e("Wrong password");
       return (ErrorCode.wrongPwd, "");
     }
   }
 
+  /// 用 JSON 全文替换当前的所有密码记录（导入）
+  ///
+  /// 兼容新版扁平列表与旧版文件夹字典格式。
   ErrorCode setPwdByJson(String jsonText) {
     try {
-      appLogger.logger.i("Setting password by json");
+      appLogger.logger.i("Setting passwords by json");
       final res = json.decode(jsonText);
-      if (res is Map) {
-        appLogger.logger.d("JSON decoded successfully");
-        final stat = _parsePwdMap(res, allowExistingUuid: false);
-        if (stat == ErrorCode.success) {
-          appLogger.logger.i("Password successfully imported");
-          return ErrorCode.success;
-        } else {
-          appLogger.logger.e("Can not import password: $stat");
-          return stat;
-        }
-      } else {
-        appLogger.logger.e("Input data type is not Map");
-        return ErrorCode.isNotMap;
-      }
+      final parsed = _parsePwdData(res);
+      _pwdList
+        ..clear()
+        ..addAll(parsed);
+      appLogger.logger.i("Passwords successfully imported");
+      return ErrorCode.success;
     } catch (e) {
       appLogger.logger.e(ErrorCode.jsonFormatError.format(e.toString()));
       return ErrorCode.jsonFormatError;
@@ -242,13 +192,15 @@ class PwdProvider extends ChangeNotifier {
     );
     appLogger.logger.d("Read stat: ${stat.code}");
     if (stat == ErrorCode.success) {
-      if (res is Map) {
-        _pwdMap = {};
-        _parsePwdMap(res);
+      try {
+        final parsed = _parsePwdData(res);
+        _pwdList
+          ..clear()
+          ..addAll(parsed);
         appLogger.logger.i("Successfully read archive");
         return ErrorCode.success;
-      } else {
-        appLogger.logger.i("Reading result is not a Map");
+      } catch (e) {
+        appLogger.logger.e("Failed to parse archive: ${e.toString()}");
         return ErrorCode.jsonFormatError;
       }
     } else if (stat == ErrorCode.fileNotExist) {
@@ -268,7 +220,7 @@ class PwdProvider extends ChangeNotifier {
     appLogger.logger.i("Writing password archive");
     final stat = await writeEncryptedJsonFile(
       enums.Paths.pwdRecord.path,
-      _pwdMap,
+      [for (final item in _pwdList) item.toMap()],
       masterPwd,
     );
     appLogger.logger.d("Stat: ${stat.code}");

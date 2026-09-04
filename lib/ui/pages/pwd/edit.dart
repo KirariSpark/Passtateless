@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
+import 'package:passtateless/modules/core/pwd_item.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
@@ -34,10 +35,10 @@ class _PwdEditPageState extends State<PwdEditPage> {
     _pwdProvider = context.read<PwdProvider>();
     _appProvider = context.read<AppProvider>();
 
-    final data = _pwdProvider.getItemById(widget.id);
-    _identifierController = TextEditingController(text: data["identifier"]);
-    _userNameController = TextEditingController(text: data["userName"]);
-    _accountController = TextEditingController(text: data["account"]);
+    final record = _pwdProvider.getItemById(widget.id);
+    _identifierController = TextEditingController(text: record?.identifier ?? "");
+    _userNameController = TextEditingController(text: record?.userName ?? "");
+    _accountController = TextEditingController(text: record?.account ?? "");
   }
 
   @override
@@ -48,11 +49,11 @@ class _PwdEditPageState extends State<PwdEditPage> {
     super.dispose();
   }
 
-  void _changeValue(String nameSpace, String value) {
+  void _applyChange(void Function(PwdItem record) changes) {
     _appProvider.hasUnsavedChanges = true;
-    final stat = _pwdProvider.setValueById(widget.id, nameSpace, value);
+    final stat = _pwdProvider.mutateById(widget.id, changes);
     if (stat != ErrorCode.success) {
-      appLogger.logger.e("Failed to change $nameSpace for archive ${widget.id}: $stat");
+      appLogger.logger.e("Failed to change archive ${widget.id}: $stat");
       ui.showSnackBarQuick(stat.generic, context);
     }
   }
@@ -80,19 +81,19 @@ class _PwdEditPageState extends State<PwdEditPage> {
                 styled.buildTextField(
                   context: context,
                   controller: _identifierController,
-                  onChanged: (value) => _changeValue("identifier", value),
+                  onChanged: (value) => _applyChange((record) => record.identifier = value),
                   label: "档案名",
                 ),
                 styled.buildTextField(
                   context: context,
                   controller: _userNameController,
-                  onChanged: (value) => _changeValue("userName", value),
+                  onChanged: (value) => _applyChange((record) => record.userName = value),
                   label: "用户名",
                 ),
                 styled.buildTextField(
                   context: context,
                   controller: _accountController,
-                  onChanged: (value) => _changeValue("account", value),
+                  onChanged: (value) => _applyChange((record) => record.account = value),
                   label: "账号",
                 )
               ],

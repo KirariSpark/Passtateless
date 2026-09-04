@@ -351,11 +351,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
     _pwdProvider = context.read<PwdProvider>();
 
     if (!widget.enableEdit) {
-      final data = _pwdProvider.getItemById(widget.id);
-      identifier = data["identifier"];
-      userName = data["userName"];
-      account = data["account"];
-      id = data["id"];
+      final record = _pwdProvider.getItemById(widget.id);
+      identifier = record?.identifier ?? "";
+      userName = record?.userName ?? "";
+      account = record?.account ?? "";
+      id = record?.id ?? widget.id;
     } else {
       identifier = "快速开始";
       userName = "快速开始";
