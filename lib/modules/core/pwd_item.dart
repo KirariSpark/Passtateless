@@ -35,8 +35,9 @@ class PwdItem {
     this.account = "",
     this.userName = "",
     this.starred = false,
-    this.tags = const [],
-  }) : _id = id;
+    List<String>? tags,
+  }) : _id = id,
+       tags = tags == null ? <String>[] : normalizeTags(tags);
 
   /// 将这个记录变成一个字典，方便序列化
   Map<String, dynamic> toMap() {
@@ -61,7 +62,7 @@ class PwdItem {
       account: map["account"] as String? ?? "",
       userName: map["userName"] as String? ?? "",
       starred: map["starred"] as bool? ?? false,
-      tags: (map["tags"] as List?)?.whereType<String>().toList() ?? const [],
+      tags: (map["tags"] as List?)?.whereType<String>().toList(),
     );
   }
 
@@ -69,4 +70,31 @@ class PwdItem {
   ///
   /// 要求 account、userName 均不为空
   bool isValid() => (account.isNotEmpty && userName.isNotEmpty);
+
+  /// 判断是否带有指定的 [tag]
+  bool hasTag(String tag) => tags.contains(tag);
+
+  /// 添加一个标签
+  ///
+  /// 空白标签会被忽略；重复的标签不会重复添加。
+  void addTag(String tag) {
+    if (tag.trim().isEmpty || hasTag(tag)) return;
+    tags.add(tag);
+  }
+
+  /// 移除一个标签，若不存在则不做任何事
+  void removeTag(String tag) {
+    tags.remove(tag);
+  }
+
+  /// 整理标签：剔除空白标签并去重，保留原有顺序
+  static List<String> normalizeTags(Iterable<String> tags) {
+    final List<String> result = [];
+    for (final tag in tags) {
+      if (tag.trim().isNotEmpty && !result.contains(tag)) {
+        result.add(tag);
+      }
+    }
+    return result;
+  }
 }
