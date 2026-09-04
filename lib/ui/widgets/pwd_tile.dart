@@ -7,7 +7,6 @@ import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/pwd/edit.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -92,13 +91,12 @@ class PwdTile extends StatelessWidget {
 
     if (!pwdRecord.isValid()) {
       return Material(
-        child: styled.buildListTile(
+        child: StyledListTileSimple(
           title: "无效记录",
           subtitle: _getAltSubtitle(),
-          context: context,
           isFirst: isFirst,
           isLast: isLast,
-          onTapped: () => _showDelDialog(context, pwdProvider, appProvider)
+          onTap: () => _showDelDialog(context, pwdProvider, appProvider)
         ),
       );
     }

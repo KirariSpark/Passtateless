@@ -11,6 +11,7 @@ import 'package:passtateless/ui/pages/settings/import.dart';
 import 'package:passtateless/ui/pages/settings/log_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 
@@ -202,43 +203,35 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
           constraints: styles.tileWidthConstraint,
           child: ListView(
             children: [
-              styled.buildListTile(
+              StyledListTileSimple(
                 isFirst: true,
                 title: "日志等级",
                 trailing: Icon(Icons.arrow_drop_down),
-                onTapped: _showLogLvlDialog,
-                context: context
+                onTap: _showLogLvlDialog,
               ),
-              styled.buildListTile(
+              StyledListTileSimple(
                 title: "查看日志",
-                titleTag: "log_view",
                 trailing: Icon(Icons.arrow_forward),
                 isLast: true,
-                onTapped: _viewLog,
-                context: context
+                onTap: _viewLog,
               ),
               styles.spacingSizedBox,
-              styled.buildListTile(
+              StyledListTileSimple(
                 title: "导出设置",
-                titleTag: "setting_export",
                 trailing: Icon(Icons.arrow_forward),
                 isFirst: true,
-                onTapped: _exportSettings,
-                context: context
+                onTap: _exportSettings,
               ),
-              styled.buildListTile(
+              StyledListTileSimple(
                 title: "导出密码",
-                titleTag: "pwd_export",
                 trailing: Icon(Icons.arrow_forward),
-                onTapped: _showPwdExportDialog,
-                context: context
+                onTap: _showPwdExportDialog,
               ),
-              styled.buildListTile(
+              StyledListTileSimple(
                 title: "导入设置",
-                titleTag: "setting_import",
                 subtitle: "此行为会覆盖现有的设置",
                 trailing: Icon(Icons.arrow_forward),
-                onTapped:  () => Navigator.push(
+                onTap:  () => Navigator.push(
                   context,
                   ui.switchRoute(
                     _appProvider.currentNavMode,
@@ -250,15 +243,13 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                     )
                   )
                 ),
-                context: context
               ),
-              styled.buildListTile(
+              StyledListTileSimple(
                 isLast: true,
                 title: "导入密码",
                 subtitle: "此行为会覆盖现有的密码档案",
-                titleTag: "pwd_import",
                 trailing: Icon(Icons.arrow_forward),
-                onTapped: () => Navigator.push(
+                onTap: () => Navigator.push(
                   context,
                   ui.switchRoute(
                     _appProvider.currentNavMode,
@@ -270,7 +261,6 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                     )
                   )
                 ),
-                context: context
               )
             ],
           ),

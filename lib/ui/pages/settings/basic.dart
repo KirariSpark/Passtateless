@@ -11,6 +11,7 @@ import 'package:passtateless/ui/pages/settings/change_master.dart';
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
@@ -105,22 +106,21 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            styled.buildListTile(
+            StyledListTileSimple(
               title: "更改主密码",
-              leading: Icons.key,
+              leadingIcon: Icons.key,
               trailing: Icon(Icons.arrow_forward),
               isFirst: true,
-              onTapped: () => navigateTo(Pages.changeMaster.id),
-              active: isSelected(Pages.changeMaster.id),
-              context: context,
+              onTap: () => navigateTo(Pages.changeMaster.id),
+              highlighted: isSelected(Pages.changeMaster.id),
             ),
-            styled.buildListTile(
+            StyledListTileSimple(
               title: "提醒我更改主密码",
               subtitle: "当前：${context.watch<AppProvider>().remindMe.displayName}",
-              leading: Icons.schedule,
+              leadingIcon: Icons.schedule,
               trailing: Icon(Icons.arrow_drop_down),
               isLast: true,
-              onTapped: () => ui.showBottomSheetQuick(
+              onTap: () => ui.showBottomSheetQuick(
                 context: context,
                 title: "在选择的天数后提醒你",
                 children: [
@@ -148,53 +148,47 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                   ),
                 ],
               ),
-              context: context,
             ),
             styles.spacingSizedBox,
-            styled.buildListTile(
+            StyledListTileSimple(
               title: "主题",
-              leading: Icons.color_lens_outlined,
+              leadingIcon: Icons.color_lens_outlined,
               trailing: Icon(Icons.arrow_forward),
-              onTapped: () => navigateTo(Pages.themeSettings.id),
+              onTap: () => navigateTo(Pages.themeSettings.id),
               isFirst: true,
-              active: isSelected(Pages.themeSettings.id),
-              context: context,
+              highlighted: isSelected(Pages.themeSettings.id),
             ),
-            styled.buildListTile(
+            StyledListTileSimple(
               title: "动画",
-              leading: Icons.animation,
+              leadingIcon: Icons.animation,
               trailing: Icon(Icons.arrow_forward),
-              onTapped: () => navigateTo(Pages.animationSettings.id),
-              active: isSelected(Pages.animationSettings.id),
-              context: context,
+              onTap: () => navigateTo(Pages.animationSettings.id),
+              highlighted: isSelected(Pages.animationSettings.id),
             ),
-            styled.buildListTile(
+            StyledListTileSimple(
               title: "对比度",
-              leading: Icons.contrast,
+              leadingIcon: Icons.contrast,
               trailing: Icon(Icons.arrow_forward),
-              onTapped: () => navigateTo(Pages.contrastnessSettings.id),
+              onTap: () => navigateTo(Pages.contrastnessSettings.id),
               isLast: true,
-              active: isSelected(Pages.contrastnessSettings.id),
-              context: context,
+              highlighted: isSelected(Pages.contrastnessSettings.id),
             ),
             styles.spacingSizedBox,
-            styled.buildListTile(
-              title: "高级设置", 
-              leading: Icons.code,
+            StyledListTileSimple(
+              title: "高级设置",
+              leadingIcon: Icons.code,
               trailing: Icon(Icons.arrow_forward),
-              onTapped: () => navigateTo(Pages.advancedSettings.id),
+              onTap: () => navigateTo(Pages.advancedSettings.id),
               isFirst: true,
-              active: isSelected(Pages.advancedSettings.id),
-              context: context
+              highlighted: isSelected(Pages.advancedSettings.id),
             ),
-            styled.buildListTile(
+            StyledListTileSimple(
               title: "关于",
-              leading: Icons.info_outline,
+              leadingIcon: Icons.info_outline,
               trailing: Icon(Icons.arrow_forward),
-              onTapped: () => navigateTo(Pages.about.id),
+              onTap: () => navigateTo(Pages.about.id),
               isLast: true,
-              active: isSelected(Pages.about.id),
-              context: context
+              highlighted: isSelected(Pages.about.id),
             )
           ],
         ),

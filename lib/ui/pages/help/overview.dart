@@ -4,8 +4,8 @@ import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 
 class HelpOverviewPage extends StatelessWidget {
@@ -38,19 +38,17 @@ class HelpOverviewPage extends StatelessWidget {
           final item = items[index];
           final tag = ("help", item.mode);
           final selected = isSelected(tag);
-          return styled.buildListTile(
-            active: selected,
+          return StyledListTileSimple(
+            highlighted: selected,
             isFirst: index == 0,
             isLast: index == items.length - 1,
             title: item.displayName,
-            titleTag: isWide ? null : item.displayName,
             subtitle: item.desc,
             trailing: const Icon(Icons.arrow_forward),
-            onTapped: () {
+            onTap: () {
               appLogger.logger.i("Opening doc ${item.name}");
               navigateTo(tag);
             },
-            context: context,
           );
         }),
       ),

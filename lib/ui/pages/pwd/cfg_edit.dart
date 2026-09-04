@@ -8,6 +8,7 @@ import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 
@@ -66,12 +67,11 @@ class _CfgEditPageState extends State<CfgEditPage> {
       title: "选择帮助",
       content: Column(
         children: [
-          for (final (index, item) in editorHelpItems.indexed) styled.buildListTile(
+          for (final (index, item) in editorHelpItems.indexed) StyledListTileSimple(
             title: item.displayName,
             isFirst: index == 0,
             isLast: index == editorHelpItems.length - 1,
-            onTapped: () => _showDoc(item),
-            context: context
+            onTap: () => _showDoc(item),
           )
         ],
       ),

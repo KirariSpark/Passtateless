@@ -15,6 +15,7 @@ import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/removal_cfg.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:re_editor/re_editor.dart';
 
 /// 密码记录的查看页面，也用于密码的生成功能，通过传入enableEdit来启用快速模式（此时将不会使用传入的id初始化页面）
@@ -96,13 +97,12 @@ class _PwdViewPageState extends State<PwdViewPage> {
   /// 根据当前预设决定是否显示自定义规则
   Widget? _showConfigEdit() {
     if (_preset == Presets.custom) {
-      return styled.buildListTile(
-        context: context,
+      return StyledListTileSimple(
         title: "配置生成规则",
         trailing: Icon(Icons.arrow_forward),
         isLast: true,
         isFirst: true,
-        onTapped: _editCfg,
+        onTap: _editCfg,
       );
     }
     return null;
@@ -329,22 +329,19 @@ class _PwdViewPageState extends State<PwdViewPage> {
       ];
     } else {
       return [
-        styled.buildListTile(
+        StyledListTileSimple(
           title: "档案名",
           subtitle: identifier,
           isFirst: true,
-          context: context,
         ),
-        styled.buildListTile(
+        StyledListTileSimple(
           title: "用户名",
           subtitle: userName,
-          context: context,
         ),
-        styled.buildListTile(
+        StyledListTileSimple(
           title: "账号",
           subtitle: account,
           isLast: true,
-          context: context,
         ),
       ];
     }
