@@ -53,7 +53,7 @@ class PwdListPage extends StatelessWidget {
     appProvider.hasUnsavedChanges = true;
     appLogger.logger.i("Record added, pushing to edit page for new record $newId");
     Navigator.push(
-      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: newId))
+      context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId))
     );
   }
 
@@ -89,9 +89,7 @@ class PwdListPage extends StatelessWidget {
               appLogger.logger.i("Pushing to view page for ${item.id}");
               Navigator.push(
                 context,
-                ui.switchRoute(
-                  appProvider.currentNavMode, builder: (context) => PwdViewPage(id: item.id, useHero: true),
-                ),
+                MaterialPageRoute(builder: (context) => PwdViewPage(id: item.id, useHero: true)),
               );
             },
           ),

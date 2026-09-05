@@ -203,7 +203,6 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
       pageBuilder: _buildPage,
       leftPaneBuilder: _buildSettingItems,
       padding: styles.pagePaddingAll,
-      navMode: appProvider.currentNavMode,
       widthThreshold:
           styles.tileWidthConstraint.maxWidth +
           styles.tileWidthConstraintSmall.maxWidth +

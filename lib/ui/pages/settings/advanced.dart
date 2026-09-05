@@ -80,7 +80,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
     final (stat, res) = await readTextFile(Paths.log.path);
     if (context.mounted && stat == ErrorCode.success) {
       appLogger.logger.i("Log loaded");
-      Navigator.push(context, ui.switchRoute(_appProvider.currentNavMode, builder: (_) => LogViewPage(log: res)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => LogViewPage(log: res)));
     } else {
       appLogger.logger.e("Can not load log: ${stat.code}");
       ui.showSnackBarQuick(stat.generic, context);
@@ -93,8 +93,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
     appLogger.logger.i("Setting JSON generated");
     Navigator.push(
       context,
-      ui.switchRoute(
-        _appProvider.currentNavMode,
+      MaterialPageRoute(
         builder: (_) => JsonExportPage(jsonText: text, title: "导出设置", titleTag: "setting_export")
       )
     );
@@ -108,8 +107,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
       masterController.text = "";
       Navigator.pop(context);
       Navigator.push(
-        context, ui.switchRoute(
-        _appProvider.currentNavMode,
+        context, MaterialPageRoute(
         builder: (_) => JsonExportPage(jsonText: json, title: "导出密码", titleTag: "pwd_export"))
       );
     } else {
@@ -233,8 +231,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                 trailing: Icon(Icons.arrow_forward),
                 onTap:  () => Navigator.push(
                   context,
-                  ui.switchRoute(
-                    _appProvider.currentNavMode,
+                  MaterialPageRoute(
                     builder: (_) => SettingsImportPage(
                       title: "导入设置",
                       titleTag: "setting_import",
@@ -251,8 +248,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                 trailing: Icon(Icons.arrow_forward),
                 onTap: () => Navigator.push(
                   context,
-                  ui.switchRoute(
-                    _appProvider.currentNavMode,
+                  MaterialPageRoute(
                     builder: (_) => SettingsImportPage(
                       title: "导入密码",
                       titleTag: "pwd_import",

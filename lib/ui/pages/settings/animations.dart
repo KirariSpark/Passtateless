@@ -55,32 +55,6 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
               spacing: styles.layoutSpacing,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("动画风格", style: Theme.of(context).textTheme.titleLarge),
-                RadioGroup(
-                  groupValue: appProviderWatch.currentNavMode,
-                  onChanged: (value) async {
-                    appProviderRead.currentNavMode = value!;
-                    final stat = await appProviderRead.saveConfig();
-                    if (stat != ErrorCode.success && context.mounted) {
-                      ui.showSnackBarQuick(stat.generic, context);
-                    }
-                  },
-                  child: Column(
-                    children: [
-                      for (final (index, item) in NavigatorMode.values.indexed) RadioListTile(
-                        value: item,
-                        title: Text(item.displayName),
-                        tileColor: ColorScheme.of(context).surfaceContainerLow,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: ui.calcRadius(
-                            isFirst: index == 0, isLast: index == NavigatorMode.values.length - 1
-                          ),
-                        )
-                      )
-                    ],
-                  )
-                ),
-                Divider(),
                 Text("动画速度", style: Theme.of(context).textTheme.titleLarge),
                 RadioGroup(
                   groupValue: appProviderWatch.currentDilation,

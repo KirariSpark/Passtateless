@@ -62,15 +62,6 @@ enum AvailableColors {
   const AvailableColors(this.color, this.displayName);
 }
 
-enum NavigatorMode {
-  material("Material（安卓）"),
-  cupertino("Cupertino（苹果）");
-
-  final String displayName;
-
-  const NavigatorMode(this.displayName);
-}
-
 enum AnimationDilation {
   fastest(0.1, "♿♿♿"),
   veryFast(0.5, "极快"),

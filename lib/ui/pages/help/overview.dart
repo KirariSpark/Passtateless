@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/providers/app_provider.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/styled_list_tile.dart';
-import 'package:provider/provider.dart';
 
 class HelpOverviewPage extends StatefulWidget {
   const HelpOverviewPage({super.key});
@@ -77,7 +74,6 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final navMode = context.read<AppProvider>().currentNavMode;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool isWide = constraints.maxWidth > _widthThreshold;
@@ -108,7 +104,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
                 (tag) {
                   Navigator.push(
                     context,
-                    ui.switchRoute(navMode, builder: (_) => _loadDoc(tag, isWide)),
+                    MaterialPageRoute(builder: (_) => _loadDoc(tag, isWide)),
                   );
                 },
                 (_) => false,

@@ -79,8 +79,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
     appLogger.logger.i("Pushing to generator config edit page");
     final result = await Navigator.push(
       context,
-      ui.switchRoute(
-        _appProvider.currentNavMode,
+      MaterialPageRoute(
         builder: (_) => CfgEditPage(initialText: _configController.text),
       ),
     );
@@ -294,8 +293,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
       appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
       Navigator.push(
         context,
-        ui.switchRoute(
-          _appProvider.currentNavMode,
+        MaterialPageRoute(
           builder: (context) => FullscreenPwd(res),
         ),
       );

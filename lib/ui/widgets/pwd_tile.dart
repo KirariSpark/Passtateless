@@ -68,14 +68,14 @@ class PwdTile extends StatelessWidget {
     appProvider.hasUnsavedChanges = true;
     appLogger.logger.i("Record added, pushing to edit page for new record $newId");
     Navigator.push(
-      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: newId))
+      context, MaterialPageRoute(builder: (context) => PwdEditPage(id: newId))
     );
   }
 
-  void _editArchive(BuildContext context, AppProvider appProvider) {
+  void _editArchive(BuildContext context) {
     appLogger.logger.i("Pushing to edit page for ${pwdRecord.id}");
     Navigator.push(
-      context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => PwdEditPage(id: pwdRecord.id))
+      context, MaterialPageRoute(builder: (context) => PwdEditPage(id: pwdRecord.id))
     );
   }
 
@@ -106,7 +106,7 @@ class PwdTile extends StatelessWidget {
         menuItems: [
           PopupMenuItem(
             child: Text("编辑"),
-            onTap: () => _editArchive(context, appProvider),
+            onTap: () => _editArchive(context),
           ),
           PopupMenuItem(
             child: Text("删除"),

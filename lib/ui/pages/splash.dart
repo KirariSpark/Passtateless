@@ -38,7 +38,6 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     final pwdProvider = context.watch<PwdProvider>();
-    final appProvider = Provider.of<AppProvider>(context, listen: false);
 
     if (isDecrypting) {
       // 正在解密
@@ -117,7 +116,7 @@ class _SplashPageState extends State<SplashPage> {
                         } else {
                           appLogger.logger.i("Archive decrypted, pushing to main app");
                           Navigator.pushReplacement(
-                            context, ui.switchRoute(appProvider.currentNavMode, builder: (context) => MainApp())
+                            context, MaterialPageRoute(builder: (context) => MainApp())
                           );
                         }
                       }

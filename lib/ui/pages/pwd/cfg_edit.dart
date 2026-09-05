@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:passtateless/ui/pages/help/doc_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/styled_list_tile.dart';
-import 'package:provider/provider.dart';
 import 'package:re_editor/re_editor.dart';
 
 class CfgEditPage extends StatefulWidget {
@@ -24,14 +22,12 @@ class CfgEditPage extends StatefulWidget {
 
 class _CfgEditPageState extends State<CfgEditPage> {
   late final CodeLineEditingController _configController;
-  late final AppProvider _appProvider;
 
   @override
   void initState() {
     super.initState();
     appLogger.logger.i("Showing generator config edit page with ${widget.initialText.length} characters");
     _configController = CodeLineEditingController.fromText(widget.initialText);
-    _appProvider = context.read<AppProvider>();
   }
 
   @override
@@ -56,8 +52,8 @@ class _CfgEditPageState extends State<CfgEditPage> {
     Navigator.of(context).pop();
     Navigator.push(
       context,
-      ui.switchRoute(
-        _appProvider.currentNavMode, builder: (context) => DocViewPage(title: item.displayName, docItem: item)
+      MaterialPageRoute(
+        builder: (context) => DocViewPage(title: item.displayName, docItem: item)
       )
     );
   }

@@ -70,15 +70,6 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 路由动画
-  NavigatorMode _currentNavMode = NavigatorMode.material;
-  NavigatorMode get currentNavMode => _currentNavMode;
-  set currentNavMode(NavigatorMode value) {
-    appLogger.logger.i("Setting navigator mode to ${value.name}");
-    _currentNavMode = value;
-    notifyListeners();
-  }
-
   // 日志等级
   LogLevels _currentLogLevel = LogLevels.debug;
   LogLevels get currentLogLevel => _currentLogLevel;
@@ -161,8 +152,7 @@ class AppProvider extends ChangeNotifier {
       'currentColor': _currentColor.name,
       'currentDilation': _currentDilation.name,
       'currentContrast': _currentContrast.name,
-      'currentLogLevel': _currentLogLevel.name,
-      'currentNavMode': _currentNavMode.name
+      'currentLogLevel': _currentLogLevel.name
     };
   }
 
@@ -205,14 +195,6 @@ class AppProvider extends ChangeNotifier {
       key: 'currentLogLevel',
       enumValues: LogLevels.values,
       defaultValue: _currentLogLevel,
-      fallback: fallback
-    );
-
-    currentNavMode = utils.restoreEnumSetting<NavigatorMode>(
-      jsonMap: res,
-      key: 'currentNavMode',
-      enumValues: NavigatorMode.values,
-      defaultValue: _currentNavMode,
       fallback: fallback
     );
   }

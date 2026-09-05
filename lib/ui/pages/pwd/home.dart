@@ -151,7 +151,6 @@ class _HomePageState extends State<HomePage> {
     return AdaptiveView(
       leftPaneBuilder: _buildLeftContent,
       pageBuilder: _switchPage,
-      navMode: context.read<AppProvider>().currentNavMode,
       padding: styles.pagePaddingAll,
       widthThreshold:
           styles.tileWidthConstraintSmall.maxWidth +

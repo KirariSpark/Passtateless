@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/core/enums.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 
@@ -35,9 +33,6 @@ class AdaptiveView extends StatefulWidget {
   /// 内边距值
   final EdgeInsets padding;
 
-  /// 路由动画模式
-  final NavigatorMode navMode;
-
   const AdaptiveView({
     super.key,
     required this.leftPaneBuilder,
@@ -46,7 +41,6 @@ class AdaptiveView extends StatefulWidget {
     this.rightPaneConstraints,
     this.padding = EdgeInsets.zero,
     this.widthThreshold,
-    this.navMode = NavigatorMode.material
   });
 
   @override
@@ -63,13 +57,13 @@ class _AdaptiveViewState extends State<AdaptiveView> {
     if (isWide) {
       setState(() => _selectedTag = tag);
       _rightNavigatorKey.currentState?.pushAndRemoveUntil(
-        ui.switchRoute(widget.navMode, builder: (_) => widget.pageBuilder(tag, isWide)),
+        MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)),
         (route) => false,
       );
     } else {
       Navigator.push(
         context,
-        ui.switchRoute(widget.navMode, builder: (_) => widget.pageBuilder(tag, isWide)),
+        MaterialPageRoute(builder: (_) => widget.pageBuilder(tag, isWide)),
       );
     }
   }
