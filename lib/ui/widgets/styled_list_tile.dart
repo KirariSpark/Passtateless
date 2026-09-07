@@ -128,14 +128,18 @@ class StyledMenuListTile extends StatelessWidget {
   });
 
   void _showMenu(PositionedGestureDetails details, BuildContext context) {
+    final RenderBox overlayBox = Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final Offset origin = overlayBox.localToGlobal(Offset.zero);
+    final Offset anchor = details.globalPosition - origin;
+
     showMenu(
       context: context,
       elevation: 1,
       position: RelativeRect.fromLTRB(
-        details.globalPosition.dx, 
-        details.globalPosition.dy, 
-        details.globalPosition.dx, 
-        details.globalPosition.dy, 
+        anchor.dx,
+        anchor.dy,
+        anchor.dx,
+        anchor.dy,
       ),
       shape: styles.roundedBorder,
       items: menuItems,
