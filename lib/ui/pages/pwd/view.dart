@@ -180,6 +180,39 @@ class _PwdViewPageState extends State<PwdViewPage> {
     ];
   }
 
+  /// 生成设置 + 两个按钮，构成第二栏
+  List<Widget> _buildSettingsColumn() {
+    return [
+      PresetPanel(
+        controller: _genController,
+        onChanged: () => setState(() {}),
+      ),
+      styles.spacingSizedBox,
+      // 按钮
+      Row(
+        spacing: styles.layoutSpacing,
+        children: [
+          // 查看密码
+          Expanded(
+            child: styled.buildTextButton(
+              onPressed: _genController.isGenerating ? null : _showWarningDialog,
+              context: context,
+              child: const Text("查看密码"),
+            ),
+          ),
+          // 复制密码
+          Expanded(
+            child: styled.buildTextButton(
+              onPressed: _genController.isGenerating ? null : _genAndCopyPwd,
+              context: context,
+              child: const Text("复制密码"),
+            ),
+          ),
+        ],
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,43 +221,68 @@ class _PwdViewPageState extends State<PwdViewPage> {
         child: Container(
           padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           alignment: Alignment.centerLeft,
-          child: ConstrainedBox(
-            constraints: styles.tileWidthConstraint,
-            child: Column(
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // 单柱内容（表头字段 + RemovalCfg）
+              final headerCol = [
                 ..._buildHeader(),
                 styles.spacingSizedBox,
                 const RemovalCfg(),
-                styles.spacingSizedBox,
-                PresetPanel(
-                  controller: _genController,
-                  onChanged: () => setState(() {}),
-                ),
-                styles.spacingSizedBox,
-                // 按钮
-                Row(
+              ];
+              final settingsCol = _buildSettingsColumn();
+
+              // 足够宽时并排双栏；否则单栏使用更宽的宽度约束
+              final wide = constraints.maxWidth >= styles.layoutChangeWidth;
+
+              // 双栏
+              Widget wideLayout() {
+                Widget tile(List<Widget> children) => ConstrainedBox(
+                  constraints: styles.tileWidthConstraint,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: children,
+                  ),
+                );
+                return Row(
+                  key: const ValueKey("wide"),
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: styles.layoutSpacing,
                   children: [
-                    // 查看密码
-                    Expanded(
-                      child: styled.buildTextButton(
-                        onPressed: _genController.isGenerating ? null : _showWarningDialog,
-                        context: context,
-                        child: const Text("查看密码"),
-                      ),
-                    ),
-                    // 复制密码
-                    Expanded(
-                      child: styled.buildTextButton(
-                        onPressed: _genController.isGenerating ? null : _genAndCopyPwd,
-                        context: context,
-                        child: const Text("复制密码"),
-                      ),
-                    ),
+                    Flexible(child: tile(headerCol)),
+                    Flexible(child: tile(settingsCol)),
+                  ],
+                );
+              }
+
+              // 单栏
+              Widget narrowLayout() => ConstrainedBox(
+                key: const ValueKey("narrow"),
+                constraints: styles.tileWidthConstraint,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...headerCol,
+                    styles.spacingSizedBox,
+                    ...settingsCol,
                   ],
                 ),
-              ],
-            ),
+              );
+
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                layoutBuilder: (currentChild, previousChildren) => Stack(
+                  alignment: AlignmentDirectional.topStart,
+                  textDirection: Directionality.of(context),
+                  children: [
+                    ...previousChildren,
+                    ?currentChild,
+                  ],
+                ),
+                child: wide ? wideLayout() : narrowLayout(),
+              );
+            },
           ),
         ),
       ),

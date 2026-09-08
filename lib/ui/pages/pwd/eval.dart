@@ -65,7 +65,7 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
         alignment: Alignment.topLeft,
         padding: widget.hasPadding ? styles.pagePaddingAll : null,
         child: ConstrainedBox(
-          constraints: styles.pageWidthConstraint,
+          constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
               spacing: styles.layoutSpacing,
