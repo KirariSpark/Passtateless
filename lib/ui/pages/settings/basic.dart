@@ -11,7 +11,6 @@ import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/styled_list_tile.dart';
-import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 
 // 基础设置页面
@@ -29,16 +28,6 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   void initState() {
     super.initState();
     appProvider = context.read<AppProvider>();
-  }
-
-  Future<void> _changeRemindDays(RemindDays value, BuildContext context) async {
-    appProvider.remindMe = value;
-    appLogger.logger.i("Remind settings updated to ${value.name}");
-    await appProvider.saveConfig();
-    if (context.mounted) {
-      appLogger.logger.i("Changes in settings saved");
-      Navigator.pop(context);
-    }
   }
 
   Widget _buildPage((String, String) id, bool isWide) {
