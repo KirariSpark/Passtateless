@@ -14,7 +14,7 @@ import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 import 'package:provider/provider.dart';
 
 /// 查看所有密码的页面
-class PwdListPage extends StatelessWidget {
+class PwdListPage extends StatefulWidget {
   /// 页面是否有横向内边距
   final bool hasPadding;
 
@@ -26,6 +26,14 @@ class PwdListPage extends StatelessWidget {
     this.hasPadding = true,
     this.hasAppBar = true
   });
+
+  @override
+  State<PwdListPage> createState() => _PwdListPageState();
+}
+
+class _PwdListPageState extends State<PwdListPage> {
+  /// 当前选中的、用于过滤密码的标签集合
+  final Set<String> _selectedTags = {};
 
   Future<void> _save(BuildContext context, PwdProvider pwdProvider, AppProvider appProvider) async {
     appLogger.logger.i("Saving changes in password archive");
@@ -62,14 +70,15 @@ class PwdListPage extends StatelessWidget {
     required BuildContext context,
     required PwdProvider pwdProvider,
     required AppProvider appProvider,
+    bool noMatch = false,
   }) {
     if (pwdList.isEmpty) {
       return <Widget>[
         ConstrainedBox(
           constraints: styles.tileWidthConstraint,
           child: StyledListTileSimple(
-            title: "没有密码",
-            subtitle: "点击新增一条密码",
+            title: noMatch ? "没有符合条件的密码" : "没有密码",
+            subtitle: noMatch ? "选择其他标签试试" : "点击新增一条密码",
             onTap: () => _newArchive(context: context, pwdProvider: pwdProvider, appProvider: appProvider),
             leadingIcon: Icons.not_interested,
             isFirst: true,
@@ -131,6 +140,47 @@ class PwdListPage extends StatelessWidget {
     return null;
   }
 
+  /// 聚合所有密码记录中出现过的不同标签
+  List<String> get _allTags {
+    final Set<String> tags = {};
+    for (final pwd in context.read<PwdProvider>().pwdList) {
+      tags.addAll(pwd.tags);
+    }
+    return tags.toList();
+  }
+
+  /// 顶部固定的标签筛选器
+  Widget _buildFilterRow() {
+    final List<String> allTags = _allTags;
+    final selectedAll = _selectedTags.isEmpty;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: styles.uniInsetsSmall,
+      child: Row(
+        spacing: styles.layoutSpacing,
+        children: [
+          FilterChip(
+            label: const Text("全部"),
+            selected: selectedAll,
+            onSelected: (_) => setState(_selectedTags.clear),
+          ),
+          for (final tag in allTags)
+            FilterChip(
+              label: Text(tag),
+              selected: _selectedTags.contains(tag),
+              onSelected: (selected) => setState(() {
+                if (selected) {
+                  _selectedTags.add(tag);
+                } else {
+                  _selectedTags.remove(tag);
+                }
+              }),
+            ),
+        ],
+      ),
+    );
+  }
+
   Scaffold _buildUi(
     List<PwdItem> pwdList,
     BuildContext context, {
@@ -138,29 +188,39 @@ class PwdListPage extends StatelessWidget {
     required AppProvider appProvider,
     required PwdProvider pwdProvider,
   }) {
+    final bool noMatch =
+        _selectedTags.isNotEmpty && pwdList.isEmpty && _allTags.isNotEmpty;
     return Scaffold(
-      appBar: _buildAppBar(context: context, hasAppBar: hasAppBar, pwdProvider: pwdProvider, appProvider: appProvider),
+      appBar: _buildAppBar(context: context, hasAppBar: widget.hasAppBar, pwdProvider: pwdProvider, appProvider: appProvider),
       body: Container(
         alignment: Alignment.topCenter,
         padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: Container(
           constraints: styles.tileWidthConstraint,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ..._buildList(
-                  pwdList: pwdList,
-                  context: context,
-                  pwdProvider: pwdProvider,
-                  appProvider: appProvider
+          child: Column(
+            children: [
+              _buildFilterRow(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ..._buildList(
+                        pwdList: pwdList,
+                        context: context,
+                        pwdProvider: pwdProvider,
+                        appProvider: appProvider,
+                        noMatch: noMatch,
+                      ),
+                      // TODO: 彩蛋
+                      TextField(
+                        decoration: InputDecoration(border: InputBorder.none),
+                        style: TextStyle(color: Colors.transparent)
+                      ),
+                    ],
+                  ),
                 ),
-                // TODO: 彩蛋
-                TextField(
-                  decoration: InputDecoration(border: InputBorder.none),
-                  style: TextStyle(color: Colors.transparent)
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -172,10 +232,16 @@ class PwdListPage extends StatelessWidget {
     final pwds = context.watch<PwdProvider>().pwdList;
     final appProvider = context.read<AppProvider>();
     final pwdProvider = context.read<PwdProvider>();
+    final filtered = _selectedTags.isEmpty
+        ? pwds
+        : [
+            for (final pwd in pwds)
+              if (_selectedTags.every(pwd.hasTag)) pwd
+          ];
     return _buildUi(
-      pwds,
+      filtered,
       context,
-      hasPadding: hasPadding,
+      hasPadding: widget.hasPadding,
       appProvider: appProvider,
       pwdProvider: pwdProvider
     );
