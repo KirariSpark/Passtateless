@@ -192,7 +192,7 @@ class _PwdListPageState extends State<PwdListPage> {
     return Scaffold(
       appBar: _buildAppBar(context: context, hasAppBar: widget.hasAppBar, pwdProvider: pwdProvider, appProvider: appProvider),
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: Container(
           constraints: styles.tileWidthConstraint,

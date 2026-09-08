@@ -46,7 +46,7 @@ class _AnimationSettingsPageState extends State<AnimationSettingsPage> {
         ? styled.buildAppBar(title: "动画", context: context, titleTag: widget.useHero ? HeroTags.animationSettings.tag : null)
         : null,
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
         child: ConstrainedBox(
           constraints: styles.tileWidthConstraint,

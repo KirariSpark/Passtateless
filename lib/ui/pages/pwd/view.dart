@@ -187,7 +187,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
       body: SingleChildScrollView(
         child: Container(
           padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
-          alignment: Alignment.center,
+          alignment: Alignment.centerLeft,
           child: ConstrainedBox(
             constraints: styles.tileWidthConstraint,
             child: Column(

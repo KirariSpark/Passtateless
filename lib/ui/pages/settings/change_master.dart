@@ -50,7 +50,7 @@ class _MasterPwdPageState extends State<MasterPwdPage> {
         context: context
       ) : null,
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         child: Container(
           padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,

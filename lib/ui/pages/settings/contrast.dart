@@ -27,7 +27,7 @@ class ContrastSettingsPage extends StatelessWidget {
         context: context
       ) : null,
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         child: Container(
           padding: hasPadding ? styles.pagePaddingAll : null,
           constraints: styles.tileWidthConstraint,

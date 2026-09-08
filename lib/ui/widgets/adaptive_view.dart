@@ -128,7 +128,7 @@ class _AdaptiveViewState extends State<AdaptiveView> {
     return Container(
       key: const ValueKey('narrow-layout'),
       padding: widget.padding,
-      alignment: Alignment.topCenter,
+      alignment: Alignment.topLeft,
       child: widget.leftPaneBuilder(context, isWide, (tag) => _navigateTo(tag, isWide), (tag) => _isSelected(tag, isWide)),
     );
   }

@@ -142,7 +142,7 @@ class _PwdEditPageState extends State<PwdEditPage> {
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
         child: Container(
-          alignment: Alignment.topCenter,
+          alignment: Alignment.topLeft,
           padding: styles.pagePaddingAll,
           child: ConstrainedBox(
             constraints: styles.tileWidthConstraint,

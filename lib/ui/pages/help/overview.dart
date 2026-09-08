@@ -97,7 +97,7 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
               ],
             )
             : Align(
-              alignment: Alignment.topCenter,
+              alignment: Alignment.topLeft,
               child: _buildDocList(
                 context,
                 isWide,

@@ -45,7 +45,7 @@ class ThemeSettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         child: Container(
           padding: hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
           constraints: styles.tileWidthConstraint,

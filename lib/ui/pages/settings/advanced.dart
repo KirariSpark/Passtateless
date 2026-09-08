@@ -126,7 +126,7 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
         ? styled.buildAppBar(title: "高级设置", titleTag: widget.useHero ? HeroTags.advancedSettings.tag : null, context: context)
         : null,
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         padding: widget.hasPadding ? styles.pagePaddingAll : null,
         child: ConstrainedBox(
           constraints: styles.tileWidthConstraint,
