@@ -90,6 +90,99 @@ Generate {
   Presets _preset = Presets.simple;
   bool isGenerating = false;
 
+  /// 折叠面板是否展示（默认展开）
+  bool _presetPanelExpanded = true;
+
+  /// 当前预设解析出的额外输入（已排除 master/seedString）
+  List<DslInput> _extraInputs = [];
+
+  /// 额外 str/int 输入对应的文本控制器
+  final Map<String, TextEditingController> _extraControllers = {};
+
+  /// 额外 bool 输入对应的开关状态
+  final Map<String, bool> _extraSwitchValues = {};
+
+  /// 面板内的输入校验错误文案
+  String? _inlineInputError;
+
+  /// 根据当前预设解析 DSL 声明，重建额外输入控件（str/int 用 Controller，bool 用开关）
+  void _refreshExtraInputs() {
+    final String dsl = switch (_preset) {
+      Presets.simple => dsl_presets.simple,
+      Presets.complex => dsl_presets.complex,
+      Presets.bank => dsl_presets.bank,
+      Presets.custom => _configController.text,
+    };
+
+    List<DslInput> extra;
+    try {
+      final declared = parseDslInputs(dsl);
+      extra = declared
+          .where((i) => i.name != 'master' && i.name != 'seedString')
+          .toList();
+    } on DslError catch (e) {
+      appLogger.logger.e("Failed to parse DSL inputs for panel: $e");
+      extra = [];
+    }
+
+    for (final c in _extraControllers.values) {
+      c.dispose();
+    }
+    _extraControllers.clear();
+    _extraSwitchValues.clear();
+
+    for (final i in extra) {
+      switch (i.type) {
+        case DslType.str:
+          _extraControllers[i.name] =
+              TextEditingController(text: (i.defaultValue as String?) ?? '');
+        case DslType.int:
+          _extraControllers[i.name] =
+              TextEditingController(text: i.defaultValue?.toString() ?? '');
+        case DslType.bool:
+          _extraSwitchValues[i.name] = i.defaultValue as bool? ?? false;
+      }
+    }
+    _extraInputs = extra;
+  }
+
+  /// 从内联控件收集额外输入值；校验失败时返回 null 并设置 [_inlineInputError]
+  Map<String, dynamic>? _collectExtraInputs() {
+    final values = <String, dynamic>{};
+    for (final i in _extraInputs) {
+      switch (i.type) {
+        case DslType.str:
+          final t = _extraControllers[i.name]!.text.trim();
+          if (t.isEmpty && i.defaultValue == null) {
+            _inlineInputError = "请填写“${i.displayName}”";
+            return null;
+          }
+          values[i.name] = t;
+        case DslType.int:
+          final t = _extraControllers[i.name]!.text.trim();
+          if (t.isEmpty) {
+            if (i.defaultValue != null) {
+              values[i.name] = i.defaultValue;
+            } else {
+              _inlineInputError = "请填写“${i.displayName}”";
+              return null;
+            }
+          } else {
+            final v = int.tryParse(t);
+            if (v == null) {
+              _inlineInputError = "“${i.displayName}”必须是整数";
+              return null;
+            }
+            values[i.name] = v;
+          }
+        case DslType.bool:
+          values[i.name] = _extraSwitchValues[i.name]!;
+      }
+    }
+    _inlineInputError = null;
+    return values;
+  }
+
   Future<void> _editCfg() async {
     // 跳转并等待返回结果
     appLogger.logger.i("Pushing to generator config edit page");
@@ -101,7 +194,10 @@ Generate {
     );
 
     if (result != null && result is String) {
-      setState(() => _configController.text = result);
+      setState(() {
+        _configController.text = result;
+        _refreshExtraInputs();
+      });
       appLogger.logger.i("Got new config with ${result.length} characters");
       if (mounted) {
         ui.showSnackBarQuick("编辑结果已保存", context);
@@ -121,135 +217,6 @@ Generate {
       );
     }
     return null;
-  }
-
-  /// 请求额外的 GroupInput 输入（master/seedString 由程序提供，不弹窗）。
-  /// 返回 {name: 值} 映射（str→String / int→int / bool→bool）；无额外输入返回空映射；取消返回 null。
-  Future<Map<String, dynamic>?> _requestExtraInputs(
-    BuildContext context,
-    List<DslInput> inputs,
-  ) async {
-    final extra = inputs
-        .where((i) => i.name != 'master' && i.name != 'seedString')
-        .toList();
-    if (extra.isEmpty) return <String, dynamic>{};
-
-    appLogger.logger.i("Requesting ${extra.length} extra inputs");
-
-    // 每个 str/int 输入一个控制器（预填默认值），bool 输入单独记录开关状态
-    final controllers = <String, TextEditingController>{};
-    final switchStates = <String, bool>{};
-    for (final i in extra) {
-      switch (i.type) {
-        case DslType.str:
-          controllers[i.name] =
-              TextEditingController(text: (i.defaultValue as String?) ?? '');
-        case DslType.int:
-          controllers[i.name] =
-              TextEditingController(text: i.defaultValue?.toString() ?? '');
-        case DslType.bool:
-          switchStates[i.name] = i.defaultValue as bool? ?? false;
-      }
-    }
-
-    String? errorText;
-    final result = await showDialog<Map<String, dynamic>>(
-      useRootNavigator: false,
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AlertDialog(
-          scrollable: true,
-          shape: styles.roundedBorder,
-          title: const Text("请求输入"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final i in extra) ...[
-                switch (i.type) {
-                  DslType.bool => SwitchListTile(
-                      title: Text(i.displayName),
-                      value: switchStates[i.name]!,
-                      onChanged: (v) =>
-                          setDialogState(() => switchStates[i.name] = v),
-                    ),
-                  _ => styled.buildTextField(
-                      context: dialogContext,
-                      controller: controllers[i.name],
-                      label: i.displayName,
-                      // int 使用数字键盘
-                      keyboardType: i.type == DslType.int
-                          ? TextInputType.number
-                          : null,
-                    ),
-                },
-                styles.spacingSizedBox,
-              ],
-              if (errorText != null)
-                Text(
-                  errorText!,
-                  style: TextStyle(
-                    color: ColorScheme.of(dialogContext).error,
-                  ),
-                ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              style: styles.buttonStyle,
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("取消"),
-            ),
-            TextButton(
-              style: styles.buttonStyle,
-              onPressed: () {
-                final values = <String, dynamic>{};
-                for (final i in extra) {
-                  switch (i.type) {
-                    case DslType.str:
-                      final t = controllers[i.name]!.text.trim();
-                      if (t.isEmpty && i.defaultValue == null) {
-                        setDialogState(
-                            () => errorText = "请填写“${i.displayName}”");
-                        return;
-                      }
-                      values[i.name] = t;
-                    case DslType.int:
-                      final t = controllers[i.name]!.text.trim();
-                      if (t.isEmpty) {
-                        if (i.defaultValue != null) {
-                          values[i.name] = i.defaultValue;
-                        } else {
-                          setDialogState(
-                              () => errorText = "请填写“${i.displayName}”");
-                          return;
-                        }
-                      } else {
-                        final v = int.tryParse(t);
-                        if (v == null) {
-                          setDialogState(
-                              () => errorText = "“${i.displayName}”必须是整数");
-                          return;
-                        }
-                        values[i.name] = v;
-                      }
-                    case DslType.bool:
-                      values[i.name] = switchStates[i.name]!;
-                  }
-                }
-                Navigator.pop(dialogContext, values);
-              },
-              child: const Text("确定"),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    for (final c in controllers.values) {
-      c.dispose();
-    }
-    return result;
   }
 
   /// 密码生成后的处理，复制和显示snack bar
@@ -291,10 +258,9 @@ Generate {
       Presets.custom => _configController.text,
     };
 
-    // 2) 解析 DSL 声明，收集额外输入并弹窗请求
-    List<DslInput> declaredInputs;
+    // 2) 解析 DSL 声明并校验（配置出错时提示）
     try {
-      declaredInputs = parseDslInputs(dslSource);
+      parseDslInputs(dslSource);
     } on DslError catch (e) {
       appLogger.logger.e("DSL config error: $e");
       if (context.mounted) {
@@ -311,14 +277,17 @@ Generate {
       }
       return (ErrorCode.generateFailed, "");
     }
-    final requested = await _requestExtraInputs(context, declaredInputs);
+
+    // 3) 从折叠面板内联控件收集额外输入
+    final requested = _collectExtraInputs();
     if (requested == null) {
-      // 用户取消输入，中止生成（不复制、不展示错误）
-      appLogger.logger.i("Input cancelled, aborting generation");
+      appLogger.logger.i("Extra input validation failed, aborting generation");
+      if (mounted) setState(() {});
+      ui.showSnackBarQuick("请检查以上输入", context);
       return (ErrorCode.unknown, "");
     }
 
-    // 3) 组装输入：seedString 对应旧 composeSeed 的拼接结果；
+    // 4) 组装输入：seedString 对应旧 composeSeed 的拼接结果；
     //    master 传入主密码哈希（明文不可恢复），供 DSL 脚本选用
     final String seedString = "$identifier: $userName @ $account";
     final inputValues = <String, dynamic>{
@@ -327,7 +296,7 @@ Generate {
       ...requested,
     };
 
-    // 4) 交给 DSL 解释器
+    // 5) 交给 DSL 解释器
     final result = await runDsl(dslSource, inputValues);
 
     if (!result.ok) {
@@ -348,7 +317,7 @@ Generate {
       return (ErrorCode.generateFailed, "");
     }
 
-    // 5) 成功：保留旧的“移除数字/字母/特殊字符”后处理
+    // 6) 成功：保留旧的“移除数字/字母/特殊字符”后处理
     var pwd = result.value!;
     if (_pwdProvider.removeDigits) pwd = utils.removeDigits(pwd);
     if (_pwdProvider.removeAlpha) pwd = utils.removeAlpha(pwd);
@@ -372,7 +341,10 @@ Generate {
 
   void _selectPreset(Presets? value) {
     appLogger.logger.i("Setting preset to ${value?.name}");
-    setState(() => _preset = value ?? Presets.simple);
+    setState(() {
+      _preset = value ?? Presets.simple;
+      _refreshExtraInputs();
+    });
   }
 
   void _showWarningDialog() {
@@ -553,15 +525,97 @@ Generate {
       account = "快速开始";
       id = "快速开始";
     }
+
+    _refreshExtraInputs();
   }
 
   @override
   void dispose() {
     _configController.dispose();
+    for (final c in _extraControllers.values) {
+      c.dispose();
+    }
     identifierController.dispose();
     userNameController.dispose();
     accountController.dispose();
     super.dispose();
+  }
+
+  /// 构建包裹预设相关 Widget 的折叠面板（预设下拉 + 自定义规则入口 + DSL 额外输入）
+  Widget _buildPresetPanel() {
+    final children = <Widget>[
+      DropdownMenu(
+        label: Text("生成预设"),
+        width: double.infinity,
+        helperText: _preset.desc,
+        menuStyle: MenuStyle(maximumSize: WidgetStatePropertyAll<Size>(Size(120, double.infinity)),),
+        dropdownMenuEntries: [for (Presets i in Presets.values) DropdownMenuEntry(value: i, label: i.displayName)],
+        onSelected: (value) => _selectPreset(value),
+        initialSelection: _preset,
+        selectOnly: true,
+      ),
+    ];
+
+    final cfgEdit = _showConfigEdit();
+    if (cfgEdit != null) children.add(cfgEdit);
+
+    if (_extraInputs.isNotEmpty) {
+      children.add(styles.spacingSizedBox);
+      for (final i in _extraInputs) {
+        children.add(
+          switch (i.type) {
+            DslType.bool => SwitchListTile(
+              title: Text(i.displayName),
+              value: _extraSwitchValues[i.name]!,
+              onChanged: (v) => setState(() => _extraSwitchValues[i.name] = v),
+            ),
+            _ => styled.buildTextField(
+              context: context,
+              controller: _extraControllers[i.name],
+              label: i.displayName,
+              // int 使用数字键盘
+              keyboardType: i.type == DslType.int ? TextInputType.number : null,
+            ),
+          },
+        );
+        children.add(styles.spacingSizedBox);
+      }
+    }
+
+    if (_inlineInputError != null) {
+      children.add(
+        Text(
+          _inlineInputError!,
+          style: TextStyle(color: ColorScheme.of(context).error),
+        ),
+      );
+    }
+
+    final contentColor = ColorScheme.of(context).onSurface;
+
+    // 与 StyledListTileSimple 视觉一致的卡片：surfaceContainerLow 背景 + 圆角
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: styles.borderRadius,
+        color: ColorScheme.of(context).surfaceContainerLow,
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: _presetPanelExpanded,
+        onExpansionChanged: (expanded) => _presetPanelExpanded = expanded,
+        childrenPadding: styles.uniInsetsSmall,
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        shape: styles.roundedBorder,
+        collapsedShape: styles.roundedBorder,
+        leading: Icon(Icons.tune, color: contentColor),
+        iconColor: contentColor,
+        collapsedIconColor: contentColor,
+        textColor: contentColor,
+        collapsedTextColor: contentColor,
+        title: const Text("生成设置"),
+        children: children,
+      ),
+    );
   }
 
   @override
@@ -580,25 +634,7 @@ Generate {
                 styles.spacingSizedBox,
                 const RemovalCfg(),
                 styles.spacingSizedBox,
-                DropdownMenu(
-                  label: Text("生成预设"),
-                  width: double.infinity,
-                  helperText: _preset.desc,
-                  menuStyle: MenuStyle(
-                    maximumSize: WidgetStatePropertyAll<Size>(Size(120, double.infinity))
-                  ),
-                  dropdownMenuEntries: [
-                    for (Presets i in Presets.values) DropdownMenuEntry(
-                      value: i,
-                      label: i.displayName,
-                    )
-                  ],
-                  onSelected: (value) => _selectPreset(value),
-                  initialSelection: _preset,
-                  selectOnly: true,
-                ),
-                styles.spacingSizedBox,
-                ?_showConfigEdit(),
+                _buildPresetPanel(),
                 styles.spacingSizedBox,
                 // 按钮
                 Row(
