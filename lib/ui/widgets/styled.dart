@@ -183,8 +183,8 @@ PopupMenuItem buildPopupMenuItem({
   );
 }
 
-/// 构建一个代码编辑器，包含高亮和行指示器，配置为JSON格式
-CodeEditor buildJsonEditor({
+/// 构建一个代码编辑器，包含高亮和行指示器
+CodeEditor buildDslEditor({
   required BuildContext context,
   CodeLineEditingController? controller,
   bool readOnly = false,
@@ -194,12 +194,6 @@ CodeEditor buildJsonEditor({
     wordWrap: false,
     controller: controller,
     style: CodeEditorStyle(
-      codeTheme: CodeHighlightTheme(
-        languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-        theme: ColorScheme.of(context).brightness == Brightness.light
-            ? a11YLightTheme
-            : a11YDarkTheme,
-      ),
       fontFamily: "SourceCodePro",
       fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
       backgroundColor: ColorScheme.of(context).surfaceContainerLow,

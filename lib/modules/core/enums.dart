@@ -114,13 +114,7 @@ enum DocItems {
   ),
   cfg("配置生成器", "cfg", "了解生成器的功能及其参数", "assets/docs/cfg.md"),
   cfgTips("生成器提示", "cfg_tips", "生成器的一些特性", "assets/docs/cfg_tips.md"),
-  features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md"),
-  importExport(
-    "导入导出",
-    "import_export",
-    "备份、恢复和分享你的数据",
-    "assets/docs/import_export.md",
-  );
+  features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md");
 
   final String displayName;
   final String mode;

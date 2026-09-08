@@ -28,7 +28,7 @@ class SettingsImportPage extends StatelessWidget {
       ),
       body: Padding(
         padding: styles.pagePaddingAll,
-        child: styled.buildJsonEditor(
+        child: styled.buildDslEditor(
           context: context,
           controller: controller
         ),

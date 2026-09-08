@@ -33,7 +33,7 @@ class JsonExportPage extends StatelessWidget {
       ),
       body: Padding(
         padding: styles.pagePaddingAll,
-        child: styled.buildJsonEditor(
+        child: styled.buildDslEditor(
           context: context,
           readOnly: true,
           controller: CodeLineEditingController.fromText(jsonText)
