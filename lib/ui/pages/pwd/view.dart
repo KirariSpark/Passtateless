@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/core/pwd_item.dart';
-import 'package:passtateless/modules/generator/errors.dart';
-import 'package:passtateless/modules/generator/inputs.dart';
-import 'package:passtateless/modules/generator/interpreter.dart';
-import 'package:passtateless/modules/generator/presets.dart' as dsl_presets;
-import 'package:passtateless/modules/generator/values.dart';
-import 'package:provider/provider.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/generator/pwd_gen_controller.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/modules/utils/utils.dart' as utils;
-import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
+import 'package:provider/provider.dart';
 import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
+import 'package:passtateless/ui/pages/pwd/master_pwd.dart';
+import 'package:passtateless/ui/pages/pwd/preset_panel.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/removal_cfg.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:passtateless/ui/widgets/styled_list_tile.dart';
-import 'package:re_editor/re_editor.dart';
 
 /// 密码记录的查看页面，也用于密码的生成功能，通过传入enableEdit来启用快速模式（此时将不会使用传入的id初始化页面）
 ///
@@ -55,20 +49,7 @@ class PwdViewPage extends StatefulWidget {
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
-  /// 语法正确的最小 DSL，作为自定义编辑器初始内容
-  static const String _defaultDslSource = '''
-GroupInput {
-    str master: "主密码";
-    str seedString: "种子字符串";
-}
-Generate {
-    return toBase64(string: seedString);
-}
-''';
-
   // 一些只读的属性
-  final CodeLineEditingController _configController =
-      CodeLineEditingController.fromText(_defaultDslSource);
   late final String identifier;
   late final String userName;
   late final String account;
@@ -78,6 +59,9 @@ Generate {
   late final AppProvider _appProvider;
   late final PwdProvider _pwdProvider;
 
+  // 密码生成逻辑控制器
+  late final PwdGenController _genController;
+
   // 非快速模式下打开的记录
   late final PwdItem? _record;
 
@@ -85,246 +69,6 @@ Generate {
   final TextEditingController identifierController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController accountController = TextEditingController();
-
-  // 一些内部要用到的状态
-  Presets _preset = Presets.simple;
-  bool isGenerating = false;
-
-  /// 折叠面板是否展示（默认展开）
-  bool _presetPanelExpanded = true;
-
-  /// 当前预设解析出的额外输入（已排除 master/seedString）
-  List<DslInput> _extraInputs = [];
-
-  /// 额外 str/int 输入对应的文本控制器
-  final Map<String, TextEditingController> _extraControllers = {};
-
-  /// 额外 bool 输入对应的开关状态
-  final Map<String, bool> _extraSwitchValues = {};
-
-  /// 面板内的输入校验错误文案
-  String? _inlineInputError;
-
-  /// 根据当前预设解析 DSL 声明，重建额外输入控件（str/int 用 Controller，bool 用开关）
-  void _refreshExtraInputs() {
-    final String dsl = switch (_preset) {
-      Presets.simple => dsl_presets.simple,
-      Presets.complex => dsl_presets.complex,
-      Presets.bank => dsl_presets.bank,
-      Presets.custom => _configController.text,
-    };
-
-    List<DslInput> extra;
-    try {
-      final declared = parseDslInputs(dsl);
-      extra = declared
-          .where((i) => i.name != 'master' && i.name != 'seedString')
-          .toList();
-    } on DslError catch (e) {
-      appLogger.logger.e("Failed to parse DSL inputs for panel: $e");
-      extra = [];
-    }
-
-    for (final c in _extraControllers.values) {
-      c.dispose();
-    }
-    _extraControllers.clear();
-    _extraSwitchValues.clear();
-
-    for (final i in extra) {
-      switch (i.type) {
-        case DslType.str:
-          _extraControllers[i.name] =
-              TextEditingController(text: (i.defaultValue as String?) ?? '');
-        case DslType.int:
-          _extraControllers[i.name] =
-              TextEditingController(text: i.defaultValue?.toString() ?? '');
-        case DslType.bool:
-          _extraSwitchValues[i.name] = i.defaultValue as bool? ?? false;
-      }
-    }
-    _extraInputs = extra;
-  }
-
-  /// 从内联控件收集额外输入值；校验失败时返回 null 并设置 [_inlineInputError]
-  Map<String, dynamic>? _collectExtraInputs() {
-    final values = <String, dynamic>{};
-    for (final i in _extraInputs) {
-      switch (i.type) {
-        case DslType.str:
-          final t = _extraControllers[i.name]!.text.trim();
-          if (t.isEmpty && i.defaultValue == null) {
-            _inlineInputError = "请填写“${i.displayName}”";
-            return null;
-          }
-          values[i.name] = t;
-        case DslType.int:
-          final t = _extraControllers[i.name]!.text.trim();
-          if (t.isEmpty) {
-            if (i.defaultValue != null) {
-              values[i.name] = i.defaultValue;
-            } else {
-              _inlineInputError = "请填写“${i.displayName}”";
-              return null;
-            }
-          } else {
-            final v = int.tryParse(t);
-            if (v == null) {
-              _inlineInputError = "“${i.displayName}”必须是整数";
-              return null;
-            }
-            values[i.name] = v;
-          }
-        case DslType.bool:
-          values[i.name] = _extraSwitchValues[i.name]!;
-      }
-    }
-    _inlineInputError = null;
-    return values;
-  }
-
-  Future<void> _editCfg() async {
-    // 跳转并等待返回结果
-    appLogger.logger.i("Pushing to generator config edit page");
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CfgEditPage(initialText: _configController.text),
-      ),
-    );
-
-    if (result != null && result is String) {
-      setState(() {
-        _configController.text = result;
-        _refreshExtraInputs();
-      });
-      appLogger.logger.i("Got new config with ${result.length} characters");
-      if (mounted) {
-        ui.showSnackBarQuick("编辑结果已保存", context);
-      }
-    }
-  }
-
-  /// 根据当前预设决定是否显示自定义规则
-  Widget? _showConfigEdit() {
-    if (_preset == Presets.custom) {
-      return StyledListTileSimple(
-        title: "配置生成规则",
-        trailing: Icon(Icons.arrow_forward),
-        isLast: true,
-        isFirst: true,
-        onTap: _editCfg,
-      );
-    }
-    return null;
-  }
-
-  /// 密码生成后的处理，复制和显示snack bar
-  (ErrorCode, String) _postProcess((ErrorCode, String) res, bool doCopy) {
-    if (res.$1 == ErrorCode.success) {
-      appLogger.logger.i("Generated successfully");
-      if (doCopy) {
-        Clipboard.setData(ClipboardData(text: res.$2));
-      }
-      if (context.mounted && doCopy) {
-        appLogger.logger.i("Password copied");
-        ui.showSnackBarQuick("密码已复制", context);
-      }
-    } else {
-      if (context.mounted) {
-        appLogger.logger.e("Can not generate password: ${res.$1.generic}");
-        ui.showSnackBarQuick(res.$1.generic, context);
-      }
-    }
-    return res;
-  }
-
-  /// 生成密码并显示提示（返回生成的密码或错误信息）
-  Future<(ErrorCode, String)> _genPwd({
-    required BuildContext context,
-    required bool copyAfterGenerate,
-    required String identifier,
-    required String userName,
-    required String account,
-  }) async {
-    appLogger.logger.i("Generating password");
-    setState(() => isGenerating = true);
-
-    // 1) 选取 DSL 源码：预设用内置 DSL，自定义用编辑器文本
-    final String dslSource = switch (_preset) {
-      Presets.simple => dsl_presets.simple,
-      Presets.complex => dsl_presets.complex,
-      Presets.bank => dsl_presets.bank,
-      Presets.custom => _configController.text,
-    };
-
-    // 2) 解析 DSL 声明并校验（配置出错时提示）
-    try {
-      parseDslInputs(dslSource);
-    } on DslError catch (e) {
-      appLogger.logger.e("DSL config error: $e");
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "配置或生成出错\n${e.display}",
-              style: TextStyle(fontFamily: "SourceCodePro"),
-            ),
-            showCloseIcon: true,
-          ),
-        );
-      }
-      return (ErrorCode.generateFailed, "");
-    }
-
-    // 3) 从折叠面板内联控件收集额外输入
-    final requested = _collectExtraInputs();
-    if (requested == null) {
-      appLogger.logger.i("Extra input validation failed, aborting generation");
-      if (mounted) setState(() {});
-      ui.showSnackBarQuick("请检查以上输入", context);
-      return (ErrorCode.unknown, "");
-    }
-
-    // 4) 组装输入：seedString 对应旧 composeSeed 的拼接结果；
-    //    master 传入主密码哈希（明文不可恢复），供 DSL 脚本选用
-    final String seedString = "$identifier: $userName @ $account";
-    final inputValues = <String, dynamic>{
-      'master': _appProvider.masterPwd,
-      'seedString': seedString,
-      ...requested,
-    };
-
-    // 5) 交给 DSL 解释器
-    final result = await runDsl(dslSource, inputValues);
-
-    if (!result.ok) {
-      final err = result.error!;
-      appLogger.logger.e("DSL generation error: $err");
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "配置或生成出错\n${err.display}",
-              style: TextStyle(fontFamily: "SourceCodePro"),
-            ),
-            showCloseIcon: true,
-          ),
-        );
-      }
-      return (ErrorCode.generateFailed, "");
-    }
-
-    // 6) 成功：保留旧的“移除数字/字母/特殊字符”后处理
-    var pwd = result.value!;
-    if (_pwdProvider.removeDigits) pwd = utils.removeDigits(pwd);
-    if (_pwdProvider.removeAlpha) pwd = utils.removeAlpha(pwd);
-    if (_pwdProvider.removeSp) pwd = utils.removeSpChar(pwd);
-
-    return _postProcess((ErrorCode.success, pwd), copyAfterGenerate);
-  }
 
   AppBar? _buildAppBar(bool hasAppBar) {
     if (hasAppBar) {
@@ -339,12 +83,38 @@ Generate {
     return null;
   }
 
-  void _selectPreset(Presets? value) {
-    appLogger.logger.i("Setting preset to ${value?.name}");
-    setState(() {
-      _preset = value ?? Presets.simple;
-      _refreshExtraInputs();
-    });
+  @override
+  void initState() {
+    super.initState();
+    _appProvider = context.read<AppProvider>();
+    _pwdProvider = context.read<PwdProvider>();
+    _genController = PwdGenController(
+      appProvider: _appProvider,
+      pwdProvider: _pwdProvider,
+    );
+
+    if (!widget.enableEdit) {
+      _record = _pwdProvider.getItemById(widget.id);
+      identifier = _record?.identifier ?? "";
+      userName = _record?.userName ?? "";
+      account = _record?.account ?? "";
+      id = _record?.id ?? widget.id;
+    } else {
+      _record = null;
+      identifier = "快速开始";
+      userName = "快速开始";
+      account = "快速开始";
+      id = "快速开始";
+    }
+  }
+
+  @override
+  void dispose() {
+    _genController.dispose();
+    identifierController.dispose();
+    userNameController.dispose();
+    accountController.dispose();
+    super.dispose();
   }
 
   void _showWarningDialog() {
@@ -356,113 +126,67 @@ Generate {
     );
   }
 
-  /// 弹出主密码验证对话框，返回：验证结果为ErrorCode或null（用户取消）
-  Future<ErrorCode?> _verifyMasterPwd() async {
-    appLogger.logger.i("Requesting master password verification");
-    final controller = TextEditingController();
-    final result = await showDialog<ErrorCode>(
-      useRootNavigator: false,
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        scrollable: true,
-        shape: styles.roundedBorder,
-        title: const Text("验证主密码"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("生成密码前需要先验证主密码"),
-            styles.spacingSizedBox,
-            styled.buildTextField(
-              context: dialogContext,
-              controller: controller,
-              label: "主密码",
-              passwordMode: true,
-            ),
-          ],
+  /// 统一的生成结果反馈：复制、提示文案或错误展示
+  void _handleGenResult((ErrorCode, String) res, {required bool doCopy}) {
+    final (stat, out) = res;
+    if (stat == ErrorCode.success) {
+      appLogger.logger.i("Generated successfully");
+      if (doCopy) {
+        Clipboard.setData(ClipboardData(text: out));
+        appLogger.logger.i("Password copied");
+        ui.showSnackBarQuick("密码已复制", context);
+      }
+    } else if (stat == ErrorCode.unknown) {
+      ui.showSnackBarQuick("请检查以上输入", context);
+    } else if (out.isNotEmpty && context.mounted) {
+      appLogger.logger.e("Can not generate password: $stat");
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(out, style: TextStyle(fontFamily: "SourceCodePro")),
+          showCloseIcon: true,
         ),
-        actions: [
-          TextButton(
-            style: styles.buttonStyle,
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text("取消"),
-          ),
-          TextButton(
-            style: styles.buttonStyle,
-            onPressed: () {
-              if (controller.text.isEmpty) {
-                Navigator.pop(dialogContext, ErrorCode.emptyPwd);
-              } else if (utils.toSHA256(controller.text) ==  _appProvider.masterPwd) {
-                Navigator.pop(dialogContext, ErrorCode.success);
-              } else {
-                Navigator.pop(dialogContext, ErrorCode.wrongPwd);
-              }
-            },
-            child: const Text("确定"),
-          ),
-        ],
-      ),
-    );
-    controller.dispose();
-    return result;
-  }
-
-  /// 验证主密码，未通过或取消时返回false；密码错误时给出提示
-  Future<bool> _ensureMasterPwdVerified() async {
-    if (_appProvider.masterPwd.isEmpty) return true;
-    final result = await _verifyMasterPwd();
-    if (result == ErrorCode.success) return true;
-    if (result != null && mounted) {
-      appLogger.logger.e(result.generic);
-      ui.showSnackBarQuick(result.generic, context);
+      );
     }
-    return false;
   }
 
   Future<void> _genAndCopyPwd() async {
     // 生成前先验证主密码
-    if (!await _ensureMasterPwdVerified()) return;
+    if (!await ensureMasterPwdVerified(context, _appProvider)) return;
     if (!mounted) return;
     // 开始生成
     appLogger.logger.i("Generating password for copying");
-    await _genPwd(
-      context: context,
-      copyAfterGenerate: true,
-      identifier: widget.enableEdit ? identifierController.text : identifier,
-      userName: widget.enableEdit ? userNameController.text : userName,
-      account: widget.enableEdit ? accountController.text : account,
+    setState(() => _genController.isGenerating = true);
+    final res = await _genController.generate(
+      seedString:
+          "${widget.enableEdit ? identifierController.text : identifier}: ${widget.enableEdit ? userNameController.text : userName} @ ${widget.enableEdit ? accountController.text : account}",
     );
-    // 启用按钮
-    if (mounted) setState(() => isGenerating = false);
+    if (!mounted) return;
+    setState(() => _genController.isGenerating = false);
+    _handleGenResult(res, doCopy: true);
   }
 
   Future<void> _viewPwd() async {
     appLogger.logger.i("Generating password for viewing");
     Navigator.pop(context);
     // 生成前先验证主密码
-    if (!await _ensureMasterPwdVerified()) return;
+    if (!await ensureMasterPwdVerified(context, _appProvider)) return;
     if (!mounted) return;
-    final (stat, res) = await _genPwd(
-      context: context,
-      copyAfterGenerate: false,
-      identifier: identifier,
-      userName: userName,
-      account: account,
+    setState(() => _genController.isGenerating = true);
+    final res = await _genController.generate(
+      seedString: "$identifier: $userName @ $account",
     );
     if (!mounted) return;
-    if (stat == ErrorCode.success) {
+    setState(() => _genController.isGenerating = false);
+    if (res.$1 == ErrorCode.success) {
       appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => FullscreenPwd(res),
-        ),
+        MaterialPageRoute(builder: (context) => FullscreenPwd(res.$2)),
       );
     } else {
-      appLogger.logger.e("Can not generate password: ${stat.code}");
+      _handleGenResult(res, doCopy: false);
     }
-    // 启用按钮
-    setState(() => isGenerating = false);
   }
 
   List<Widget> _buildHeader() {
@@ -507,118 +231,6 @@ Generate {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _appProvider = context.read<AppProvider>();
-    _pwdProvider = context.read<PwdProvider>();
-
-    if (!widget.enableEdit) {
-      _record = _pwdProvider.getItemById(widget.id);
-      identifier = _record?.identifier ?? "";
-      userName = _record?.userName ?? "";
-      account = _record?.account ?? "";
-      id = _record?.id ?? widget.id;
-    } else {
-      _record = null;
-      identifier = "快速开始";
-      userName = "快速开始";
-      account = "快速开始";
-      id = "快速开始";
-    }
-
-    _refreshExtraInputs();
-  }
-
-  @override
-  void dispose() {
-    _configController.dispose();
-    for (final c in _extraControllers.values) {
-      c.dispose();
-    }
-    identifierController.dispose();
-    userNameController.dispose();
-    accountController.dispose();
-    super.dispose();
-  }
-
-  /// 构建包裹预设相关 Widget 的折叠面板（预设下拉 + 自定义规则入口 + DSL 额外输入）
-  Widget _buildPresetPanel() {
-    final children = <Widget>[
-      DropdownMenu(
-        label: Text("生成预设"),
-        width: double.infinity,
-        helperText: _preset.desc,
-        menuStyle: MenuStyle(maximumSize: WidgetStatePropertyAll<Size>(Size(120, double.infinity)),),
-        dropdownMenuEntries: [for (Presets i in Presets.values) DropdownMenuEntry(value: i, label: i.displayName)],
-        onSelected: (value) => _selectPreset(value),
-        initialSelection: _preset,
-        selectOnly: true,
-      ),
-    ];
-
-    final cfgEdit = _showConfigEdit();
-    if (cfgEdit != null) children.add(cfgEdit);
-
-    if (_extraInputs.isNotEmpty) {
-      children.add(styles.spacingSizedBox);
-      for (final i in _extraInputs) {
-        children.add(
-          switch (i.type) {
-            DslType.bool => SwitchListTile(
-              title: Text(i.displayName),
-              value: _extraSwitchValues[i.name]!,
-              onChanged: (v) => setState(() => _extraSwitchValues[i.name] = v),
-            ),
-            _ => styled.buildTextField(
-              context: context,
-              controller: _extraControllers[i.name],
-              label: i.displayName,
-              // int 使用数字键盘
-              keyboardType: i.type == DslType.int ? TextInputType.number : null,
-            ),
-          },
-        );
-        children.add(styles.spacingSizedBox);
-      }
-    }
-
-    if (_inlineInputError != null) {
-      children.add(
-        Text(
-          _inlineInputError!,
-          style: TextStyle(color: ColorScheme.of(context).error),
-        ),
-      );
-    }
-
-    final contentColor = ColorScheme.of(context).onSurface;
-
-    // 与 StyledListTileSimple 视觉一致的卡片：surfaceContainerLow 背景 + 圆角
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: styles.borderRadius,
-        color: ColorScheme.of(context).surfaceContainerLow,
-      ),
-      child: ExpansionTile(
-        initiallyExpanded: _presetPanelExpanded,
-        onExpansionChanged: (expanded) => _presetPanelExpanded = expanded,
-        childrenPadding: styles.uniInsetsSmall,
-        backgroundColor: Colors.transparent,
-        collapsedBackgroundColor: Colors.transparent,
-        shape: styles.roundedBorder,
-        collapsedShape: styles.roundedBorder,
-        leading: Icon(Icons.tune, color: contentColor),
-        iconColor: contentColor,
-        collapsedIconColor: contentColor,
-        textColor: contentColor,
-        collapsedTextColor: contentColor,
-        title: const Text("生成设置"),
-        children: children,
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(widget.hasAppBar),
@@ -634,7 +246,10 @@ Generate {
                 styles.spacingSizedBox,
                 const RemovalCfg(),
                 styles.spacingSizedBox,
-                _buildPresetPanel(),
+                PresetPanel(
+                  controller: _genController,
+                  onChanged: () => setState(() {}),
+                ),
                 styles.spacingSizedBox,
                 // 按钮
                 Row(
@@ -643,7 +258,8 @@ Generate {
                     // 查看密码
                     Expanded(
                       child: styled.buildTextButton(
-                        onPressed: isGenerating ? null : _showWarningDialog,
+                        onPressed:
+                            _genController.isGenerating ? null : _showWarningDialog,
                         context: context,
                         child: const Text("查看密码"),
                       ),
@@ -651,7 +267,8 @@ Generate {
                     // 复制密码
                     Expanded(
                       child: styled.buildTextButton(
-                        onPressed: isGenerating ? null : _genAndCopyPwd,
+                        onPressed:
+                            _genController.isGenerating ? null : _genAndCopyPwd,
                         context: context,
                         child: const Text("复制密码"),
                       ),
