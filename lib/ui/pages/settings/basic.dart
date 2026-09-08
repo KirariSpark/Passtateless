@@ -7,7 +7,6 @@ import 'package:passtateless/ui/pages/settings/contrast.dart';
 import 'package:passtateless/ui/pages/settings/themes.dart';
 import 'package:passtateless/ui/pages/settings/about.dart';
 import 'package:passtateless/ui/pages/settings/advanced.dart';
-import 'package:passtateless/ui/pages/settings/change_master.dart';
 import 'package:passtateless/ui/widgets/adaptive_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -43,14 +42,6 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
   }
 
   Widget _buildPage((String, String) id, bool isWide) {
-    if (id == Pages.changeMaster.id) {
-      return MasterPwdPage(
-        key: ValueKey(id),
-        useHero: !isWide,
-        hasPadding: !isWide,
-        hasAppBar: !isWide,
-      );
-    }
     if (id == Pages.themeSettings.id) {
       return ThemeSettingsPage(
         key: ValueKey(id),
@@ -107,18 +98,11 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         child: Column(
           children: [
             StyledListTileSimple(
-              title: "更改主密码",
-              leadingIcon: Icons.key,
-              trailing: Icon(Icons.arrow_forward),
-              isFirst: true,
-              onTap: () => navigateTo(Pages.changeMaster.id),
-              highlighted: isSelected(Pages.changeMaster.id),
-            ),
-            StyledListTileSimple(
               title: "提醒我更改主密码",
               subtitle: "当前：${context.watch<AppProvider>().remindMe.displayName}",
               leadingIcon: Icons.schedule,
               trailing: Icon(Icons.arrow_drop_down),
+              isFirst: true,
               isLast: true,
               onTap: () => ui.showBottomSheetQuick(
                 context: context,

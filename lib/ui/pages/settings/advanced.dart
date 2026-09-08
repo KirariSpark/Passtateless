@@ -4,7 +4,6 @@ import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:passtateless/ui/pages/settings/export.dart';
 import 'package:passtateless/ui/pages/settings/import.dart';
@@ -38,11 +37,8 @@ class AdvancedSettingsPage extends StatefulWidget {
 }
 
 class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
-  final TextEditingController masterController = TextEditingController();
   final CodeLineEditingController configController = CodeLineEditingController();
-  final CodeLineEditingController pwdController = CodeLineEditingController();
   late final AppProvider _appProvider;
-  late final PwdProvider _pwdProvider;
 
   Future<void> _changeLogLvl(LogLevels value) async {
     _appProvider.currentLogLevel = value;
@@ -99,46 +95,6 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
     );
   }
 
-  void _exportPwd() {
-    appLogger.logger.i("Trying to export password");
-    final (stat, json) = _pwdProvider.getPwdJson(masterController.text, _appProvider.masterPwd);
-    if (stat == ErrorCode.success) {
-      appLogger.logger.i("Got password JSON");
-      masterController.text = "";
-      Navigator.pop(context);
-      Navigator.push(
-        context, MaterialPageRoute(
-        builder: (_) => JsonExportPage(jsonText: json, title: "导出密码", titleTag: "pwd_export"))
-      );
-    } else {
-      appLogger.logger.e("Can not get password map json: $stat");
-      Navigator.pop(context);
-      ui.showSnackBarQuick(stat.generic, context);
-    }
-  }
-
-  void _showPwdExportDialog() {
-    ui.showAlertDialogQuick(
-      title: "危险操作",
-      content: Column(
-        spacing: styles.layoutSpacing,
-        children: [
-          Text("此操作会明文展示你的所有密码档案，需要先验证主密码"),
-          styled.buildTextField(
-            context: context,
-            controller: masterController,
-            passwordMode: true
-          )
-        ],
-      ),
-      action: () => Navigator.of(context).pop(),
-      actionText: "取消",
-      action2: _exportPwd,
-      action2Text: "确定",
-      context: context
-    );
-  }
-
   void _importSettings() {
     appLogger.logger.i("Importing setting using json");
     final stat = _appProvider.restoreConfigFromText(configController.text, fallback: false);
@@ -151,40 +107,15 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
     }
   }
 
-  Future<void> _importPwd() async {
-    appLogger.logger.i("Importing password using json");
-    // Step1：使用JSON设置密码
-    final importStat = _pwdProvider.setPwdByJson(pwdController.text);
-    if (importStat != ErrorCode.success) {
-      appLogger.logger.e("Can not import password: $importStat");
-      ui.showSnackBarQuick(importStat.generic, context);
-      return;
-    }
-    // Step2：保存更改
-    appLogger.logger.i("Password imported successfully, saving changes");
-    ui.showSnackBarQuick("导入成功，正在保存", context);
-    final saveStat = await _pwdProvider.saveArchive(_appProvider.masterPwd);
-    if (saveStat == ErrorCode.success) {
-      appLogger.logger.i("Successfully saved passwords");
-      if (mounted) ui.showSnackBarQuick("保存成功", context);
-      return;
-    }
-    appLogger.logger.e("Failed to save passwords: $saveStat");
-    if (mounted) ui.showSnackBarQuick(saveStat.generic, context);
-  }
-
   @override
   void initState() {
     super.initState();
     _appProvider = context.read<AppProvider>();
-    _pwdProvider = context.read<PwdProvider>();
   }
 
   @override
   void dispose() {
-    masterController.dispose();
     configController.dispose();
-    pwdController.dispose();
     super.dispose();
   }
 
@@ -221,13 +152,9 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                 onTap: _exportSettings,
               ),
               StyledListTileSimple(
-                title: "导出密码",
-                trailing: Icon(Icons.arrow_forward),
-                onTap: _showPwdExportDialog,
-              ),
-              StyledListTileSimple(
                 title: "导入设置",
                 subtitle: "此行为会覆盖现有的设置",
+                isLast: true,
                 trailing: Icon(Icons.arrow_forward),
                 onTap:  () => Navigator.push(
                   context,
@@ -237,23 +164,6 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                       titleTag: "setting_import",
                       controller: configController,
                       onImport: _importSettings,
-                    )
-                  )
-                ),
-              ),
-              StyledListTileSimple(
-                isLast: true,
-                title: "导入密码",
-                subtitle: "此行为会覆盖现有的密码档案",
-                trailing: Icon(Icons.arrow_forward),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => SettingsImportPage(
-                      title: "导入密码",
-                      titleTag: "pwd_import",
-                      onImport: _importPwd,
-                      controller: pwdController
                     )
                   )
                 ),

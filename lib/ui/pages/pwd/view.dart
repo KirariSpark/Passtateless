@@ -2,27 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/core/pwd_item.dart';
 import 'package:passtateless/modules/generator/pwd_gen_controller.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
 import 'package:provider/provider.dart';
 import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
-import 'package:passtateless/ui/pages/pwd/master_pwd.dart';
 import 'package:passtateless/ui/pages/pwd/preset_panel.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/removal_cfg.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 
-/// 密码记录的查看页面，也用于密码的生成功能，通过传入enableEdit来启用快速模式（此时将不会使用传入的id初始化页面）
-///
-/// 记录的 id 将被用于 Hero 动画
+/// 纯无状态密码生成页面：输入用户名、账号、主密码，即时生成密码。
 class PwdViewPage extends StatefulWidget {
-  /// 要查看的密码记录的id
-  final String id;
-
   /// 有AppBar时，AppBar是否要使用Hero动画
   final bool useHero;
 
@@ -32,7 +24,10 @@ class PwdViewPage extends StatefulWidget {
   /// 页面是否有内边距
   final bool hasPadding;
 
-  /// 是否启用编辑模式/快速模式
+  /// 兼容旧调用方的占位参数，已不再生效
+  final String id;
+
+  /// 兼容旧调用方的占位参数，已不再生效
   final bool enableEdit;
 
   const PwdViewPage({
@@ -49,12 +44,6 @@ class PwdViewPage extends StatefulWidget {
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
-  // 一些只读的属性
-  late final String identifier;
-  late final String userName;
-  late final String account;
-  late final String id;
-
   // Providers
   late final AppProvider _appProvider;
   late final PwdProvider _pwdProvider;
@@ -62,21 +51,16 @@ class _PwdViewPageState extends State<PwdViewPage> {
   // 密码生成逻辑控制器
   late final PwdGenController _genController;
 
-  // 非快速模式下打开的记录
-  late final PwdItem? _record;
-
   // Controllers
-  final TextEditingController identifierController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController accountController = TextEditingController();
+  final TextEditingController masterPwdController = TextEditingController();
 
   AppBar? _buildAppBar(bool hasAppBar) {
     if (hasAppBar) {
       return styled.buildAppBar(
-        title: widget.enableEdit
-            ? "快速开始"
-            : (_record?.displayName ?? "未命名"),
-        titleTag: widget.useHero ? id : null,
+        title: "快速开始",
+        titleTag: widget.useHero ? widget.id : null,
         context: context,
       );
     }
@@ -92,28 +76,14 @@ class _PwdViewPageState extends State<PwdViewPage> {
       appProvider: _appProvider,
       pwdProvider: _pwdProvider,
     );
-
-    if (!widget.enableEdit) {
-      _record = _pwdProvider.getItemById(widget.id);
-      identifier = _record?.identifier ?? "";
-      userName = _record?.userName ?? "";
-      account = _record?.account ?? "";
-      id = _record?.id ?? widget.id;
-    } else {
-      _record = null;
-      identifier = "快速开始";
-      userName = "快速开始";
-      account = "快速开始";
-      id = "快速开始";
-    }
   }
 
   @override
   void dispose() {
     _genController.dispose();
-    identifierController.dispose();
     userNameController.dispose();
     accountController.dispose();
+    masterPwdController.dispose();
     super.dispose();
   }
 
@@ -124,6 +94,11 @@ class _PwdViewPageState extends State<PwdViewPage> {
       title: "危险操作",
       info: "此操作将会显示你的密码，以便于你的记忆\n请确保周围没有人能够窥视到你的屏幕",
     );
+  }
+
+  /// 生成前将主密码交由 AppProvider 哈希，作为 master 输入
+  void _refreshMasterPwd() {
+    _appProvider.masterPwd = masterPwdController.text;
   }
 
   /// 统一的生成结果反馈：复制、提示文案或错误展示
@@ -150,32 +125,25 @@ class _PwdViewPageState extends State<PwdViewPage> {
     }
   }
 
+  String get _seed =>
+      "${userNameController.text} @ ${accountController.text}";
+
   Future<void> _genAndCopyPwd() async {
-    // 生成前先验证主密码
-    if (!await ensureMasterPwdVerified(context, _appProvider)) return;
-    if (!mounted) return;
+    _refreshMasterPwd();
     // 开始生成
     appLogger.logger.i("Generating password for copying");
     setState(() => _genController.isGenerating = true);
-    final res = await _genController.generate(
-      seedString:
-          "${widget.enableEdit ? identifierController.text : identifier}: ${widget.enableEdit ? userNameController.text : userName} @ ${widget.enableEdit ? accountController.text : account}",
-    );
+    final res = await _genController.generate(seedString: _seed);
     if (!mounted) return;
     setState(() => _genController.isGenerating = false);
     _handleGenResult(res, doCopy: true);
   }
 
   Future<void> _viewPwd() async {
+    _refreshMasterPwd();
     appLogger.logger.i("Generating password for viewing");
-    Navigator.pop(context);
-    // 生成前先验证主密码
-    if (!await ensureMasterPwdVerified(context, _appProvider)) return;
-    if (!mounted) return;
     setState(() => _genController.isGenerating = true);
-    final res = await _genController.generate(
-      seedString: "$identifier: $userName @ $account",
-    );
+    final res = await _genController.generate(seedString: _seed);
     if (!mounted) return;
     setState(() => _genController.isGenerating = false);
     if (res.$1 == ErrorCode.success) {
@@ -190,44 +158,26 @@ class _PwdViewPageState extends State<PwdViewPage> {
   }
 
   List<Widget> _buildHeader() {
-    if (widget.enableEdit) {
-      return [
-        styled.buildTextField(
-          label: "档案名",
-          controller: identifierController,
-          context: context,
-        ),
-        styles.spacingSizedBox,
-        styled.buildTextField(
-          label: "用户名",
-          controller: userNameController,
-          context: context,
-        ),
-        styles.spacingSizedBox,
-        styled.buildTextField(
-          label: "账号",
-          controller: accountController,
-          context: context,
-        ),
-      ];
-    } else {
-      return [
-        StyledListTileSimple(
-          title: "档案名",
-          subtitle: identifier,
-          isFirst: true,
-        ),
-        StyledListTileSimple(
-          title: "用户名",
-          subtitle: userName,
-        ),
-        StyledListTileSimple(
-          title: "账号",
-          subtitle: account,
-          isLast: true,
-        ),
-      ];
-    }
+    return [
+      styled.buildTextField(
+        label: "用户名",
+        controller: userNameController,
+        context: context,
+      ),
+      styles.spacingSizedBox,
+      styled.buildTextField(
+        label: "账号",
+        controller: accountController,
+        context: context,
+      ),
+      styles.spacingSizedBox,
+      styled.buildTextField(
+        label: "主密码",
+        controller: masterPwdController,
+        passwordMode: true,
+        context: context,
+      ),
+    ];
   }
 
   @override

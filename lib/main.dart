@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'modules/core/logger.dart';
 import 'modules/providers/app_provider.dart';
 import 'modules/providers/pwd_provider.dart';
-import 'ui/pages/splash.dart';
+import 'ui/pages/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +46,7 @@ class _AppContent extends StatelessWidget {
         fontFamily: 'SourceHans',
       ),
       themeMode: ThemeMode.system,
-      home: const SplashPage(),
+      home: const MainApp(),
     );
   }
 }
