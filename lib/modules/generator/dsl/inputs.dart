@@ -17,6 +17,9 @@ class DslInput {
   /// 变量名
   final String name;
 
+  /// 变量声明类型（str/int/bool）
+  final DslType type;
+
   /// 显示名（GroupInput 中声明的 `"显示名"`，用于请求用户输入时代替变量名）
   final String displayName;
 
@@ -29,6 +32,7 @@ class DslInput {
 
   DslInput({
     required this.name,
+    required this.type,
     required this.displayName,
     this.value,
     this.defaultValue,
@@ -36,7 +40,7 @@ class DslInput {
 
   @override
   String toString() =>
-      'DslInput(name: $name, displayName: $displayName, value: $value, default: $defaultValue)';
+      'DslInput(name: $name, type: $type, displayName: $displayName, value: $value, default: $defaultValue)';
 }
 
 /// 将 DSL 源码中 `GroupInput` 声明的输入解析成一个 [DslInput] 列表。
@@ -55,6 +59,7 @@ List<DslInput> parseDslInputs(String source) {
     final rawDefault = _toRaw(def.defaultValue);
     return DslInput(
       name: def.name,
+      type: def.type,
       displayName: def.displayName,
       value: rawDefault,
       defaultValue: rawDefault,

@@ -4,7 +4,11 @@ import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/core/pwd_item.dart';
-import 'package:passtateless/modules/generator/generate.dart' as generate;
+import 'package:passtateless/modules/generator/dsl/errors.dart';
+import 'package:passtateless/modules/generator/dsl/inputs.dart';
+import 'package:passtateless/modules/generator/dsl/interpreter.dart';
+import 'package:passtateless/modules/generator/dsl/presets.dart' as dsl_presets;
+import 'package:passtateless/modules/generator/dsl/values.dart';
 import 'package:provider/provider.dart';
 import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
@@ -51,8 +55,20 @@ class PwdViewPage extends StatefulWidget {
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
+  /// 语法正确的最小 DSL，作为自定义编辑器初始内容
+  static const String _defaultDslSource = '''
+GroupInput {
+    str master: "主密码";
+    str seedString: "种子字符串";
+}
+Generate {
+    return toBase64(string: seedString);
+}
+''';
+
   // 一些只读的属性
-  final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
+  final CodeLineEditingController _configController =
+      CodeLineEditingController.fromText(_defaultDslSource);
   late final String identifier;
   late final String userName;
   late final String account;
@@ -107,6 +123,135 @@ class _PwdViewPageState extends State<PwdViewPage> {
     return null;
   }
 
+  /// 请求额外的 GroupInput 输入（master/seedString 由程序提供，不弹窗）。
+  /// 返回 {name: 值} 映射（str→String / int→int / bool→bool）；无额外输入返回空映射；取消返回 null。
+  Future<Map<String, dynamic>?> _requestExtraInputs(
+    BuildContext context,
+    List<DslInput> inputs,
+  ) async {
+    final extra = inputs
+        .where((i) => i.name != 'master' && i.name != 'seedString')
+        .toList();
+    if (extra.isEmpty) return <String, dynamic>{};
+
+    appLogger.logger.i("Requesting ${extra.length} extra inputs");
+
+    // 每个 str/int 输入一个控制器（预填默认值），bool 输入单独记录开关状态
+    final controllers = <String, TextEditingController>{};
+    final switchStates = <String, bool>{};
+    for (final i in extra) {
+      switch (i.type) {
+        case DslType.str:
+          controllers[i.name] =
+              TextEditingController(text: (i.defaultValue as String?) ?? '');
+        case DslType.int:
+          controllers[i.name] =
+              TextEditingController(text: i.defaultValue?.toString() ?? '');
+        case DslType.bool:
+          switchStates[i.name] = i.defaultValue as bool? ?? false;
+      }
+    }
+
+    String? errorText;
+    final result = await showDialog<Map<String, dynamic>>(
+      useRootNavigator: false,
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          scrollable: true,
+          shape: styles.roundedBorder,
+          title: const Text("请求输入"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final i in extra) ...[
+                switch (i.type) {
+                  DslType.bool => SwitchListTile(
+                      title: Text(i.displayName),
+                      value: switchStates[i.name]!,
+                      onChanged: (v) =>
+                          setDialogState(() => switchStates[i.name] = v),
+                    ),
+                  _ => styled.buildTextField(
+                      context: dialogContext,
+                      controller: controllers[i.name],
+                      label: i.displayName,
+                      // int 使用数字键盘
+                      keyboardType: i.type == DslType.int
+                          ? TextInputType.number
+                          : null,
+                    ),
+                },
+                styles.spacingSizedBox,
+              ],
+              if (errorText != null)
+                Text(
+                  errorText!,
+                  style: TextStyle(
+                    color: ColorScheme.of(dialogContext).error,
+                  ),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              style: styles.buttonStyle,
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("取消"),
+            ),
+            TextButton(
+              style: styles.buttonStyle,
+              onPressed: () {
+                final values = <String, dynamic>{};
+                for (final i in extra) {
+                  switch (i.type) {
+                    case DslType.str:
+                      final t = controllers[i.name]!.text.trim();
+                      if (t.isEmpty && i.defaultValue == null) {
+                        setDialogState(
+                            () => errorText = "请填写“${i.displayName}”");
+                        return;
+                      }
+                      values[i.name] = t;
+                    case DslType.int:
+                      final t = controllers[i.name]!.text.trim();
+                      if (t.isEmpty) {
+                        if (i.defaultValue != null) {
+                          values[i.name] = i.defaultValue;
+                        } else {
+                          setDialogState(
+                              () => errorText = "请填写“${i.displayName}”");
+                          return;
+                        }
+                      } else {
+                        final v = int.tryParse(t);
+                        if (v == null) {
+                          setDialogState(
+                              () => errorText = "“${i.displayName}”必须是整数");
+                          return;
+                        }
+                        values[i.name] = v;
+                      }
+                    case DslType.bool:
+                      values[i.name] = switchStates[i.name]!;
+                  }
+                }
+                Navigator.pop(dialogContext, values);
+              },
+              child: const Text("确定"),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    for (final c in controllers.values) {
+      c.dispose();
+    }
+    return result;
+  }
+
   /// 密码生成后的处理，复制和显示snack bar
   (ErrorCode, String) _postProcess((ErrorCode, String) res, bool doCopy) {
     if (res.$1 == ErrorCode.success) {
@@ -138,34 +283,78 @@ class _PwdViewPageState extends State<PwdViewPage> {
     appLogger.logger.i("Generating password");
     setState(() => isGenerating = true);
 
-    final res = await generate.generatePassword(
-      preset: _preset,
-      configText: _configController.text,
-      identifier: identifier,
-      userName: userName,
-      account: account,
-      removeDigits: _pwdProvider.removeDigits,
-      removeAlpha: _pwdProvider.removeAlpha,
-      removeSp: _pwdProvider.removeSp,
-    );
+    // 1) 选取 DSL 源码：预设用内置 DSL，自定义用编辑器文本
+    final String dslSource = switch (_preset) {
+      Presets.simple => dsl_presets.simple,
+      Presets.complex => dsl_presets.complex,
+      Presets.bank => dsl_presets.bank,
+      Presets.custom => _configController.text,
+    };
 
-    if (res.$1 == ErrorCode.jsonFormatError) {
+    // 2) 解析 DSL 声明，收集额外输入并弹窗请求
+    List<DslInput> declaredInputs;
+    try {
+      declaredInputs = parseDslInputs(dslSource);
+    } on DslError catch (e) {
+      appLogger.logger.e("DSL config error: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "JSON 格式错误\n${res.$2}",
+              "配置或生成出错\n${e.display}",
               style: TextStyle(fontFamily: "SourceCodePro"),
             ),
             showCloseIcon: true,
           ),
         );
       }
-      return (ErrorCode.jsonFormatError, "");
+      return (ErrorCode.generateFailed, "");
+    }
+    final requested = await _requestExtraInputs(context, declaredInputs);
+    if (requested == null) {
+      // 用户取消输入，中止生成（不复制、不展示错误）
+      appLogger.logger.i("Input cancelled, aborting generation");
+      return (ErrorCode.unknown, "");
     }
 
-    return _postProcess(res, copyAfterGenerate);
+    // 3) 组装输入：seedString 对应旧 composeSeed 的拼接结果；
+    //    master 传入主密码哈希（明文不可恢复），供 DSL 脚本选用
+    final String seedString = "$identifier: $userName @ $account";
+    final inputValues = <String, dynamic>{
+      'master': _appProvider.masterPwd,
+      'seedString': seedString,
+      ...requested,
+    };
+
+    // 4) 交给 DSL 解释器
+    final result = await runDsl(dslSource, inputValues);
+
+    if (!result.ok) {
+      final err = result.error!;
+      appLogger.logger.e("DSL generation error: $err");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "配置或生成出错\n${err.display}",
+              style: TextStyle(fontFamily: "SourceCodePro"),
+            ),
+            showCloseIcon: true,
+          ),
+        );
+      }
+      return (ErrorCode.generateFailed, "");
+    }
+
+    // 5) 成功：保留旧的“移除数字/字母/特殊字符”后处理
+    var pwd = result.value!;
+    if (_pwdProvider.removeDigits) pwd = utils.removeDigits(pwd);
+    if (_pwdProvider.removeAlpha) pwd = utils.removeAlpha(pwd);
+    if (_pwdProvider.removeSp) pwd = utils.removeSpChar(pwd);
+
+    return _postProcess((ErrorCode.success, pwd), copyAfterGenerate);
   }
 
   AppBar? _buildAppBar(bool hasAppBar) {

@@ -26,6 +26,7 @@ TextField buildTextField({
   bool multiline = false,
   bool readonly = false,
   int maxLines = 1,
+  TextInputType? keyboardType,
 }) {
   return TextField(
     controller: controller,
@@ -37,7 +38,7 @@ TextField buildTextField({
       border: const OutlineInputBorder(),
     ),
     obscureText: passwordMode,
-    keyboardType: multiline ? TextInputType.multiline : null,
+    keyboardType: keyboardType ?? (multiline ? TextInputType.multiline : null),
     maxLines: maxLines,
     minLines: 1,
     readOnly: readonly,
