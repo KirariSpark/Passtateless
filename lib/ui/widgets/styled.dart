@@ -1,9 +1,5 @@
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
-import 'package:re_editor/re_editor.dart';
-import 'package:re_highlight/languages/json.dart';
-import 'package:re_highlight/styles/a11y-dark.dart';
-import 'package:re_highlight/styles/a11y-light.dart';
 
 /// 构建预定义了风格的TextField
 ///
@@ -180,39 +176,5 @@ PopupMenuItem buildPopupMenuItem({
       spacing: styles.layoutSpacing,
       children: [Icon(icon), Text(description)],
     ),
-  );
-}
-
-/// 构建一个代码编辑器，包含高亮和行指示器
-CodeEditor buildDslEditor({
-  required BuildContext context,
-  CodeLineEditingController? controller,
-  bool readOnly = false,
-}) {
-  return CodeEditor(
-    readOnly: readOnly,
-    wordWrap: false,
-    controller: controller,
-    style: CodeEditorStyle(
-      fontFamily: "SourceCodePro",
-      fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-      backgroundColor: ColorScheme.of(context).surfaceContainerLow,
-    ),
-    borderRadius: styles.borderRadius,
-    indicatorBuilder: (context, editingController, chunkController, notifier) {
-      return Row(
-        children: [
-          DefaultCodeLineNumber(
-            controller: editingController,
-            notifier: notifier,
-          ),
-          DefaultCodeChunkIndicator(
-            width: 20,
-            controller: chunkController,
-            notifier: notifier,
-          ),
-        ],
-      );
-    },
   );
 }

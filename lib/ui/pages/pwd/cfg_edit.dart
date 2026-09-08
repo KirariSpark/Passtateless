@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/dsl_editor.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
 import 'package:re_editor/re_editor.dart';
 
@@ -50,7 +51,7 @@ class _CfgEditPageState extends State<CfgEditPage> {
       ),
       body: Padding(
         padding: styles.pagePaddingAll,
-        child: styled.buildDslEditor(controller: _configController, context: context),
+        child: DslEditor(controller: _configController),
       ),
     );
   }
