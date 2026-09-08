@@ -4,8 +4,8 @@
 
 DSL 语法详情见 [Grammer.md](./Grammer.md)。解释器代码位于：
 
-- 公共入口：[`lib/modules/generator/dsl/interpreter.dart`](../lib/modules/generator/dsl/interpreter.dart)
-- 错误类型：[`lib/modules/generator/dsl/errors.dart`](../lib/modules/generator/dsl/errors.dart)
+- 公共入口：[`lib/modules/generator/dsl/interpreter.dart`](../lib/modules/generator/interpreter.dart)
+- 错误类型：[`lib/modules/generator/dsl/errors.dart`](../lib/modules/generator/errors.dart)
 - 词法/语法/内建函数/值类型：`lib/modules/generator/dsl/` 下其余文件
 
 ---

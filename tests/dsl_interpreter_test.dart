@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:passtateless/modules/generator/dsl/errors.dart';
-import 'package:passtateless/modules/generator/dsl/inputs.dart';
-import 'package:passtateless/modules/generator/dsl/interpreter.dart';
+import 'package:passtateless/modules/generator/errors.dart';
+import 'package:passtateless/modules/generator/inputs.dart';
+import 'package:passtateless/modules/generator/interpreter.dart';
 
 /// 组装一个 DSL 源码，默认带上 master/seedString 两个必填输入
 Future<DslResult> runp(
