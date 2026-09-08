@@ -107,9 +107,9 @@ enum DocItems {
   getStarted("开始使用", "get_started", "查看此文档以快速上手", "assets/docs/get_started.md"),
   faq("常见问题", "faq", "你可能会遇到的问题", "assets/docs/faq.md"),
   jsonBasic(
-    "JSON 基础",
+    "DSL 基础",
     "json_basic",
-    "了解基础的 JSON 语法",
+    "了解基础的生成脚本（DSL）语法",
     "assets/docs/json_basic.md",
   ),
   cfg("配置生成器", "cfg", "了解生成器的功能及其参数", "assets/docs/cfg.md"),
