@@ -10,6 +10,9 @@ class StyledListTileSimple extends StatelessWidget {
   /// 这个ListTile的副标题文本
   final String? subtitle;
 
+  /// 这个ListTile的副标题Widget，优先于 [subtitle] 生效
+  final Widget? subtitleWidget;
+
   /// 这个ListTile最前面的图标
   final IconData? leadingIcon;
 
@@ -37,6 +40,7 @@ class StyledListTileSimple extends StatelessWidget {
   const StyledListTileSimple({
     required this.title,
     this.subtitle,
+    this.subtitleWidget,
     this.leadingIcon,
     this.trailing,
     this.onTap,
@@ -64,7 +68,7 @@ class StyledListTileSimple extends StatelessWidget {
       onTap: onTap,
       leading: leadingIcon == null ? null : Icon(leadingIcon),
       title: Text(title),
-      subtitle: subtitle == null ? null : Text(subtitle!),
+      subtitle: subtitleWidget ?? (subtitle == null ? null : Text(subtitle!)),
       trailing: trailing,
       shape: RoundedRectangleBorder(
         borderRadius: ui.calcRadius(isFirst: isFirst, isLast: isLast),
@@ -83,6 +87,9 @@ class StyledMenuListTile extends StatelessWidget {
 
   /// 这个ListTile的副标题文本
   final String? subtitle;
+
+  /// 这个ListTile的副标题Widget，优先于 [subtitle] 生效
+  final Widget? subtitleWidget;
 
   /// 这个ListTile最前面的图标
   final IconData? leadingIcon;
@@ -115,6 +122,7 @@ class StyledMenuListTile extends StatelessWidget {
   const StyledMenuListTile({
     required this.title,
     this.subtitle,
+    this.subtitleWidget,
     this.leadingIcon,
     this.trailing,
     this.onTap,
@@ -154,6 +162,7 @@ class StyledMenuListTile extends StatelessWidget {
       child: StyledListTileSimple(
         title: title,
         subtitle: subtitle,
+        subtitleWidget: subtitleWidget,
         leadingIcon: leadingIcon,
         trailing: trailing,
         onTap: onTap,

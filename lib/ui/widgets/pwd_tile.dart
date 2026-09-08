@@ -83,6 +83,32 @@ class PwdTile extends StatelessWidget {
     return pwdRecord.identifier.toString().isNotEmpty ? "原标题：${pwdRecord.identifier}" : null;
   }
 
+  /// 由标签渲染的副标题，没有标签时返回 null
+  Widget? _buildTagsSubtitle(BuildContext context) {
+    if (pwdRecord.tags.isEmpty) return null;
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: [
+        for (final tag in pwdRecord.tags)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: ColorScheme.of(context).tertiaryContainer,
+              borderRadius: styles.borderRadius,
+            ),
+            child: Text(
+              tag,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.bodySmall?.fontSize,
+                color: ColorScheme.of(context).onTertiaryContainer
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String displayName = pwdRecord.displayName;
@@ -118,16 +144,14 @@ class PwdTile extends StatelessWidget {
           )
         ],
         title: displayName,
-        subtitle: "${pwdRecord.userName} @ ${pwdRecord.account}",
+        subtitleWidget: _buildTagsSubtitle(context),
         trailing: IconButton(
           style: styles.buttonStyle,
           onPressed: () {
             appProvider.hasUnsavedChanges = true;
             pwdProvider.switchStarStateById(pwdRecord.id);
           },
-          icon: pwdRecord.starred
-            ? Icon(Icons.star, color: ColorScheme.of(context).primary)
-            : Icon(Icons.star_border),
+          icon: pwdRecord.starred ? Icon(Icons.star, color: ColorScheme.of(context).primary) : Icon(Icons.star_border),
         ),
         onTap: onTapped,
         isFirst: isFirst,
