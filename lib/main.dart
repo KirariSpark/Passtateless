@@ -10,17 +10,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await appLogger.init();
   appLogger.logger.i("Starting app");
-  runApp(const Passtateless());
+  // 启动时加载已保存的设置，保证重启后设置生效
+  final appProvider = AppProvider();
+  await appProvider.readConfig();
+  runApp(Passtateless(appProvider: appProvider));
 }
 
 class Passtateless extends StatelessWidget {
-  const Passtateless({super.key});
+  const Passtateless({super.key, required this.appProvider});
+
+  final AppProvider appProvider;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => AppProvider()),
+        ChangeNotifierProvider.value(value: appProvider),
         ChangeNotifierProvider(create: (context) => PwdProvider())
       ],
       child: _AppContent()
