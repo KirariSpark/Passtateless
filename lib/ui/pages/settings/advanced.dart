@@ -5,8 +5,6 @@ import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/file_mgr/core_mgr.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/ui/pages/settings/export.dart';
-import 'package:passtateless/ui/pages/settings/import.dart';
 import 'package:passtateless/ui/pages/settings/log_view.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
@@ -83,30 +81,6 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
     }
   }
 
-  void _exportSettings() {
-    appLogger.logger.i("Generating settings JSON");
-    final text = _appProvider.getSettingsJson();
-    appLogger.logger.i("Setting JSON generated");
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => JsonExportPage(jsonText: text, title: "导出设置", titleTag: "setting_export")
-      )
-    );
-  }
-
-  void _importSettings() {
-    appLogger.logger.i("Importing setting using json");
-    final stat = _appProvider.restoreConfigFromText(configController.text, fallback: false);
-    if (stat == ErrorCode.success) {
-      appLogger.logger.i("Successfully imported settings");
-      ui.showSnackBarQuick("导入成功", context);
-    } else {
-      appLogger.logger.e("Can not import settings: ${stat.code}");
-      ui.showSnackBarQuick(stat.generic, context);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -143,30 +117,6 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                 trailing: Icon(Icons.arrow_forward),
                 isLast: true,
                 onTap: _viewLog,
-              ),
-              styles.spacingSizedBox,
-              StyledListTileSimple(
-                title: "导出设置",
-                trailing: Icon(Icons.arrow_forward),
-                isFirst: true,
-                onTap: _exportSettings,
-              ),
-              StyledListTileSimple(
-                title: "导入设置",
-                subtitle: "此行为会覆盖现有的设置",
-                isLast: true,
-                trailing: Icon(Icons.arrow_forward),
-                onTap:  () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => SettingsImportPage(
-                      title: "导入设置",
-                      titleTag: "setting_import",
-                      controller: configController,
-                      onImport: _importSettings,
-                    )
-                  )
-                ),
               )
             ],
           ),
