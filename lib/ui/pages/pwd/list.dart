@@ -164,18 +164,17 @@ class _PwdListPageState extends State<PwdListPage> {
             selected: selectedAll,
             onSelected: (_) => setState(_selectedTags.clear),
           ),
-          for (final tag in allTags)
-            FilterChip(
-              label: Text(tag),
-              selected: _selectedTags.contains(tag),
-              onSelected: (selected) => setState(() {
-                if (selected) {
-                  _selectedTags.add(tag);
-                } else {
-                  _selectedTags.remove(tag);
-                }
-              }),
-            ),
+          for (final tag in allTags) FilterChip(
+            label: Text(tag),
+            selected: _selectedTags.contains(tag),
+            onSelected: (selected) => setState(() {
+              if (selected) {
+                _selectedTags.add(tag);
+              } else {
+                _selectedTags.remove(tag);
+              }
+            }),
+          ),
         ],
       ),
     );
@@ -233,11 +232,7 @@ class _PwdListPageState extends State<PwdListPage> {
     final appProvider = context.read<AppProvider>();
     final pwdProvider = context.read<PwdProvider>();
     final filtered = _selectedTags.isEmpty
-        ? pwds
-        : [
-            for (final pwd in pwds)
-              if (_selectedTags.every(pwd.hasTag)) pwd
-          ];
+      ? pwds : [for (final pwd in pwds) if (_selectedTags.every(pwd.hasTag)) pwd];
     return _buildUi(
       filtered,
       context,

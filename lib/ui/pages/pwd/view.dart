@@ -258,8 +258,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                     // 查看密码
                     Expanded(
                       child: styled.buildTextButton(
-                        onPressed:
-                            _genController.isGenerating ? null : _showWarningDialog,
+                        onPressed: _genController.isGenerating ? null : _showWarningDialog,
                         context: context,
                         child: const Text("查看密码"),
                       ),
@@ -267,8 +266,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
                     // 复制密码
                     Expanded(
                       child: styled.buildTextButton(
-                        onPressed:
-                            _genController.isGenerating ? null : _genAndCopyPwd,
+                        onPressed: _genController.isGenerating ? null : _genAndCopyPwd,
                         context: context,
                         child: const Text("复制密码"),
                       ),

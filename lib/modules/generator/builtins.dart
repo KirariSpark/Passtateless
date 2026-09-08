@@ -139,6 +139,78 @@ class _ToPbkdf2Fn extends BuiltinFn {
   }
 }
 
+class _ToArgon2idFn extends BuiltinFn {
+  @override
+  String get name => 'toArgon2id';
+  @override
+  Map<String, ParamSpec> get params => {
+        'string': ParamSpec(DslType.str, true),
+        'salt': ParamSpec(DslType.str, true),
+        'parallelism': ParamSpec(DslType.int, false, DslInt(1)),
+        'memory': ParamSpec(DslType.int, false, DslInt(19000)),
+        'iterations': ParamSpec(DslType.int, false, DslInt(2)),
+        'hashLength': ParamSpec(DslType.int, false, DslInt(32)),
+      };
+
+  @override
+  Future<DslValue> execute(Map<String, DslValue> provided) async {
+    final string = (provided['string'] as DslString).value;
+    final salt = (provided['salt'] as DslString).value;
+
+    int parallelism = 1;
+    final p = provided['parallelism'];
+    if (p != null) {
+      BuiltinFn._ensureType(p, DslType.int, 'parallelism');
+      parallelism = (p as DslInt).value;
+    }
+    int memory = 19000;
+    final m = provided['memory'];
+    if (m != null) {
+      BuiltinFn._ensureType(m, DslType.int, 'memory');
+      memory = (m as DslInt).value;
+    }
+    int iterations = 2;
+    final it = provided['iterations'];
+    if (it != null) {
+      BuiltinFn._ensureType(it, DslType.int, 'iterations');
+      iterations = (it as DslInt).value;
+    }
+    int hashLength = 32;
+    final h = provided['hashLength'];
+    if (h != null) {
+      BuiltinFn._ensureType(h, DslType.int, 'hashLength');
+      hashLength = (h as DslInt).value;
+    }
+
+    if (parallelism < 1) {
+      throw DslError.runtime('toArgon2id 的 parallelism 必须为正数');
+    }
+    if (memory < 8 * parallelism) {
+      throw DslError.runtime('toArgon2id 的 memory 必须不小于 8 × parallelism');
+    }
+    if (iterations < 1) {
+      throw DslError.runtime('toArgon2id 的 iterations 必须为正数');
+    }
+    if (hashLength < 4) {
+      throw DslError.runtime('toArgon2id 的 hashLength 必须不小于 4');
+    }
+
+    final argon2id = cryptography.Argon2id(
+      parallelism: parallelism,
+      memory: memory,
+      iterations: iterations,
+      hashLength: hashLength,
+    );
+    final key = await argon2id.deriveKeyFromPassword(
+      password: string,
+      nonce: utf8.encode(salt),
+    );
+    final bytes = await key.extractBytes();
+    final mapped = bytes.map((b) => (b % 93) + 33).toList();
+    return DslString(ascii.decode(mapped, allowInvalid: true));
+  }
+}
+
 class _ReverseFn extends BuiltinFn {
   @override
   String get name => 'reverse';
@@ -550,6 +622,7 @@ final Map<String, BuiltinFn> builtins = Map.fromEntries([
   _ToBase64Fn(),
   _ToSha256Fn(),
   _ToPbkdf2Fn(),
+  _ToArgon2idFn(),
   _ReverseFn(),
   _DeduplicateFn(),
   _RotateFn(),
