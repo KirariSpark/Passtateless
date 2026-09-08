@@ -59,7 +59,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
   AppBar? _buildAppBar(bool hasAppBar) {
     if (hasAppBar) {
       return styled.buildAppBar(
-        title: "快速开始",
+        title: "主页",
         titleTag: widget.useHero ? widget.id : null,
         context: context,
       );
@@ -125,8 +125,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
     }
   }
 
-  String get _seed =>
-      "${userNameController.text} @ ${accountController.text}";
+  String get _seed => "${userNameController.text} @ ${accountController.text}";
 
   Future<void> _genAndCopyPwd() async {
     _refreshMasterPwd();
@@ -141,6 +140,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
 
   Future<void> _viewPwd() async {
     _refreshMasterPwd();
+    Navigator.pop(context);
     appLogger.logger.i("Generating password for viewing");
     setState(() => _genController.isGenerating = true);
     final res = await _genController.generate(seedString: _seed);

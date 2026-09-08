@@ -98,43 +98,6 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
         child: Column(
           children: [
             StyledListTileSimple(
-              title: "提醒我更改主密码",
-              subtitle: "当前：${context.watch<AppProvider>().remindMe.displayName}",
-              leadingIcon: Icons.schedule,
-              trailing: Icon(Icons.arrow_drop_down),
-              isFirst: true,
-              isLast: true,
-              onTap: () => ui.showBottomSheetQuick(
-                context: context,
-                title: "在选择的天数后提醒你",
-                children: [
-                  RadioGroup(
-                    groupValue: appProvider.remindMe,
-                    onChanged: (value) => _changeRemindDays(value!, context),
-                    child: Column(
-                      children: [
-                        for (final (index, item) in RemindDays.values.indexed)
-                          RadioListTile(
-                            value: item,
-                            title: Text(item.displayName),
-                            tileColor: ColorScheme.of(
-                              context,
-                            ).surfaceContainerLow,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: ui.calcRadius(
-                                isFirst: index == 0,
-                                isLast: index == RemindDays.values.length - 1,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            styles.spacingSizedBox,
-            StyledListTileSimple(
               title: "主题",
               leadingIcon: Icons.color_lens_outlined,
               trailing: Icon(Icons.arrow_forward),

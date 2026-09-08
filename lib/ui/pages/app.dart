@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
 import 'package:passtateless/ui/pages/help/overview.dart';
-import 'package:passtateless/ui/pages/pwd/home.dart';
+import 'package:passtateless/ui/pages/pwd/eval.dart';
+import 'package:passtateless/ui/pages/pwd/view.dart';
 import 'package:passtateless/ui/pages/settings/basic.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:provider/provider.dart';
@@ -43,6 +44,11 @@ class _MainAppState extends State<MainApp> {
                   label: "主页",
                 ),
                 BottomNavigationBarItem(
+                  icon: Icon(Icons.checklist_outlined),
+                  activeIcon: Icon(Icons.checklist),
+                  label: "密码强度",
+                ),
+                BottomNavigationBarItem(
                   icon: Icon(Icons.settings_outlined),
                   activeIcon: Icon(Icons.settings),
                   label: "设置",
@@ -76,6 +82,11 @@ class _MainAppState extends State<MainApp> {
                         label: Text("主页"),
                       ),
                       NavigationRailDestination(
+                        icon: Icon(Icons.checklist_outlined),
+                        selectedIcon: Icon(Icons.checklist),
+                        label: Text("密码强度"),
+                      ),
+                      NavigationRailDestination(
                         icon: Icon(Icons.settings_outlined),
                         selectedIcon: Icon(Icons.settings),
                         label: Text("设置"),
@@ -106,7 +117,8 @@ class _MainAppState extends State<MainApp> {
         key: ValueKey(appProvider.currentIndex),
         index: appProvider.currentIndex,
         children: [
-          HomePage(),
+          PwdViewPage(useHero: false, hasAppBar: true, hasPadding: true),
+          PwdEvalPage(useHero: false, hasAppBar: true, hasPadding: true),
           BasicSettingsPage(),
           HelpOverviewPage()
         ],

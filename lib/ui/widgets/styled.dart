@@ -67,7 +67,7 @@ Container buildPlaceHolder({
 ///
 /// [title] 标题<br>
 /// [context] BuildContext context<br>
-/// [titleTag] 标题的 tag，用于 hero 动画<br>
+/// [titleTag] （已弃用）标题的 tag，用于 hero 动画<br>
 /// [actions] 放在 AppBar 右侧的一组 Widget<br>
 /// [exitIcon] 自定义退出按钮<br>
 AppBar buildAppBar({
@@ -78,9 +78,7 @@ AppBar buildAppBar({
   IconData exitIcon = Icons.arrow_back,
 }) {
   return buildAppBarWidget(
-    title: titleTag == null
-      ? Text(title)
-      : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+    title: Text(title),
     context: context,
     exitIcon: exitIcon,
     actions: actions
@@ -104,7 +102,6 @@ AppBar buildAppBarWidget({
     hasLeading = false;
   }
   return AppBar(
-    shape: styles.roundedBorder,
     leading: hasLeading
       ? IconButton(
         onPressed: () => Navigator.pop(context),
