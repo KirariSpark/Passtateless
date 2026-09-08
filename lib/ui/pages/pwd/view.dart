@@ -231,7 +231,7 @@ class _PwdViewPageState extends State<PwdViewPage> {
               ];
               final settingsCol = _buildSettingsColumn();
 
-              // 足够宽时并排双栏；否则单栏使用更宽的宽度约束
+              // 足够宽时并排双栏
               final wide = constraints.maxWidth >= styles.layoutChangeWidth;
 
               // 双栏
