@@ -1,27 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passtateless/modules/core/enums.dart';
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
-import 'package:passtateless/modules/generator/parser.dart' as parser;
-import 'package:provider/provider.dart';
-import 'dart:convert';
-import 'package:passtateless/modules/providers/pwd_provider.dart';
+import 'package:passtateless/modules/generator/pwd_gen_controller.dart';
 import 'package:passtateless/modules/providers/app_provider.dart';
+import 'package:passtateless/modules/providers/pwd_provider.dart';
 import 'package:passtateless/modules/utils/ui.dart' as ui;
-import 'package:passtateless/ui/pages/pwd/cfg_edit.dart';
+import 'package:provider/provider.dart';
 import 'package:passtateless/ui/pages/pwd/fullscreen.dart';
+import 'package:passtateless/ui/pages/pwd/preset_panel.dart';
 import 'package:passtateless/ui/styles.dart' as styles;
+import 'package:passtateless/ui/widgets/removal_cfg.dart';
 import 'package:passtateless/ui/widgets/styled.dart' as styled;
-import 'package:re_editor/re_editor.dart';
 
-/// 密码记录的只读页面
-///
-/// 记录的 id 将被用于 Hero 动画
+/// 纯无状态密码生成页面：输入用户名、账号、主密码，即时生成密码。
 class PwdViewPage extends StatefulWidget {
-  /// 要查看的密码记录的id
-  final String id;
-
   /// 有AppBar时，AppBar是否要使用Hero动画
   final bool useHero;
 
@@ -30,175 +23,68 @@ class PwdViewPage extends StatefulWidget {
 
   /// 页面是否有内边距
   final bool hasPadding;
-  const PwdViewPage({super.key,required this.id, required this.useHero, this.hasAppBar = true, this.hasPadding = true});
+
+  /// 兼容旧调用方的占位参数，已不再生效
+  final String id;
+
+  /// 兼容旧调用方的占位参数，已不再生效
+  final bool enableEdit;
+
+  const PwdViewPage({
+    super.key,
+    this.id = "",
+    this.useHero = true,
+    this.hasAppBar = true,
+    this.hasPadding = true,
+    this.enableEdit = false,
+  });
 
   @override
   State<PwdViewPage> createState() => _PwdViewPageState();
 }
 
 class _PwdViewPageState extends State<PwdViewPage> {
-  // 一些只读的属性
-  final CodeLineEditingController _configController = CodeLineEditingController.fromText("[{\"name\":\"toBase64\"}]");
-  late final String identifier;
-  late final String userName;
-  late final String account;
-  late final String id;
-
   // Providers
   late final AppProvider _appProvider;
   late final PwdProvider _pwdProvider;
 
-  // 一些内部要用到的状态
-  Presets _preset = Presets.simple;
-  bool isGenerating = false;
-  bool removeDigits = false;
-  bool removeAlpha = false;
-  bool removeSp = false;
+  // 密码生成逻辑控制器
+  late final PwdGenController _genController;
 
-  Future<void> _editCfg() async {
-    // 跳转并等待返回结果
-    appLogger.logger.i("Pushing to generator config edit page");
-    final result = await Navigator.push(
-      context, 
-      ui.switchRoute(
-        _appProvider.currentNavMode, 
-        builder: (_) => CfgEditPage(initialText: _configController.text)
-      ),
-    );
-
-    if (result != null && result is String) {
-      setState(() => _configController.text = result);
-      appLogger.logger.i("Got new config with ${result.length} characters");
-      if (mounted) {
-        ui.showSnackBarQuick("编辑结果已保存", context);
-      }
-    }
-  }
-
-  /// 根据当前预设决定是否显示自定义规则
-  Widget? _showConfigEdit() {
-    if (_preset == Presets.custom) {
-      return styled.buildListTile(
-        context: context,
-        title: "配置生成规则",
-        trailing: Icon(Icons.arrow_forward),
-        isLast: true,
-        onTapped: _editCfg,
-      );
-    }
-    return null;
-  }
-
-  /// 密码生成后的处理，复制和显示snack bar
-  (ErrorCode, String) _postProcess((ErrorCode, String) res, bool doCopy) {
-    if (res.$1 == ErrorCode.success) {
-      appLogger.logger.i("Generated successfully");
-      if (doCopy) {
-        Clipboard.setData(ClipboardData(text: res.$2));
-      }
-      if (context.mounted && doCopy) {
-        appLogger.logger.i("Password copied");
-        ui.showSnackBarQuick("密码已复制", context);
-      }
-    } else {
-      if (context.mounted) {
-        appLogger.logger.e("Can not generate password: ${res.$1.generic}");
-        ui.showSnackBarQuick(res.$1.generic, context);
-      }
-    }
-    return res;
-  }
-
-  bool _isBuiltin(Presets preset) {
-    return <Presets>[Presets.simple, Presets.complex, Presets.bank].contains(_preset);
-  }
-
-  /// 生成密码并显示提示（返回生成的密码或错误信息）
-  Future<(ErrorCode, String)> _genPwd({
-    required BuildContext context,
-    required bool copyAfterGenerate,
-    required String identifier,
-    required String userName,
-    required String account
-  }) async {
-    appLogger.logger.i("Generating password");
-    setState(() => isGenerating = true);
-
-    if (_isBuiltin(_preset)) {
-      appLogger.logger.i("Generating using builtin presets");
-      final res = await parser.parseBuiltins(
-        _preset,
-        "$identifier: $userName @ $account",
-        removeAlpha: removeAlpha,
-        removeDigits: removeDigits,
-        removeSp: removeSp,
-      );
-      return _postProcess(res, copyAfterGenerate);
-    }
-
-    try {
-      appLogger.logger.i("Generating using custom config");
-      final res = await parser.parse(
-        jsonDecode(_configController.text),
-        "$identifier: $userName @ $account",
-        removeAlpha: removeAlpha,
-        removeDigits: removeDigits,
-        removeSp: removeSp,
-      );
-      return _postProcess(res, copyAfterGenerate);
-    } catch (e) {
-      if (context.mounted) {
-        appLogger.logger.e("Can not generate password: $e");
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("JSON 格式错误\n${e.toString()}", style: TextStyle(fontFamily: "SourceCodePro")),
-            showCloseIcon: true,
-          ),
-        );
-      }
-      return (ErrorCode.jsonFormatError, "");
-    }
-  }
+  // Controllers
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController accountController = TextEditingController();
+  final TextEditingController masterPwdController = TextEditingController();
 
   AppBar? _buildAppBar(bool hasAppBar) {
     if (hasAppBar) {
       return styled.buildAppBar(
-        title: identifier.isEmpty ? '未命名' : identifier,
-        titleTag: widget.useHero ? id : null,
+        title: "主页",
+        titleTag: widget.useHero ? widget.id : null,
         context: context,
       );
     }
     return null;
   }
 
-  void _selectPreset(Presets? value) {
-    appLogger.logger.i("Setting preset to ${value?.name}");
-    setState(() => _preset = value ?? Presets.simple);
-    Navigator.pop(context);
+  @override
+  void initState() {
+    super.initState();
+    _appProvider = context.read<AppProvider>();
+    _pwdProvider = context.read<PwdProvider>();
+    _genController = PwdGenController(
+      appProvider: _appProvider,
+      pwdProvider: _pwdProvider,
+    );
   }
 
-  void _showPresetSelectionDialog() {
-    ui.showAlertDialogQuick(
-      title: "选择预设",
-      content: RadioGroup(
-        groupValue: _preset,
-        onChanged: _selectPreset,
-        child: Column(
-          children: [
-            for (var item in Presets.values) RadioListTile(
-              value: item,
-              subtitle: Text(item.desc),
-              shape: styles.roundedBorder,
-              title: Text(item.displayName)
-            )
-          ],
-        )
-      ),
-      actionText: "取消",
-      action: () => Navigator.of(context).pop(),
-      context: context,
-    );
+  @override
+  void dispose() {
+    _genController.dispose();
+    userNameController.dispose();
+    accountController.dispose();
+    masterPwdController.dispose();
+    super.dispose();
   }
 
   void _showWarningDialog() {
@@ -210,64 +96,121 @@ class _PwdViewPageState extends State<PwdViewPage> {
     );
   }
 
+  /// 生成前将主密码交由 AppProvider 哈希，作为 master 输入
+  void _refreshMasterPwd() {
+    _appProvider.masterPwd = masterPwdController.text;
+  }
+
+  /// 统一的生成结果反馈：复制、提示文案或错误展示
+  void _handleGenResult((ErrorCode, String) res, {required bool doCopy}) {
+    final (stat, out) = res;
+    if (stat == ErrorCode.success) {
+      appLogger.logger.i("Generated successfully");
+      if (doCopy) {
+        Clipboard.setData(ClipboardData(text: out));
+        appLogger.logger.i("Password copied");
+        ui.showSnackBarQuick("密码已复制", context);
+      }
+    } else if (stat == ErrorCode.unknown) {
+      ui.showSnackBarQuick("请检查以上输入", context);
+    } else if (out.isNotEmpty && context.mounted) {
+      appLogger.logger.e("Can not generate password: $stat");
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(out, style: TextStyle(fontFamily: "SourceCodePro")),
+          showCloseIcon: true,
+        ),
+      );
+    }
+  }
+
+  String get _seed => "${userNameController.text} @ ${accountController.text}";
+
   Future<void> _genAndCopyPwd() async {
+    _refreshMasterPwd();
     // 开始生成
-    appLogger.logger.i(
-      "Generating password for copying",
-    );
-    await _genPwd(
-      context: context,
-      copyAfterGenerate: true,
-      identifier: identifier,
-      userName: userName,
-      account: account,
-    );
-    // 启用按钮
-    setState(() => isGenerating = false);
+    appLogger.logger.i("Generating password for copying");
+    setState(() => _genController.isGenerating = true);
+    final res = await _genController.generate(seedString: _seed);
+    if (!mounted) return;
+    setState(() => _genController.isGenerating = false);
+    _handleGenResult(res, doCopy: true);
   }
 
   Future<void> _viewPwd() async {
-    appLogger.logger.i("Generating password for viewing");
+    _refreshMasterPwd();
     Navigator.pop(context);
-    final (stat, res) = await _genPwd(
-      context: context,
-      copyAfterGenerate: false,
-      identifier: identifier,
-      userName: userName,
-      account: account
-    );
-    if (context.mounted) {
-      if (stat == ErrorCode.success) {
-        appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
-        Navigator.push(
-          context,
-          ui.switchRoute(_appProvider.currentNavMode, builder: (context) => FullscreenPwd(res)),
-        );
-      } else {
-        appLogger.logger.e("Can not generate password: ${stat.code}");
-      }
+    appLogger.logger.i("Generating password for viewing");
+    setState(() => _genController.isGenerating = true);
+    final res = await _genController.generate(seedString: _seed);
+    if (!mounted) return;
+    setState(() => _genController.isGenerating = false);
+    if (res.$1 == ErrorCode.success) {
+      appLogger.logger.i("Generated successfully, pushing to fullscreen mode");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => FullscreenPwd(res.$2)),
+      );
+    } else {
+      _handleGenResult(res, doCopy: false);
     }
-    // 启用按钮
-    setState(() => isGenerating = false);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _appProvider = context.read<AppProvider>();
-    _pwdProvider = context.read<PwdProvider>();
-
-    final data = _pwdProvider.getItemById(widget.id);
-    identifier = data["identifier"];
-    userName = data["userName"];
-    account = data["account"];
-    id = data["id"];
+  List<Widget> _buildHeader() {
+    return [
+      styled.buildTextField(
+        label: "用户名",
+        controller: userNameController,
+        context: context,
+      ),
+      styles.spacingSizedBox,
+      styled.buildTextField(
+        label: "账号",
+        controller: accountController,
+        context: context,
+      ),
+      styles.spacingSizedBox,
+      styled.buildTextField(
+        label: "主密码",
+        controller: masterPwdController,
+        passwordMode: true,
+        context: context,
+      ),
+    ];
   }
 
-  @override
-  void dispose() {
-    _configController.dispose();
-    super.dispose();
+  /// 生成设置 + 两个按钮，构成第二栏
+  List<Widget> _buildSettingsColumn() {
+    return [
+      PresetPanel(
+        controller: _genController,
+        onChanged: () => setState(() {}),
+      ),
+      styles.spacingSizedBox,
+      // 按钮
+      Row(
+        spacing: styles.layoutSpacing,
+        children: [
+          // 查看密码
+          Expanded(
+            child: styled.buildTextButton(
+              onPressed: _genController.isGenerating ? null : _showWarningDialog,
+              context: context,
+              child: const Text("查看密码"),
+            ),
+          ),
+          // 复制密码
+          Expanded(
+            child: styled.buildTextButton(
+              onPressed: _genController.isGenerating ? null : _genAndCopyPwd,
+              context: context,
+              child: const Text("复制密码"),
+            ),
+          ),
+        ],
+      ),
+    ];
   }
 
   @override
@@ -277,105 +220,69 @@ class _PwdViewPageState extends State<PwdViewPage> {
       body: SingleChildScrollView(
         child: Container(
           padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
-          alignment: Alignment.center,
-          child: ConstrainedBox(
-            constraints: styles.tileWidthConstraint,
-            child: Column(
-              children: [
-                styled.buildListTile(
-                  title: "档案名",
-                  subtitle: identifier,
-                  isFirst: true,
-                  context: context,
-                ),
-                styled.buildListTile(
-                  title: "用户名",
-                  subtitle: userName,
-                  context: context,
-                ),
-                styled.buildListTile(
-                  title: "账号",
-                  subtitle: account,
-                  isLast: true,
-                  context: context,
-                ),
+          alignment: Alignment.centerLeft,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // 单柱内容（表头字段 + RemovalCfg）
+              final headerCol = [
+                ..._buildHeader(),
                 styles.spacingSizedBox,
-                // 移除数字
-                SwitchListTile(
-                  value: removeDigits,
-                  onChanged: (value) {
-                    if (removeSp == true && removeAlpha == true) return;
-                    setState(() => removeDigits = value);
-                    appLogger.logger.d("Current digit removal state: $removeDigits");
-                  },
-                  title: const Text("移除数字"),
-                  shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(isFirst: true)),
-                  tileColor: ColorScheme.of(context).surfaceContainerLow,
-                ),
-                // 移除字母
-                SwitchListTile(
-                  value: removeAlpha,
-                  onChanged: (value) {
-                    if (removeDigits == true && removeSp == true) return;
-                    setState(() => removeAlpha = value);
-                    appLogger.logger.d("Current alphabet removal state: $removeAlpha");
-                  },
-                  title: const Text("移除字母"),
-                  tileColor: ColorScheme.of(context).surfaceContainerLow,
-                ),
-                // 移除特殊字符
-                SwitchListTile(
-                  value: removeSp,
-                  onChanged: (value) {
-                    if (removeDigits == true && removeAlpha == true) return;
-                    setState(() => removeSp = value);
-                    appLogger.logger.d("Current special char removal state: $removeSp");
-                  },
-                  title: const Text("移除特殊字符"),
-                  shape: RoundedRectangleBorder(borderRadius: ui.calcRadius(isLast: true)),
-                  tileColor: ColorScheme.of(context).surfaceContainerLow,
-                ),
-                styles.spacingSizedBox,
-                styled.buildListTile(
-                  context: context,
-                  title: "生成预设",
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(_preset.displayName, style: Theme.of(context).textTheme.bodyLarge),
-                      Icon(Icons.arrow_drop_down)
-                    ],
+                const RemovalCfg(),
+              ];
+              final settingsCol = _buildSettingsColumn();
+
+              // 足够宽时并排双栏
+              final wide = constraints.maxWidth >= styles.layoutChangeWidth;
+
+              // 双栏
+              Widget wideLayout() {
+                Widget tile(List<Widget> children) => ConstrainedBox(
+                  constraints: styles.tileWidthConstraint,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: children,
                   ),
-                  isFirst: true,
-                  isLast: _preset == Presets.custom ? false : true,
-                  onTapped: _showPresetSelectionDialog,
-                ),
-                ?_showConfigEdit(),
-                styles.spacingSizedBox,
-                // 按钮
-                Row(
+                );
+                return Row(
+                  key: const ValueKey("wide"),
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: styles.layoutSpacing,
                   children: [
-                    // 查看密码
-                    Expanded(
-                      child: styled.buildTextButton(
-                        onPressed: isGenerating ? null : _showWarningDialog,
-                        context: context,
-                        child: const Text("查看密码"),
-                      ),
-                    ),
-                    // 复制密码
-                    Expanded(
-                      child: styled.buildTextButton(
-                        onPressed: isGenerating ? null : _genAndCopyPwd,
-                        context: context,
-                        child: const Text("复制密码"),
-                      ),
-                    ),
+                    Flexible(child: tile(headerCol)),
+                    Flexible(child: tile(settingsCol)),
+                  ],
+                );
+              }
+
+              // 单栏
+              Widget narrowLayout() => ConstrainedBox(
+                key: const ValueKey("narrow"),
+                constraints: styles.tileWidthConstraint,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...headerCol,
+                    styles.spacingSizedBox,
+                    ...settingsCol,
                   ],
                 ),
-              ],
-            ),
+              );
+
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                layoutBuilder: (currentChild, previousChildren) => Stack(
+                  alignment: AlignmentDirectional.topStart,
+                  textDirection: Directionality.of(context),
+                  children: [
+                    ...previousChildren,
+                    ?currentChild,
+                  ],
+                ),
+                child: wide ? wideLayout() : narrowLayout(),
+              );
+            },
           ),
         ),
       ),

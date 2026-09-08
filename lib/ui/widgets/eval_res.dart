@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zxcvbn/zxcvbn.dart';
-import 'package:passtateless/ui/widgets/styled.dart' as styled;
+import 'package:passtateless/ui/widgets/styled_list_tile.dart';
 
 // 评分 - 文本
 const Map<int, String> scoreTextMap = {
@@ -37,39 +37,34 @@ class EvalRes extends StatelessWidget {
     if (evalRes != null) {
       return Column(
         children: <Widget>[
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "评分",
             subtitle: (evalRes!.score! + 1).toString(),
-            context: context,
             trailing: Text(
               scoreTextMap[evalRes!.score]!,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             isFirst: true,
           ),
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "预估猜测次数",
             subtitle: evalRes!.guesses.toString(),
-            context: context,
           ),
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "警告",
             subtitle: _getWarning(),
-            context: context,
           ),
-          styled.buildListTile(
+          StyledListTileSimple(
             title: "建议",
-            context: context,
             subtitle: _getSuggestion(),
             isLast: true,
           ),
         ],
       );
     }
-    return styled.buildListTile(
+    return StyledListTileSimple(
       title: "请输入密码",
       subtitle: "输入要评估的密码，以获取评分、警告和建议",
-      context: context,
       isLast: true,
       isFirst: true,
     );

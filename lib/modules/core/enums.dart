@@ -15,16 +15,23 @@ enum Paths {
 }
 
 enum Presets {
-  simple("simple", "简易", "简易预设，适用于对安全性要求不高的场景"),
-  complex("complex", "复杂", "使用更复杂的生成流程和 PBKDF2 算法，可能较慢"),
-  bank("bank", "支付密码", "基于 PBKDF2 算法生成六位的纯数字密码，可能较慢"),
-  custom("custom", "自定义", "使用 JSON 完全自定义整个生成流程");
+  simple("simple", "简易", "简易预设，使用 PBKDF2 算法"),
+  complex("complex", "复杂", "使用更复杂的生成流程和 Argon2id 算法"),
+  bank("bank", "六位数字", "基于 Argon2id 算法生成六位的纯数字密码"),
+  custom("custom", "自定义", "使用 DSL 自定义整个生成流程");
 
   final String preset;
   final String displayName;
   final String desc;
 
   const Presets(this.preset, this.displayName, this.desc);
+}
+
+/// 密码生成时可移除的字符类型（数字/字母/特殊字符）
+enum CharType {
+  digits,
+  alpha,
+  specialChar;
 }
 
 enum RemindDays {
@@ -53,15 +60,6 @@ enum AvailableColors {
   final Color color;
   final String displayName;
   const AvailableColors(this.color, this.displayName);
-}
-
-enum NavigatorMode {
-  material("Material（安卓）"),
-  cupertino("Cupertino（苹果）");
-
-  final String displayName;
-
-  const NavigatorMode(this.displayName);
 }
 
 enum AnimationDilation {
@@ -109,20 +107,14 @@ enum DocItems {
   getStarted("开始使用", "get_started", "查看此文档以快速上手", "assets/docs/get_started.md"),
   faq("常见问题", "faq", "你可能会遇到的问题", "assets/docs/faq.md"),
   jsonBasic(
-    "JSON 基础",
+    "DSL 基础",
     "json_basic",
-    "了解基础的 JSON 语法",
+    "了解基础的生成脚本（DSL）语法",
     "assets/docs/json_basic.md",
   ),
   cfg("配置生成器", "cfg", "了解生成器的功能及其参数", "assets/docs/cfg.md"),
   cfgTips("生成器提示", "cfg_tips", "生成器的一些特性", "assets/docs/cfg_tips.md"),
-  features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md"),
-  importExport(
-    "导入导出",
-    "import_export",
-    "备份、恢复和分享你的数据",
-    "assets/docs/import_export.md",
-  );
+  features("特色功能", "features", "Passtateless 的特殊功能", "assets/docs/features.md");
 
   final String displayName;
   final String mode;
@@ -138,8 +130,7 @@ enum HeroTags {
   themeSettings("settings/theme"),
   animationSettings("settings/animation"),
   contrastnessSettings("settings/contrastness"),
-  advancedSettings("settings/advanced"),
-  folders("pwd/folders");
+  advancedSettings("settings/advanced");
 
   final String tag;
 

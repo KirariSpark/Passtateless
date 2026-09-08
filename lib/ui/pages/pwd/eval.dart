@@ -62,10 +62,10 @@ class _PwdEvalPageState extends State<PwdEvalPage> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: Container(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         padding: widget.hasPadding ? styles.pagePaddingAll : null,
         child: ConstrainedBox(
-          constraints: styles.pageWidthConstraint,
+          constraints: styles.tileWidthConstraint,
           child: SingleChildScrollView(
             child: Column(
               spacing: styles.layoutSpacing,

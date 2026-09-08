@@ -1,102 +1,5 @@
 import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
-import 'package:re_editor/re_editor.dart';
-import 'package:re_highlight/languages/json.dart';
-import 'package:re_highlight/styles/a11y-dark.dart';
-import 'package:re_highlight/styles/a11y-light.dart';
-
-/// 构建预定义了风格的ListTile
-///
-/// [title] ListTile的标题<br>
-/// [context] BuildContext context<br>
-/// [leading] 位于头部的图标<br>
-/// [subtitle] ListTile的副标题<br>
-/// [trailing] 位于尾部的Widget<br>
-/// [titleTag] 用于 Hero 动画的 tag<br>
-/// [onTapped] 当ListTile被点击时，调用的函数<br>
-/// [alpha] ListTile背景的透明度（0-255）<br>
-/// [isFirst] 决定上方是否有圆角<br>
-/// [isLast] 决定下方是否有圆角<br>
-/// [active] 非active状态，颜色为surfaceContainerLow，否则为secondaryContainer
-ListTile buildListTile({
-  required String title,
-  required BuildContext context,
-  IconData? leading,
-  String? subtitle,
-  Widget? trailing,
-  String? titleTag,
-  void Function()? onTapped,
-  bool isFirst = false,
-  bool isLast = false,
-  bool active = false,
-  bool enabled = true,
-}) {
-  return ListTile(
-    onTap: onTapped,
-    leading: leading == null ? null : Icon(leading),
-    title: titleTag == null
-        ? Text(title)
-        : Hero(
-            tag: titleTag,
-            child: Text(title, style: Theme.of(context).textTheme.bodyLarge),
-          ),
-    subtitle: subtitle == null ? null : Text(subtitle),
-    trailing: trailing,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadiusGeometry.vertical(
-        top: isFirst ? styles.radius : Radius.zero,
-        bottom: isLast ? styles.radius : Radius.zero,
-      ),
-    ),
-    enabled: enabled,
-    iconColor: active
-        ? ColorScheme.of(context).onSecondaryContainer
-        : ColorScheme.of(context).onSurface,
-    textColor: active
-        ? ColorScheme.of(context).onSecondaryContainer
-        : ColorScheme.of(context).onSurface,
-    tileColor: active
-        ? ColorScheme.of(context).secondaryContainer
-        : ColorScheme.of(context).surfaceContainerLow,
-  );
-}
-
-/// 构建预定义了风格的ListTile（但实际上被GestureDetector包裹），支持右键（长按）操作
-///
-/// 参数同 [buildListTile]，额外增加 [onRightClick] 回调，
-/// 当检测到右键点击（onSecondaryTap）或长按（onLongPress）时触发。
-GestureDetector buildListTileAdvanced({
-  required String title,
-  required BuildContext context,
-  IconData? leading,
-  String? subtitle,
-  Widget? trailing,
-  String? titleTag,
-  void Function()? onTapped,
-  bool isFirst = false,
-  bool isLast = false,
-  bool active = false,
-  bool enabled = true,
-  void Function()? onRightClick,
-}) {
-  return GestureDetector(
-    onSecondaryTap: onRightClick,
-    onLongPress: onRightClick,
-    child: buildListTile(
-      title: title,
-      context: context,
-      leading: leading,
-      subtitle: subtitle,
-      trailing: trailing,
-      titleTag: titleTag,
-      onTapped: onTapped,
-      isFirst: isFirst,
-      isLast: isLast,
-      active: active,
-      enabled: enabled,
-    ),
-  );
-}
 
 /// 构建预定义了风格的TextField
 ///
@@ -119,6 +22,7 @@ TextField buildTextField({
   bool multiline = false,
   bool readonly = false,
   int maxLines = 1,
+  TextInputType? keyboardType,
 }) {
   return TextField(
     controller: controller,
@@ -130,7 +34,7 @@ TextField buildTextField({
       border: const OutlineInputBorder(),
     ),
     obscureText: passwordMode,
-    keyboardType: multiline ? TextInputType.multiline : null,
+    keyboardType: keyboardType ?? (multiline ? TextInputType.multiline : null),
     maxLines: maxLines,
     minLines: 1,
     readOnly: readonly,
@@ -159,7 +63,7 @@ Container buildPlaceHolder({
 ///
 /// [title] 标题<br>
 /// [context] BuildContext context<br>
-/// [titleTag] 标题的 tag，用于 hero 动画<br>
+/// [titleTag] （已弃用）标题的 tag，用于 hero 动画<br>
 /// [actions] 放在 AppBar 右侧的一组 Widget<br>
 /// [exitIcon] 自定义退出按钮<br>
 AppBar buildAppBar({
@@ -170,9 +74,7 @@ AppBar buildAppBar({
   IconData exitIcon = Icons.arrow_back,
 }) {
   return buildAppBarWidget(
-    title: titleTag == null
-      ? Text(title)
-      : Hero(tag: titleTag, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+    title: Text(title),
     context: context,
     exitIcon: exitIcon,
     actions: actions
@@ -196,7 +98,6 @@ AppBar buildAppBarWidget({
     hasLeading = false;
   }
   return AppBar(
-    shape: styles.roundedBorder,
     leading: hasLeading
       ? IconButton(
         onPressed: () => Navigator.pop(context),
@@ -275,45 +176,5 @@ PopupMenuItem buildPopupMenuItem({
       spacing: styles.layoutSpacing,
       children: [Icon(icon), Text(description)],
     ),
-  );
-}
-
-/// 构建一个代码编辑器，包含高亮和行指示器，配置为JSON格式
-CodeEditor buildJsonEditor({
-  required BuildContext context,
-  CodeLineEditingController? controller,
-  bool readOnly = false,
-}) {
-  return CodeEditor(
-    readOnly: readOnly,
-    wordWrap: false,
-    controller: controller,
-    style: CodeEditorStyle(
-      codeTheme: CodeHighlightTheme(
-        languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-        theme: ColorScheme.of(context).brightness == Brightness.light
-            ? a11YLightTheme
-            : a11YDarkTheme,
-      ),
-      fontFamily: "SourceCodePro",
-      fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-      backgroundColor: ColorScheme.of(context).surfaceContainerLow,
-    ),
-    borderRadius: styles.borderRadius,
-    indicatorBuilder: (context, editingController, chunkController, notifier) {
-      return Row(
-        children: [
-          DefaultCodeLineNumber(
-            controller: editingController,
-            notifier: notifier,
-          ),
-          DefaultCodeChunkIndicator(
-            width: 20,
-            controller: chunkController,
-            notifier: notifier,
-          ),
-        ],
-      );
-    },
   );
 }

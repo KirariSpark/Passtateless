@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:passtateless/modules/core/enums.dart';
-import 'package:passtateless/ui/styles.dart' as styles;
 import 'package:flutter/material.dart';
+import 'package:passtateless/ui/styles.dart' as styles;
 
 /// 计算圆角<br>
 /// 通常用于决定列表中的每一个元素的圆角
@@ -73,14 +71,6 @@ void showConfirmDialogQuick({
     title: title, content: Text(info), action: (){Navigator.of(context).pop();},
     actionText: "取消", context: context, action2: function, action2Text: "确定"
   );
-}
-
-PageRoute switchRoute(NavigatorMode mode, {required Widget Function(BuildContext) builder}) {
-  if (mode == NavigatorMode.material) {
-    return MaterialPageRoute(builder: builder);
-  } else {
-    return CupertinoPageRoute(builder: builder);
-  }
 }
 
 void showBottomSheetQuick ({

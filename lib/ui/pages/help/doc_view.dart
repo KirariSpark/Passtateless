@@ -61,7 +61,7 @@ class _DocViewPageState extends State<DocViewPage> {
           }
           return Container(
             padding: widget.hasPadding ? styles.pagePaddingAll : EdgeInsets.zero,
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topLeft,
             child: Markdown(data: snapshot.data!)
           );
         },

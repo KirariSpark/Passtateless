@@ -35,6 +35,9 @@ EdgeInsets pagePaddingAll = const EdgeInsets.all(16);
 
 const double layoutSpacing = 8;
 
+/// 单栏/双栏布局切换的宽度阈值
+const double layoutChangeWidth = 600;
+
 const SizedBox spacingSizedBox = SizedBox(width: 8, height: 8);
 
 InputDecoration uniInputDecoration(String label) {
