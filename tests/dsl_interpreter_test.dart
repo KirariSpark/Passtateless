@@ -302,6 +302,58 @@ Generate { return "x"; }
       expect((await runp('return removeAlpha(string: "a1b2");')).value, '12');
       expect((await runp('return removeDigit(string: "a1b2");')).value, 'ab');
     });
+
+    test('insertRandDigit 确定性且只插入数字', () async {
+      final a = await runp('return insertRandDigit(string: "abc", amount: 3, seed: 42);');
+      final b = await runp('return insertRandDigit(string: "abc", amount: 3, seed: 42);');
+      expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
+      expect(a.value, b.value);
+      expect(a.value!.length, 6); // 3 个数字插入后长度 6
+      expect(a.value!.replaceAll(RegExp(r'[^0-9]'), '').length, 3); // 恰好 3 个数字
+    });
+
+    test('insertRandSp 只插入特殊字符', () async {
+      final a = await runp('return insertRandSp(string: "abc", amount: 2, seed: 42);');
+      final b = await runp('return insertRandSp(string: "abc", amount: 2, seed: 42);');
+      expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
+      expect(a.value, b.value);
+      const special = ['!', '@', '#', '=', '%', '^', '&', '*'];
+      final inserted = a.value!
+          .split('')
+          .where((c) => special.contains(c))
+          .toList();
+      expect(inserted.length, 2);
+    });
+
+    test('insertRandAlpha 只插入字母', () async {
+      final a = await runp('return insertRandAlpha(string: "abc", amount: 2, seed: 42);');
+      final b = await runp('return insertRandAlpha(string: "abc", amount: 2, seed: 42);');
+      expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
+      expect(a.value, b.value);
+      expect(a.value!.length, 5); // 2 个字母插入后长度 5
+      expect(a.value!.replaceAll(RegExp(r'[^a-zA-Z]'), '').length, 5); // 全部为字母
+    });
+
+    test('insertRand* amount=0 返回原串', () async {
+      expect((await runp('return insertRandDigit(string: "abc", amount: 0);')).value, 'abc');
+      expect((await runp('return insertRandSp(string: "abc", amount: 0);')).value, 'abc');
+      expect((await runp('return insertRandAlpha(string: "abc", amount: 0);')).value, 'abc');
+    });
+
+    test('insertRand* 空串时生成单个对应字符', () async {
+      final d = await runp('return insertRandDigit(string: "", amount: 1);');
+      expect(d.value, matches(RegExp(r'[0-9]')));
+      final s = await runp('return insertRandSp(string: "", amount: 1);');
+      expect(s.value, matches(RegExp(r'[!@#=%^&*]')));
+      final a = await runp('return insertRandAlpha(string: "", amount: 1);');
+      expect(a.value, matches(RegExp(r'[a-zA-Z]')));
+    });
+
+    test('insertRand* 不同 seed 输出不同', () async {
+      final a = await runp('return insertRandDigit(string: "abc", amount: 3, seed: 1);');
+      final b = await runp('return insertRandDigit(string: "abc", amount: 3, seed: 2);');
+      expect(a.value, isNot(b.value));
+    });
   });
 
   group('toPBKDF2 / shuffle 确定性', () {

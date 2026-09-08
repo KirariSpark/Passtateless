@@ -256,6 +256,44 @@ removeDigit(
 )
 ```
 
+#### insertRandDigit
+
+`insertRandDigit`是一个用于在字符串中随机位置插入数字的函数，返回类型为`str`。  
+随机性由`string`的sha256前7位ASCII码之和与`seed`共同决定，相同输入与种子产生相同结果。
+
+```
+insertRandDigit(
+    str string, # 输入的字符串
+    int amount = 1, # 插入数量
+    int seed = 0 # 随机种子
+)
+```
+
+#### insertRandSp
+
+`insertRandSp`是一个用于在字符串中随机位置插入特殊字符的函数，返回类型为`str`。  
+特殊字符取自`["!", "@", "#", "=", "%", "^", "&", "*"]`。
+
+```
+insertRandSp(
+    str string, # 输入的字符串
+    int amount = 1, # 插入数量
+    int seed = 0 # 随机种子
+)
+```
+
+#### insertRandAlpha
+
+`insertRandAlpha`是一个用于在字符串中随机位置插入字母（A-Z / a-z）的函数，返回类型为`str`。
+
+```
+insertRandAlpha(
+    str string, # 输入的字符串
+    int amount = 1, # 插入数量
+    int seed = 0 # 随机种子
+)
+```
+
 ### DSL结构
 
 一个完整的配置DSL要求包含输入、处理和输出三部分，分别由三个代码块定义。  

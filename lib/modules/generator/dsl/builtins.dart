@@ -50,6 +50,9 @@ abstract class BuiltinFn {
   }
 }
 
+/// 与 core.dart 中 Generator.specialChars 保持一致的特殊字符表
+const List<String> _specialChars = ["!", "@", "#", "=", "%", "^", "&", "*"];
+
 /// 计算某字符串的 sha256 前 7 位 ASCII 码之和，作为 shuffle 的基础种子
 int _sha256AsciiSum(String s) {
   final digest = sha256.convert(utf8.encode(s)).toString();
@@ -403,6 +406,144 @@ class _ShuffleFn extends BuiltinFn {
   }
 }
 
+class _InsertRandDigitFn extends BuiltinFn {
+  @override
+  String get name => 'insertRandDigit';
+  @override
+  Map<String, ParamSpec> get params => {
+        'string': ParamSpec(DslType.str, true),
+        'amount': ParamSpec(DslType.int, false, DslInt(1)),
+        'seed': ParamSpec(DslType.int, false, DslInt(0)),
+      };
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    int amount = 1;
+    final a = provided['amount'];
+    if (a != null) {
+      BuiltinFn._ensureType(a, DslType.int, 'amount');
+      amount = (a as DslInt).value;
+    }
+    int seed = 0;
+    final sd = provided['seed'];
+    if (sd != null) {
+      BuiltinFn._ensureType(sd, DslType.int, 'seed');
+      seed = (sd as DslInt).value;
+    }
+    if (amount <= 0) return DslString(s);
+    final baseSeed = s.isEmpty ? 0 : _sha256AsciiSum(s);
+    final random = Xorshift32(baseSeed + seed);
+    var result = s;
+    for (int i = 0; i < amount; i++) {
+      if (result.isEmpty) {
+        // 与 core.dart 一致：空串时先取随机字符
+        result = String.fromCharCode(48 + (random.nextInt() % 10)); // 0-9
+      } else {
+        // 与 core.dart 一致：先取插入位置，再取随机字符
+        final insertIndex = random.nextIntRange(0, result.length + 1);
+        final ch = String.fromCharCode(48 + (random.nextInt() % 10)); // 0-9
+        result = result.substring(0, insertIndex) + ch + result.substring(insertIndex);
+      }
+    }
+    return DslString(result);
+  }
+}
+
+class _InsertRandSpFn extends BuiltinFn {
+  @override
+  String get name => 'insertRandSp';
+  @override
+  Map<String, ParamSpec> get params => {
+        'string': ParamSpec(DslType.str, true),
+        'amount': ParamSpec(DslType.int, false, DslInt(1)),
+        'seed': ParamSpec(DslType.int, false, DslInt(0)),
+      };
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    int amount = 1;
+    final a = provided['amount'];
+    if (a != null) {
+      BuiltinFn._ensureType(a, DslType.int, 'amount');
+      amount = (a as DslInt).value;
+    }
+    int seed = 0;
+    final sd = provided['seed'];
+    if (sd != null) {
+      BuiltinFn._ensureType(sd, DslType.int, 'seed');
+      seed = (sd as DslInt).value;
+    }
+    if (amount <= 0) return DslString(s);
+    final baseSeed = s.isEmpty ? 0 : _sha256AsciiSum(s);
+    final random = Xorshift32(baseSeed + seed);
+    var result = s;
+    for (int i = 0; i < amount; i++) {
+      if (result.isEmpty) {
+        // 与 core.dart 一致：空串时先取随机字符
+        result = _specialChars[random.nextInt() % _specialChars.length];
+      } else {
+        // 与 core.dart 一致：先取插入位置，再取随机字符
+        final insertIndex = random.nextIntRange(0, result.length + 1);
+        final ch = _specialChars[random.nextInt() % _specialChars.length];
+        result = result.substring(0, insertIndex) + ch + result.substring(insertIndex);
+      }
+    }
+    return DslString(result);
+  }
+}
+
+class _InsertRandAlphaFn extends BuiltinFn {
+  @override
+  String get name => 'insertRandAlpha';
+  @override
+  Map<String, ParamSpec> get params => {
+        'string': ParamSpec(DslType.str, true),
+        'amount': ParamSpec(DslType.int, false, DslInt(1)),
+        'seed': ParamSpec(DslType.int, false, DslInt(0)),
+      };
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    int amount = 1;
+    final a = provided['amount'];
+    if (a != null) {
+      BuiltinFn._ensureType(a, DslType.int, 'amount');
+      amount = (a as DslInt).value;
+    }
+    int seed = 0;
+    final sd = provided['seed'];
+    if (sd != null) {
+      BuiltinFn._ensureType(sd, DslType.int, 'seed');
+      seed = (sd as DslInt).value;
+    }
+    if (amount <= 0) return DslString(s);
+    final baseSeed = s.isEmpty ? 0 : _sha256AsciiSum(s);
+    final random = Xorshift32(baseSeed + seed);
+    var result = s;
+    for (int i = 0; i < amount; i++) {
+      if (result.isEmpty) {
+        // 与 core.dart 一致：空串时先取随机字母
+        result = _randAlphaChar(random);
+      } else {
+        // 与 core.dart 一致：先取插入位置，再取随机字母
+        final insertIndex = random.nextIntRange(0, result.length + 1);
+        final ch = _randAlphaChar(random);
+        result = result.substring(0, insertIndex) + ch + result.substring(insertIndex);
+      }
+    }
+    return DslString(result);
+  }
+}
+
+/// 生成一个随机字母（大写或小写），RNG 消耗顺序与 core.dart 一致
+String _randAlphaChar(Xorshift32 random) {
+  final letterType = random.nextInt() % 2;
+  final asciiCode = letterType == 0
+      ? 65 + (random.nextInt() % 26) // A-Z
+      : 97 + (random.nextInt() % 26); // a-z
+  return String.fromCharCode(asciiCode);
+}
+
 /// 全部内建函数的查找表（if 不在此处，是解释器特设语法）
 final Map<String, BuiltinFn> builtins = Map.fromEntries([
   _LenFn(),
@@ -421,4 +562,7 @@ final Map<String, BuiltinFn> builtins = Map.fromEntries([
   _RemoveAlphaFn(),
   _RemoveDigitFn(),
   _ShuffleFn(),
+  _InsertRandDigitFn(),
+  _InsertRandSpFn(),
+  _InsertRandAlphaFn(),
 ].map((f) => MapEntry(f.name, f)));
