@@ -3,10 +3,7 @@ import 'package:passtateless/modules/core/enums.dart' as enums;
 import 'package:passtateless/modules/core/error_codes.dart';
 import 'package:passtateless/modules/core/logger.dart';
 import 'package:passtateless/modules/core/pwd_item.dart';
-import 'package:passtateless/modules/file_mgr/json_mgr.dart';
-import 'package:passtateless/modules/utils/utils.dart' as utils;
 import 'package:uuid/uuid.dart';
-import 'dart:convert';
 
 const _uuid = Uuid();
 

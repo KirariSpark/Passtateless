@@ -16,11 +16,6 @@ class HelpOverviewPage extends StatefulWidget {
 class _HelpOverviewPageState extends State<HelpOverviewPage> {
   (String, String)? _selectedTag;
 
-  static final double _widthThreshold =
-      styles.tileWidthConstraint.maxWidth +
-      styles.tileWidthConstraintSmall.maxWidth +
-      styles.layoutSpacing;
-
   Widget _loadDoc((String, String) tag, bool isWide) {
     final mode = tag.$2;
     final docItem = DocItems.values.firstWhere((d) => d.mode == mode);
@@ -74,44 +69,72 @@ class _HelpOverviewPageState extends State<HelpOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final bool isWide = constraints.maxWidth > _widthThreshold;
-        return Container(
-          padding: styles.pagePaddingAll,
-          child: isWide
-            ? Row(
-              spacing: styles.layoutSpacing,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDocList(
+    return Scaffold(
+      appBar: styled.buildAppBar(title: "帮助", context: context),
+      body: Container(
+        padding: styles.pagePaddingAll,
+        alignment: Alignment.centerLeft,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            // 足够宽时并排双栏
+            final bool isWide = constraints.maxWidth > styles.layoutChangeWidth;
+
+            // 双栏
+            Widget wideLayout() {
+              return Row(
+                key: const ValueKey("wide"),
+                spacing: styles.layoutSpacing,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDocList(
+                    context,
+                    isWide,
+                    (tag) {
+                      setState(() => _selectedTag = tag);
+                    },
+                    (tag) => _selectedTag == tag,
+                  ),
+                  Expanded(child: _buildRightPane(context)),
+                ],
+              );
+            }
+
+            // 单栏
+            Widget narrowLayout() {
+              return Align(
+                key: const ValueKey("narrow"),
+                alignment: Alignment.centerLeft,
+                child: _buildDocList(
                   context,
                   isWide,
                   (tag) {
-                    setState(() => _selectedTag = tag);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => _loadDoc(tag, isWide)),
+                    );
                   },
-                  (tag) => _selectedTag == tag,
+                  (_) => false,
                 ),
-                const VerticalDivider(width: 1),
-                Expanded(child: _buildRightPane(context)),
-              ],
-            )
-            : Align(
-              alignment: Alignment.topLeft,
-              child: _buildDocList(
-                context,
-                isWide,
-                (tag) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => _loadDoc(tag, isWide)),
-                  );
-                },
-                (_) => false,
+              );
+            }
+
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              layoutBuilder: (currentChild, previousChildren) => Stack(
+                alignment: AlignmentDirectional.topStart,
+                textDirection: Directionality.of(context),
+                children: [
+                  ...previousChildren,
+                  ?currentChild,
+                ],
               ),
-            ),
-        );
-      },
+              child: isWide ? wideLayout() : narrowLayout(),
+            );
+          },
+        ),
+      ),
     );
   }
 }
