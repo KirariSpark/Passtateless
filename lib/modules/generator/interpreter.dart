@@ -69,6 +69,13 @@ class _Env {
 
 // ———————— 解释器 ————————
 
+/// 内部控制流信号：if 分支中的 return 被选中时抛出，由 [run] 捕获后
+/// 作为整个 Generate 块的返回值。类似主流语言"函数在任意位置 return"。
+class _ReturnSignal implements Exception {
+  final DslValue value;
+  _ReturnSignal(this.value);
+}
+
 class _Interpreter {
   final _Env _env;
   final Map<String, BuiltinFn> _builtins;
@@ -77,27 +84,31 @@ class _Interpreter {
 
   /// 执行 Generate 块语句，返回 return 的值；未 return 则返回 null
   Future<DslValue?> run(List<Stmt> statements) async {
-    for (final stmt in statements) {
-      switch (stmt) {
-        case DeclStmt():
-          final value = await _eval(stmt.initializer);
-          _env.define(stmt.name, stmt.type, value);
-          break;
-        case AssignStmt():
-          final value = await _eval(stmt.value);
-          _env.assign(stmt.name, value);
-          break;
-        case ReturnStmt():
-          return await _eval(stmt.value);
-        case RaiseStmt():
-          final msg = await _eval(stmt.message);
-          throw _raise(msg);
-        case PassStmt():
-          break;
-        case ExprStmt():
-          await _eval(stmt.expr);
-          break;
+    try {
+      for (final stmt in statements) {
+        switch (stmt) {
+          case DeclStmt():
+            final value = await _eval(stmt.initializer);
+            _env.define(stmt.name, stmt.type, value);
+            break;
+          case AssignStmt():
+            final value = await _eval(stmt.value);
+            _env.assign(stmt.name, value);
+            break;
+          case ReturnStmt():
+            return await _eval(stmt.value);
+          case RaiseStmt():
+            final msg = await _eval(stmt.message);
+            throw _raise(msg);
+          case PassStmt():
+            break;
+          case ExprStmt():
+            await _eval(stmt.expr);
+            break;
+        }
       }
+    } on _ReturnSignal catch (s) {
+      return s.value;
     }
     return null;
   }
@@ -250,8 +261,8 @@ class _Interpreter {
       switch (arg.body) {
         case CallArgExpr(:final expr):
           value = await _eval(expr);
-        case CallArgPass() || CallArgRaise():
-          throw DslError.type('pass/raise 只能作为 if 的分支使用');
+        case CallArgPass() || CallArgRaise() || CallArgReturn():
+          throw DslError.type('pass/raise/return 只能作为 if 的分支使用');
       }
       if (provided.containsKey(arg.name)) {
         throw DslError.type('函数 "${expr.name}" 参数 "${arg.name}" 重复');
@@ -293,6 +304,8 @@ class _Interpreter {
       case CallArgRaise(:final message):
         final msg = await _eval(message);
         throw _raise(msg);
+      case CallArgReturn(:final value):
+        throw _ReturnSignal(await _eval(value));
     }
   }
 
@@ -337,7 +350,7 @@ Future<DslResult> runDsl(String source, Map<String, dynamic> inputValues) async 
     if (result is DslString) {
       return DslResult.ok(result.value);
     }
-    if (result == null) {
+    if (result == null || result is DslVoid) {
       return DslResult.err(DslError.runtime('Generate 未执行到 return，未产生输出'));
     }
     return DslResult.err(

@@ -50,16 +50,16 @@ Generate { return "x"; }
       expect(r.error!.kind, DslErrorKind.syntax);
     });
 
-    test('缺少 return', () async {
+    test('缺少 return -> runtime 错误', () async {
       final r = await runp('pass;');
       expect(r.ok, isFalse);
-      expect(r.error!.kind, DslErrorKind.syntax);
+      expect(r.error!.kind, DslErrorKind.runtime);
     });
 
-    test('多余 return', () async {
+    test('多余 return：首个 return 生效', () async {
       final r = await runp('return "a"; return "b";');
-      expect(r.ok, isFalse);
-      expect(r.error!.kind, DslErrorKind.syntax);
+      expect(r.ok, isTrue);
+      expect(r.value, 'a');
     });
 
     test('语句缺少分号', () async {
@@ -210,6 +210,42 @@ Generate { return "x"; }
       final r = await runp('return if(cond: false, onTrue: raise("boom"), onFalse: "ok");');
       expect(r.ok, isTrue);
       expect(r.value, 'ok');
+    });
+
+    test('if 分支直接 return 终止 Generate（onTrue 命中）', () async {
+      final r = await runp('if(cond: true, onTrue: return "yes", onFalse: return "no");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'yes');
+    });
+
+    test('if 分支直接 return 终止 Generate（onFalse 命中）', () async {
+      final r = await runp('if(cond: false, onTrue: return "yes", onFalse: return "no");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'no');
+    });
+
+    test('if 分支 return 与 raise 懒求值', () async {
+      final r = await runp('if(cond: true, onTrue: return "ok", onFalse: raise("boom"));');
+      expect(r.ok, isTrue);
+      expect(r.value, 'ok');
+    });
+
+    test('return if(...) 内嵌分支 return', () async {
+      final r = await runp('return if(cond: true, onTrue: return "a", onFalse: return "b");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'a');
+    });
+
+    test('if 分支 return 后语句不执行', () async {
+      final r = await runp('if(cond: true, onTrue: return "a", onFalse: pass); raise("boom");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'a');
+    });
+
+    test('普通函数参数传 return -> typeError', () async {
+      final r = await runp('return toBase64(string: return "x");');
+      expect(r.ok, isFalse);
+      expect(r.error!.kind, DslErrorKind.typeError);
     });
   });
 

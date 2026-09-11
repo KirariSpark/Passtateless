@@ -131,7 +131,7 @@ class CallArg {
   CallArg(this.name, this.body);
 }
 
-/// 参数项本体：表达式 / pass / raise
+/// 参数项本体：表达式 / pass / raise / return
 sealed class CallArgBody {}
 
 class CallArgExpr extends CallArgBody {
@@ -144,6 +144,11 @@ class CallArgPass extends CallArgBody {}
 class CallArgRaise extends CallArgBody {
   final Expr message;
   CallArgRaise(this.message);
+}
+
+class CallArgReturn extends CallArgBody {
+  final Expr value;
+  CallArgReturn(this.value);
 }
 
 // ———————— 语法分析器 ————————
@@ -203,11 +208,6 @@ class Parser {
     if (!_isAtEnd) {
       throw DslError.syntax('出现在程序末尾之后的多余内容："${_current.lexeme}"',
           line: _current.line, col: _current.col);
-    }
-
-    final returnCount = stmts.whereType<ReturnStmt>().length;
-    if (returnCount != 1) {
-      throw DslError.syntax('Generate 中必须有且只有一个 return 语句，当前有 $returnCount 个');
     }
 
     return DslProgram(inputs, stmts);
@@ -461,6 +461,11 @@ class Parser {
       final msg = _parseExpression();
       _expect(TokenType.rightParen, ')');
       return CallArgRaise(msg);
+    }
+    if (_check(TokenType.kwReturn)) {
+      _advance();
+      final value = _parseExpression();
+      return CallArgReturn(value);
     }
     return CallArgExpr(_parseExpression());
   }
