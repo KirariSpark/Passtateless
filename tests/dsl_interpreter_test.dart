@@ -325,19 +325,29 @@ Generate { return "x"; }
       expect(inserted.length, 2);
     });
 
-    test('insertRandAlpha 只插入字母', () async {
-      final a = await runp('return insertRandAlpha(string: "abc", amount: 2, seed: 42);');
-      final b = await runp('return insertRandAlpha(string: "abc", amount: 2, seed: 42);');
+    test('insertRandLower 只插入小写字母', () async {
+      final a = await runp('return insertRandLower(string: "abc", amount: 2, seed: 42);');
+      final b = await runp('return insertRandLower(string: "abc", amount: 2, seed: 42);');
       expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
       expect(a.value, b.value);
       expect(a.value!.length, 5); // 2 个字母插入后长度 5
-      expect(a.value!.replaceAll(RegExp(r'[^a-zA-Z]'), '').length, 5); // 全部为字母
+      expect(a.value!.replaceAll(RegExp(r'[^a-z]'), '').length, 5); // 全部为小写字母
+    });
+
+    test('insertRandUpper 只插入大写字母', () async {
+      final a = await runp('return insertRandUpper(string: "ABC", amount: 2, seed: 42);');
+      final b = await runp('return insertRandUpper(string: "ABC", amount: 2, seed: 42);');
+      expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
+      expect(a.value, b.value);
+      expect(a.value!.length, 5); // 2 个字母插入后长度 5
+      expect(a.value!.replaceAll(RegExp(r'[^A-Z]'), '').length, 5); // 全部为大写字母
     });
 
     test('insertRand* amount=0 返回原串', () async {
       expect((await runp('return insertRandDigit(string: "abc", amount: 0);')).value, 'abc');
       expect((await runp('return insertRandSp(string: "abc", amount: 0);')).value, 'abc');
-      expect((await runp('return insertRandAlpha(string: "abc", amount: 0);')).value, 'abc');
+      expect((await runp('return insertRandLower(string: "abc", amount: 0);')).value, 'abc');
+      expect((await runp('return insertRandUpper(string: "abc", amount: 0);')).value, 'abc');
     });
 
     test('insertRand* 空串时生成单个对应字符', () async {
@@ -345,8 +355,10 @@ Generate { return "x"; }
       expect(d.value, matches(RegExp(r'[0-9]')));
       final s = await runp('return insertRandSp(string: "", amount: 1);');
       expect(s.value, matches(RegExp(r'[!@#=%^&*]')));
-      final a = await runp('return insertRandAlpha(string: "", amount: 1);');
-      expect(a.value, matches(RegExp(r'[a-zA-Z]')));
+      final lo = await runp('return insertRandLower(string: "", amount: 1);');
+      expect(lo.value, matches(RegExp(r'[a-z]')));
+      final up = await runp('return insertRandUpper(string: "", amount: 1);');
+      expect(up.value, matches(RegExp(r'[A-Z]')));
     });
 
     test('insertRand* 不同 seed 输出不同', () async {

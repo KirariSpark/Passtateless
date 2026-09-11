@@ -100,6 +100,30 @@ class _ToSha256Fn extends BuiltinFn {
   }
 }
 
+class _ToLowerFn extends BuiltinFn {
+  @override
+  String get name => 'toLower';
+  @override
+  Map<String, ParamSpec> get params => {'string': ParamSpec(DslType.str, true)};
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    return DslString(s.toLowerCase());
+  }
+}
+
+class _ToUpperFn extends BuiltinFn {
+  @override
+  String get name => 'toUpper';
+  @override
+  Map<String, ParamSpec> get params => {'string': ParamSpec(DslType.str, true)};
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    return DslString(s.toUpperCase());
+  }
+}
+
 class _ToPbkdf2Fn extends BuiltinFn {
   @override
   String get name => 'toPBKDF2';
@@ -448,6 +472,54 @@ class _RemoveDigitFn extends BuiltinFn {
   }
 }
 
+class _HasDigitFn extends BuiltinFn {
+  @override
+  String get name => 'hasDigit';
+  @override
+  Map<String, ParamSpec> get params => {'string': ParamSpec(DslType.str, true)};
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    return DslBool(RegExp(r'[0-9]').hasMatch(s));
+  }
+}
+
+class _HasSpFn extends BuiltinFn {
+  @override
+  String get name => 'hasSp';
+  @override
+  Map<String, ParamSpec> get params => {'string': ParamSpec(DslType.str, true)};
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    return DslBool(s.split('').any(_specialChars.contains));
+  }
+}
+
+class _HasLowerFn extends BuiltinFn {
+  @override
+  String get name => 'hasLower';
+  @override
+  Map<String, ParamSpec> get params => {'string': ParamSpec(DslType.str, true)};
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    return DslBool(RegExp(r'[a-z]').hasMatch(s));
+  }
+}
+
+class _HasUpperFn extends BuiltinFn {
+  @override
+  String get name => 'hasUpper';
+  @override
+  Map<String, ParamSpec> get params => {'string': ParamSpec(DslType.str, true)};
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    return DslBool(RegExp(r'[A-Z]').hasMatch(s));
+  }
+}
+
 class _ShuffleFn extends BuiltinFn {
   @override
   String get name => 'shuffle';
@@ -564,9 +636,9 @@ class _InsertRandSpFn extends BuiltinFn {
   }
 }
 
-class _InsertRandAlphaFn extends BuiltinFn {
+class _InsertRandLowerFn extends BuiltinFn {
   @override
-  String get name => 'insertRandAlpha';
+  String get name => 'insertRandLower';
   @override
   Map<String, ParamSpec> get params => {
         'string': ParamSpec(DslType.str, true),
@@ -594,12 +666,12 @@ class _InsertRandAlphaFn extends BuiltinFn {
     var result = s;
     for (int i = 0; i < amount; i++) {
       if (result.isEmpty) {
-        // 与 core.dart 一致：空串时先取随机字母
-        result = _randAlphaChar(random);
+        // 与 core.dart 一致：空串时先取随机字符
+        result = _randLowerChar(random);
       } else {
-        // 与 core.dart 一致：先取插入位置，再取随机字母
+        // 与 core.dart 一致：先取插入位置，再取随机字符
         final insertIndex = random.nextIntRange(0, result.length + 1);
-        final ch = _randAlphaChar(random);
+        final ch = _randLowerChar(random);
         result = result.substring(0, insertIndex) + ch + result.substring(insertIndex);
       }
     }
@@ -607,13 +679,57 @@ class _InsertRandAlphaFn extends BuiltinFn {
   }
 }
 
-/// 生成一个随机字母（大写或小写），RNG 消耗顺序与 core.dart 一致
-String _randAlphaChar(Xorshift32 random) {
-  final letterType = random.nextInt() % 2;
-  final asciiCode = letterType == 0
-      ? 65 + (random.nextInt() % 26) // A-Z
-      : 97 + (random.nextInt() % 26); // a-z
-  return String.fromCharCode(asciiCode);
+class _InsertRandUpperFn extends BuiltinFn {
+  @override
+  String get name => 'insertRandUpper';
+  @override
+  Map<String, ParamSpec> get params => {
+        'string': ParamSpec(DslType.str, true),
+        'amount': ParamSpec(DslType.int, false, DslInt(1)),
+        'seed': ParamSpec(DslType.int, false, DslInt(0)),
+      };
+  @override
+  DslValue _sync(Map<String, DslValue> provided) {
+    final s = (provided['string']! as DslString).value;
+    int amount = 1;
+    final a = provided['amount'];
+    if (a != null) {
+      BuiltinFn._ensureType(a, DslType.int, 'amount');
+      amount = (a as DslInt).value;
+    }
+    int seed = 0;
+    final sd = provided['seed'];
+    if (sd != null) {
+      BuiltinFn._ensureType(sd, DslType.int, 'seed');
+      seed = (sd as DslInt).value;
+    }
+    if (amount <= 0) return DslString(s);
+    final baseSeed = s.isEmpty ? 0 : _sha256AsciiSum(s);
+    final random = Xorshift32(baseSeed + seed);
+    var result = s;
+    for (int i = 0; i < amount; i++) {
+      if (result.isEmpty) {
+        // 与 core.dart 一致：空串时先取随机字符
+        result = _randUpperChar(random);
+      } else {
+        // 与 core.dart 一致：先取插入位置，再取随机字符
+        final insertIndex = random.nextIntRange(0, result.length + 1);
+        final ch = _randUpperChar(random);
+        result = result.substring(0, insertIndex) + ch + result.substring(insertIndex);
+      }
+    }
+    return DslString(result);
+  }
+}
+
+/// 生成一个随机小写字母（a-z），RNG 消耗顺序与 core.dart 一致
+String _randLowerChar(Xorshift32 random) {
+  return String.fromCharCode(97 + (random.nextInt() % 26)); // a-z
+}
+
+/// 生成一个随机大写字母（A-Z），RNG 消耗顺序与 core.dart 一致
+String _randUpperChar(Xorshift32 random) {
+  return String.fromCharCode(65 + (random.nextInt() % 26)); // A-Z
 }
 
 /// 全部内建函数的查找表（if 不在此处，是解释器特设语法）
@@ -621,6 +737,8 @@ final Map<String, BuiltinFn> builtins = Map.fromEntries([
   _LenFn(),
   _ToBase64Fn(),
   _ToSha256Fn(),
+  _ToLowerFn(),
+  _ToUpperFn(),
   _ToPbkdf2Fn(),
   _ToArgon2idFn(),
   _ReverseFn(),
@@ -634,8 +752,13 @@ final Map<String, BuiltinFn> builtins = Map.fromEntries([
   _RemoveSpCharFn(),
   _RemoveAlphaFn(),
   _RemoveDigitFn(),
+  _HasDigitFn(),
+  _HasSpFn(),
+  _HasLowerFn(),
+  _HasUpperFn(),
   _ShuffleFn(),
   _InsertRandDigitFn(),
   _InsertRandSpFn(),
-  _InsertRandAlphaFn(),
+  _InsertRandLowerFn(),
+  _InsertRandUpperFn(),
 ].map((f) => MapEntry(f.name, f)));

@@ -63,34 +63,47 @@
 
 ### 长度与编码
 
-| 函数 | 说明 | 参数（默认值） |
-|:----|:----|:----------|
-| `len` | 返回字符串长度 | `string` |
-| `toBase64` | Base64 编码 | `string` |
-| `toSHA256` | SHA256 哈希 | `string` |
-| `toPBKDF2` | PBKDF2 密钥派生（HMAC-SHA256） | `string`, `salt`（必填）, `iterations`（`100000`） |
-| `toArgon2id` | Argon2id 密钥派生 | `string`, `salt`（必填）, `parallelism`（`1`）, `memory`（`19000`）, `iterations`（`2`）, `hashLength`（`32`） |
+| 函数         | 说明                           | 参数（默认值）                                                                                                 |
+|:-------------|:-------------------------------|:---------------------------------------------------------------------------------------------------------------|
+| `len`        | 返回字符串长度                 | `string`                                                                                                       |
+| `toBase64`   | Base64 编码                    | `string`                                                                                                       |
+| `toSHA256`   | SHA256 哈希                    | `string`                                                                                                       |
+| `toPBKDF2`   | PBKDF2 密钥派生（HMAC-SHA256） | `string`, `salt`（必填）, `iterations`（`100000`）                                                             |
+| `toArgon2id` | Argon2id 密钥派生              | `string`, `salt`（必填）, `parallelism`（`1`）, `memory`（`19000`）, `iterations`（`2`）, `hashLength`（`32`） |
 
 ### 字符过滤与清理
 
-| 函数 | 说明 | 参数（默认值） |
-|:----|:----|:----------|
-| `removeSpChar` | 移除所有特殊字符 | `string` |
-| `removeAlpha` | 移除所有字母 | `string` |
-| `removeDigit` | 移除所有数字 | `string` |
-| `deduplicate` | 去除重复字符，仅保留首次出现的字符 | `string` |
+| 函数           | 说明                               | 参数（默认值） |
+|:---------------|:-----------------------------------|:---------------|
+| `removeSpChar` | 移除所有特殊字符                   | `string`       |
+| `removeAlpha`  | 移除所有字母                       | `string`       |
+| `removeDigit`  | 移除所有数字                       | `string`       |
+| `deduplicate`  | 去除重复字符，仅保留首次出现的字符 | `string`       |
+
+### 字符检测
+
+返回 `bool`，常用于 `if(cond: …, onTrue: …, onFalse: …)` 校验生成的密码是否满足特定字符要求。
+
+| 函数       | 说明                           | 参数（默认值） |
+|:-----------|:-------------------------------|:---------------|
+| `hasDigit` | 是否包含数字 (0-9)             | `string`       |
+| `hasSp`    | 是否包含特殊字符（`!@#=%^&*`） | `string`       |
+| `hasLower` | 是否包含小写字母 (a-z)         | `string`       |
+| `hasUpper` | 是否包含大写字母 (A-Z)         | `string`       |
 
 ### 字符串变换
 
-| 函数 | 说明 | 参数（默认值） |
-|:----|:----|:----------|
-| `reverse` | 完全反转字符串 | `string` |
-| `rotate` | 旋转字符（左移或右移） | `string`, `rotations`（`1`）, `direction`（`"left"`/`"right"`） |
-| `extract` | 从索引 0 开始按步长抽取字符 | `string`, `stepSize`（`1`） |
-| `crop` | 按索引区间截取子串 | `string`, `startIndex`（`0`）, `endIndex`（`len(string)`） |
-| `pad` | 填充字符至目标长度 | `string`, `paddingChar`（必填）, `length`（`0`）, `paddingDirection`（`"right"`） |
-| `insert` | 在指定索引处插入子串 | `string`, `index`（`0`）, `subString`（必填） |
-| `append` | 在末尾追加子串 | `string`, `subString`（必填） |
+| 函数      | 说明                        | 参数（默认值）                                                                    |
+|:----------|:----------------------------|:----------------------------------------------------------------------------------|
+| `toLower` | 全部转为小写                | `string`                                                                          |
+| `toUpper` | 全部转为大写                | `string`                                                                          |
+| `reverse` | 完全反转字符串              | `string`                                                                          |
+| `rotate`  | 旋转字符（左移或右移）      | `string`, `rotations`（`1`）, `direction`（`"left"`/`"right"`）                   |
+| `extract` | 从索引 0 开始按步长抽取字符 | `string`, `stepSize`（`1`）                                                       |
+| `crop`    | 按索引区间截取子串          | `string`, `startIndex`（`0`）, `endIndex`（`len(string)`）                        |
+| `pad`     | 填充字符至目标长度          | `string`, `paddingChar`（必填）, `length`（`0`）, `paddingDirection`（`"right"`） |
+| `insert`  | 在指定索引处插入子串        | `string`, `index`（`0`）, `subString`（必填）                                     |
+| `append`  | 在末尾追加子串              | `string`, `subString`（必填）                                                     |
 
 其中 `crop` 的 `endIndex` 默认取当前字符串长度，因此省略时等价于「截取前 `startIndex` 个字符」。`pad` 在源码长度已达或超过 `length`，或 `length <= 0` 时保持不变。
 
@@ -98,12 +111,13 @@
 
 *随机性以当前字符串的 SHA256 前 7 位 ASCII 码之和作为基础种子（空串时基种子为 0），并叠加 `seed`。在输入保持不变的前提下，相同脚本总是产生相同结果。*
 
-| 函数 | 说明 | 参数（默认值） |
-|:----|:----|:----------|
-| `insertRandDigit` | 随机插入数字 (0-9) | `string`, `amount`（`1`）, `seed`（`0`） |
-| `insertRandAlpha` | 随机插入字母 (A-Z / a-z) | `string`, `amount`（`1`）, `seed`（`0`） |
-| `insertRandSp` | 随机插入特殊字符 | `string`, `amount`（`1`）, `seed`（`0`） |
-| `shuffle` | 随机打乱字符顺序 | `string`, `seed`（`0`） |
+| 函数              | 说明                   | 参数（默认值）                           |
+|:------------------|:-----------------------|:-----------------------------------------|
+| `insertRandDigit` | 随机插入数字 (0-9)     | `string`, `amount`（`1`）, `seed`（`0`） |
+| `insertRandLower` | 随机插入小写字母 (a-z) | `string`, `amount`（`1`）, `seed`（`0`） |
+| `insertRandUpper` | 随机插入大写字母 (A-Z) | `string`, `amount`（`1`）, `seed`（`0`） |
+| `insertRandSp`    | 随机插入特殊字符       | `string`, `amount`（`1`）, `seed`（`0`） |
+| `shuffle`         | 随机打乱字符顺序       | `string`, `seed`（`0`）                  |
 
 ## 变量传递
 
@@ -146,10 +160,11 @@ Generate {
     );
     str password = toBase64(string: seedString);
     password = toPBKDF2(string: password, salt: master, iterations: iter);
-    password = crop(string: password, endIndex: length - 6);
+    password = crop(string: password, endIndex: length - 8);
     password = insertRandDigit(string: password, amount: 2);
     password = insertRandSp(string: password, amount: 2);
-    password = insertRandAlpha(string: password, amount: 2);
+    password = insertRandLower(string: password, amount: 2);
+    password = insertRandUpper(string: password, amount: 2);
     return password;
 }
 ```
@@ -158,7 +173,7 @@ Generate {
 
 1. **`toBase64`**：将可能包含 Unicode 的原始输入转换为标准 Base64 字符串，使后续处理只接触 ASCII 字符。
 2. **`toPBKDF2`**：用 主密码 作为 salt，对上一步结果做密钥派生（迭代次数 `iter`）。
-3. **`crop`**：截取前 `length - 6` 个字符。
-4. **`insertRand*`**：再随机补入 2 位数字、2 位特殊字符、2 位字母，得到最终密码。
+3. **`crop`**：截取前 `length - 8` 个字符。
+4. **`insertRand*`**：再随机补入 2 位数字、2 位特殊字符、2 位小写字母、2 位大写字母，得到最终密码。
 
 更完整的脚本与组合方式可参考应用内置的预设。

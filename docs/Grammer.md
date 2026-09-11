@@ -112,6 +112,26 @@ toSHA256(
 )
 ```
 
+#### toLower
+
+`toLower`是一个用于将字符串中的大写字母转换为小写字母的函数，返回类型为`str`。
+
+```
+toLower(
+    str string # 输入的字符串
+)
+```
+
+#### toUpper
+
+`toUpper`是一个用于将字符串中的小写字母转换为大写字母的函数，返回类型为`str`。
+
+```
+toUpper(
+    str string # 输入的字符串
+)
+```
+
 #### toPBKDF2
 
 `toPBKDF2`是一个用于将字符串使用`PBKDF2`进行密钥派生的函数，返回类型为`str`。
@@ -271,6 +291,47 @@ removeDigit(
 )
 ```
 
+#### hasDigit
+
+`hasDigit`是一个用于判断字符串中是否包含数字的函数，返回类型为`bool`。
+
+```
+hasDigit(
+    str string # 输入的字符串
+)
+```
+
+#### hasSp
+
+`hasSp`是一个用于判断字符串中是否包含特殊字符的函数，返回类型为`bool`。\
+特殊字符指`["!", "@", "#", "=", "%", "^", "&", "*"]`。
+
+```
+hasSp(
+    str string # 输入的字符串
+)
+```
+
+#### hasLower
+
+`hasLower`是一个用于判断字符串中是否包含小写字母的函数，返回类型为`bool`。
+
+```
+hasLower(
+    str string # 输入的字符串
+)
+```
+
+#### hasUpper
+
+`hasUpper`是一个用于判断字符串中是否包含大写字母的函数，返回类型为`bool`。
+
+```
+hasUpper(
+    str string # 输入的字符串
+)
+```
+
 #### insertRandDigit
 
 `insertRandDigit`是一个用于在字符串中随机位置插入数字的函数，返回类型为`str`。\
@@ -297,12 +358,24 @@ insertRandSp(
 )
 ```
 
-#### insertRandAlpha
+#### insertRandLower
 
-`insertRandAlpha`是一个用于在字符串中随机位置插入字母（A-Z / a-z）的函数，返回类型为`str`。
+`insertRandLower`是一个用于在字符串中随机位置插入小写字母（a-z）的函数，返回类型为`str`。
 
 ```
-insertRandAlpha(
+insertRandLower(
+    str string, # 输入的字符串
+    int amount = 1, # 插入数量
+    int seed = 0 # 随机种子
+)
+```
+
+#### insertRandUpper
+
+`insertRandUpper`是一个用于在字符串中随机位置插入大写字母（A-Z）的函数，返回类型为`str`。
+
+```
+insertRandUpper(
     str string, # 输入的字符串
     int amount = 1, # 插入数量
     int seed = 0 # 随机种子
