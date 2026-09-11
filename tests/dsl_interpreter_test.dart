@@ -50,16 +50,16 @@ Generate { return "x"; }
       expect(r.error!.kind, DslErrorKind.syntax);
     });
 
-    test('缺少 return', () async {
+    test('缺少 return -> runtime 错误', () async {
       final r = await runp('pass;');
       expect(r.ok, isFalse);
-      expect(r.error!.kind, DslErrorKind.syntax);
+      expect(r.error!.kind, DslErrorKind.runtime);
     });
 
-    test('多余 return', () async {
+    test('多余 return：首个 return 生效', () async {
       final r = await runp('return "a"; return "b";');
-      expect(r.ok, isFalse);
-      expect(r.error!.kind, DslErrorKind.syntax);
+      expect(r.ok, isTrue);
+      expect(r.value, 'a');
     });
 
     test('语句缺少分号', () async {
@@ -211,6 +211,42 @@ Generate { return "x"; }
       expect(r.ok, isTrue);
       expect(r.value, 'ok');
     });
+
+    test('if 分支直接 return 终止 Generate（onTrue 命中）', () async {
+      final r = await runp('if(cond: true, onTrue: return "yes", onFalse: return "no");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'yes');
+    });
+
+    test('if 分支直接 return 终止 Generate（onFalse 命中）', () async {
+      final r = await runp('if(cond: false, onTrue: return "yes", onFalse: return "no");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'no');
+    });
+
+    test('if 分支 return 与 raise 懒求值', () async {
+      final r = await runp('if(cond: true, onTrue: return "ok", onFalse: raise("boom"));');
+      expect(r.ok, isTrue);
+      expect(r.value, 'ok');
+    });
+
+    test('return if(...) 内嵌分支 return', () async {
+      final r = await runp('return if(cond: true, onTrue: return "a", onFalse: return "b");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'a');
+    });
+
+    test('if 分支 return 后语句不执行', () async {
+      final r = await runp('if(cond: true, onTrue: return "a", onFalse: pass); raise("boom");');
+      expect(r.ok, isTrue);
+      expect(r.value, 'a');
+    });
+
+    test('普通函数参数传 return -> typeError', () async {
+      final r = await runp('return toBase64(string: return "x");');
+      expect(r.ok, isFalse);
+      expect(r.error!.kind, DslErrorKind.typeError);
+    });
   });
 
   group('return 截断', () {
@@ -325,19 +361,29 @@ Generate { return "x"; }
       expect(inserted.length, 2);
     });
 
-    test('insertRandAlpha 只插入字母', () async {
-      final a = await runp('return insertRandAlpha(string: "abc", amount: 2, seed: 42);');
-      final b = await runp('return insertRandAlpha(string: "abc", amount: 2, seed: 42);');
+    test('insertRandLower 只插入小写字母', () async {
+      final a = await runp('return insertRandLower(string: "abc", amount: 2, seed: 42);');
+      final b = await runp('return insertRandLower(string: "abc", amount: 2, seed: 42);');
       expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
       expect(a.value, b.value);
       expect(a.value!.length, 5); // 2 个字母插入后长度 5
-      expect(a.value!.replaceAll(RegExp(r'[^a-zA-Z]'), '').length, 5); // 全部为字母
+      expect(a.value!.replaceAll(RegExp(r'[^a-z]'), '').length, 5); // 全部为小写字母
+    });
+
+    test('insertRandUpper 只插入大写字母', () async {
+      final a = await runp('return insertRandUpper(string: "ABC", amount: 2, seed: 42);');
+      final b = await runp('return insertRandUpper(string: "ABC", amount: 2, seed: 42);');
+      expect(a.ok, isTrue, reason: 'detail: ${a.error?.toString()}');
+      expect(a.value, b.value);
+      expect(a.value!.length, 5); // 2 个字母插入后长度 5
+      expect(a.value!.replaceAll(RegExp(r'[^A-Z]'), '').length, 5); // 全部为大写字母
     });
 
     test('insertRand* amount=0 返回原串', () async {
       expect((await runp('return insertRandDigit(string: "abc", amount: 0);')).value, 'abc');
       expect((await runp('return insertRandSp(string: "abc", amount: 0);')).value, 'abc');
-      expect((await runp('return insertRandAlpha(string: "abc", amount: 0);')).value, 'abc');
+      expect((await runp('return insertRandLower(string: "abc", amount: 0);')).value, 'abc');
+      expect((await runp('return insertRandUpper(string: "abc", amount: 0);')).value, 'abc');
     });
 
     test('insertRand* 空串时生成单个对应字符', () async {
@@ -345,8 +391,10 @@ Generate { return "x"; }
       expect(d.value, matches(RegExp(r'[0-9]')));
       final s = await runp('return insertRandSp(string: "", amount: 1);');
       expect(s.value, matches(RegExp(r'[!@#=%^&*]')));
-      final a = await runp('return insertRandAlpha(string: "", amount: 1);');
-      expect(a.value, matches(RegExp(r'[a-zA-Z]')));
+      final lo = await runp('return insertRandLower(string: "", amount: 1);');
+      expect(lo.value, matches(RegExp(r'[a-z]')));
+      final up = await runp('return insertRandUpper(string: "", amount: 1);');
+      expect(up.value, matches(RegExp(r'[A-Z]')));
     });
 
     test('insertRand* 不同 seed 输出不同', () async {

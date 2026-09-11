@@ -146,7 +146,7 @@ class DslError implements Exception {
 | 类别 | 触发场景 |
 | --- | --- |
 | `lexical` | 非法字符、未闭合字符串、非法转义 |
-| `syntax` | 缺少 master / 缺少或多余 `return` / 缺失分号 / 关键字参数非法等 |
+| `syntax` | 缺少 master / 缺失分号 / 关键字参数非法等 |
 | `typeError` | 赋值跨类型、运算符类型不符、参数类型不符、if 的 cond 非布尔、pass/raise 误用等 |
 | `missingInput` | 某输入变量缺少值且未声明默认值 |
 | `userRaise` | DSL 执行到 `raise("...")` 主动抛出的错误 |
@@ -218,7 +218,8 @@ flutter test tests/dsl_interpreter_test.dart
 ## 9. 注意事项
 
 - **`return` 只能返回字符串**，其它类型会报 `typeError`。
-- **必须有且只能有一个 `return`**，否则语法报错；`return` 之后的语句会被忽略。
+- **可以有任意多个 `return`**，运行时首个被执行到的生效；`return` 之后的语句会被忽略；若执行完整个 Generate 都没有执行到 `return`，则运行时报错"未产生输出"。
+- **`if` 分支内可直接 `return`**（如 `onTrue: return "x"`），命中该分支时立即结束 Generate 并以其值作为输出；`return` 也可嵌套在 `return if(...)` 表达式中。
 - **函数调用仅支持关键字参数**（如 `toBase64(string: ...)`），不接受位置参数。
 - `master`、`seedString` 由程序在 `inputValues` 中提供，解释器不会把它们视为"待用户输入"。
 - `raise()` 通过 `result.error.kind == DslErrorKind.userRaise` 以及

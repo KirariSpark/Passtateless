@@ -13,6 +13,8 @@
 #### 其他
 
 `return`返回值，所有位于它后面的语句都将被忽略，只能返回字符串。\
+Generate 中可以有任意多个 `return`，运行时首个被执行到的生效；若执行完整个 Generate 都没有执行到 `return`，则运行时报错"未产生输出"。\
+`return` 也可作为 `if` 分支使用（如 `onTrue: return "x"`），命中该分支时立即结束 Generate 并以其值作为输出。\
 `raise(<错误信息>)`抛出错误，生成器在碰到它时将会`throw`并停止运行。\
 `pass`是一个占位符，不执行任何操作，但可以确保语法正确。
 
@@ -82,6 +84,8 @@ if(
 )
 ```
 
+`onTrue`/`onFalse` 分支可以是普通表达式、`pass`（不产生结果）、`raise("…")`（抛出错误）或 `return 表达式`（立即结束 Generate 并以该值作为输出）。
+
 #### len
 
 `len`是一个用于获取字符串长度的函数，返回类型为`int`。
@@ -108,6 +112,26 @@ toBase64(
 
 ```
 toSHA256(
+    str string # 输入的字符串
+)
+```
+
+#### toLower
+
+`toLower`是一个用于将字符串中的大写字母转换为小写字母的函数，返回类型为`str`。
+
+```
+toLower(
+    str string # 输入的字符串
+)
+```
+
+#### toUpper
+
+`toUpper`是一个用于将字符串中的小写字母转换为大写字母的函数，返回类型为`str`。
+
+```
+toUpper(
     str string # 输入的字符串
 )
 ```
@@ -271,6 +295,47 @@ removeDigit(
 )
 ```
 
+#### hasDigit
+
+`hasDigit`是一个用于判断字符串中是否包含数字的函数，返回类型为`bool`。
+
+```
+hasDigit(
+    str string # 输入的字符串
+)
+```
+
+#### hasSp
+
+`hasSp`是一个用于判断字符串中是否包含特殊字符的函数，返回类型为`bool`。\
+特殊字符指`["!", "@", "#", "=", "%", "^", "&", "*"]`。
+
+```
+hasSp(
+    str string # 输入的字符串
+)
+```
+
+#### hasLower
+
+`hasLower`是一个用于判断字符串中是否包含小写字母的函数，返回类型为`bool`。
+
+```
+hasLower(
+    str string # 输入的字符串
+)
+```
+
+#### hasUpper
+
+`hasUpper`是一个用于判断字符串中是否包含大写字母的函数，返回类型为`bool`。
+
+```
+hasUpper(
+    str string # 输入的字符串
+)
+```
+
 #### insertRandDigit
 
 `insertRandDigit`是一个用于在字符串中随机位置插入数字的函数，返回类型为`str`。\
@@ -297,12 +362,24 @@ insertRandSp(
 )
 ```
 
-#### insertRandAlpha
+#### insertRandLower
 
-`insertRandAlpha`是一个用于在字符串中随机位置插入字母（A-Z / a-z）的函数，返回类型为`str`。
+`insertRandLower`是一个用于在字符串中随机位置插入小写字母（a-z）的函数，返回类型为`str`。
 
 ```
-insertRandAlpha(
+insertRandLower(
+    str string, # 输入的字符串
+    int amount = 1, # 插入数量
+    int seed = 0 # 随机种子
+)
+```
+
+#### insertRandUpper
+
+`insertRandUpper`是一个用于在字符串中随机位置插入大写字母（A-Z）的函数，返回类型为`str`。
+
+```
+insertRandUpper(
     str string, # 输入的字符串
     int amount = 1, # 插入数量
     int seed = 0 # 随机种子
@@ -333,7 +410,7 @@ GroupInput {
 
 使用`Generate`定义处理和输出代码块，在此处可以使用输入变量进行处理，也可以使用其他函数进行处理。\
 处理代码块中可以使用赋值运算符`=`对变量进行赋值，也可以使用其他函数进行处理。\
-处理代码块中必须有且只能有一个`return`语句，用于返回最终的密码。\
+处理代码块中可以有任意多个`return`语句，运行时首个被执行到的生效，用于返回最终的密码；`return` 之后（同一路径上）的语句不会执行。若执行完整个 Generate 都没有执行到`return`，则运行时报错"未产生输出"。\
 定义在此处的变量是局部变量，只能在该代码块中使用。
 
 ```
@@ -355,6 +432,19 @@ Generate {
         iterations: iterations,
         salt: seedString
     ); # 这个语句不会执行，因为它在return之后
+}
+```
+
+`if` 分支也可以直接使用 `return` 提前结束并输出：
+
+```
+Generate {
+    if(
+        cond: len(string: seedString) < 6,
+        onTrue: return "种子太短"; # 命中即立即结束 Generate
+        onFalse: pass
+    );
+    return toBase64(string: seedString);
 }
 ```
 

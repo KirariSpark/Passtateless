@@ -16,7 +16,8 @@ Generate {
     password = crop(string: password, endIndex: length - 6);
     password = insertRandDigit(string: password, amount: 2);
     password = insertRandSp(string: password, amount: 2);
-    password = insertRandAlpha(string: password, amount: 2);
+    password = insertRandLower(string: password, amount: 1);
+    password = insertRandUpper(string: password, amount: 1);
     return password;
 }
 ''';
@@ -47,7 +48,8 @@ Generate {
     );
     password = insertRandDigit(string: password, amount: 2);
     password = insertRandSp(string: password, amount: 2);
-    password = insertRandAlpha(string: password, amount: 2);
+    password = insertRandLower(string: password, amount: 1);
+    password = insertRandUpper(string: password, amount: 1);
     return password;
 }
 ''';

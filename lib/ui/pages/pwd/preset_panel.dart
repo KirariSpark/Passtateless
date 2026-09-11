@@ -89,6 +89,7 @@ class _PresetPanelState extends State<PresetPanel> {
     if (controller.extraInputs.isNotEmpty) {
       children.add(styles.spacingSizedBox);
       for (final i in controller.extraInputs) {
+        children.add(styles.spacingSizedBox);
         children.add(
           switch (i.type) {
             DslType.bool => SwitchListTile(
@@ -98,6 +99,7 @@ class _PresetPanelState extends State<PresetPanel> {
                 controller.extraSwitchValues[i.name] = v;
                 widget.onChanged();
               },
+              shape: styles.roundedBorder,
             ),
             _ => styled.buildTextField(
               context: context,
@@ -108,7 +110,6 @@ class _PresetPanelState extends State<PresetPanel> {
             ),
           },
         );
-        children.add(styles.spacingSizedBox);
       }
     }
 

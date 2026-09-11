@@ -10,7 +10,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await appLogger.init();
   appLogger.logger.i("Starting app");
-  // 启动时加载已保存的设置，保证重启后设置生效
   final appProvider = AppProvider();
   await appProvider.readConfig();
   runApp(Passtateless(appProvider: appProvider));
